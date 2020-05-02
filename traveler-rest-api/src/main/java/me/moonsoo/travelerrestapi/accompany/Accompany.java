@@ -1,0 +1,47 @@
+package me.moonsoo.travelerrestapi.accompany;
+
+import lombok.*;
+import me.moonsoo.commonmodule.account.Account;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+
+
+//동행 구하기 게시판의 게시물을 저장하는 엔티티
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Builder
+@Entity
+public class Accompany {
+
+    @Id @GeneratedValue
+    private Integer id;
+
+    @ManyToOne(targetEntity = Account.class)
+    private Account account;//게시물 업로더
+
+    @Column(nullable = false)
+    private String title;//게시물 제목
+
+    @Column(nullable = false)
+    private String article;//본문
+
+    @Column(nullable = false)
+    private LocalDateTime startDate;//여행 시작 시간
+
+    @Column(nullable = false)
+    private LocalDateTime endDate;//여행 종료 시간
+
+    @Column(nullable = false)
+    private String location;//여행 장소명
+
+    @Column(nullable = false, columnDefinition = "decimal(13, 10)")
+    private Double latitude;//여행 장소 위도
+
+    @Column(nullable = false, columnDefinition = "decimal(13, 10)")
+    private Double longitude;//여행 장소 경도
+
+    @Column(nullable = false)
+    private LocalDateTime regDate;//게시물 등록 시간
+}
