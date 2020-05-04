@@ -1,6 +1,7 @@
-package me.moonsoo.commonmodule.account;
+package me.moonsoo.travelerrestapi.account;
 
-import me.moonsoo.commonmodule.BaseControllerTest;
+import me.moonsoo.travelerrestapi.BaseControllerTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,14 @@ class AccountServiceTest extends BaseControllerTest {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    AccountRepository accountRepository;
+
+    @BeforeEach
+    public void setUp() {
+        accountRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("사용자 추가 후 정보 가져오기")

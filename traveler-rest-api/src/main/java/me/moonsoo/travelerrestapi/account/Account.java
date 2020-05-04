@@ -1,4 +1,4 @@
-package me.moonsoo.commonmodule.account;
+package me.moonsoo.travelerrestapi.account;
 
 import lombok.*;
 
@@ -7,7 +7,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Set;
-
 
 
 @Getter @Setter
@@ -49,4 +48,5 @@ public class Account implements Serializable {
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private Set<AccountRole> roles;//권한
+
 }

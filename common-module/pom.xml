@@ -12,7 +12,6 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>common-module</name>
     <description>common module which is referenced by other traveler projects</description>
-    <packaging>jar</packaging>
     <properties>
         <java.version>11</java.version>
     </properties>
@@ -35,14 +34,4 @@
             </exclusions>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>

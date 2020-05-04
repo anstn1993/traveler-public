@@ -1,10 +1,11 @@
 package me.moonsoo.travelerrestapi.accompany;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
-import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.travelerrestapi.account.Account;
+import me.moonsoo.travelerrestapi.account.AccountSerializer;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -19,6 +20,7 @@ public class Accompany {
     private Integer id;
 
     @ManyToOne(targetEntity = Account.class)
+    @JsonSerialize(using = AccountSerializer.class)
     private Account account;//게시물 업로더
 
     @Column(nullable = false)

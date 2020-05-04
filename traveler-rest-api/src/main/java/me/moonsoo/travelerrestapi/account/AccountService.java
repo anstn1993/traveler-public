@@ -1,7 +1,6 @@
-package me.moonsoo.commonmodule.account;
+package me.moonsoo.travelerrestapi.account;
 
 import lombok.extern.slf4j.Slf4j;
-import me.moonsoo.commonmodule.oauth.OAuthAccessTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,9 +17,6 @@ public class AccountService implements UserDetailsService {
 
     @Autowired
     AccountRepository accountRepository;
-
-    @Autowired
-    OAuthAccessTokenRepository accessTokenRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;

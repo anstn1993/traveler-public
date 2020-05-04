@@ -1,12 +1,8 @@
-package me.moonsoo.commonmodule.config;
+package me.moonsoo.travelerrestapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.session.MapSessionRepository;
-import org.springframework.session.SessionRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 //HttpSession을 spring session으로 대체하는 역할을 하는 SpringSessionRepositoryFilter를 생성해준다.
 @EnableRedisHttpSession

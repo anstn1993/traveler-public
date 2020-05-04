@@ -1,4 +1,4 @@
-package me.moonsoo.commonmodule.account;
+package me.moonsoo.travelerrestapi.account;
 
 public enum AccountRole {
     ADMIN, USER

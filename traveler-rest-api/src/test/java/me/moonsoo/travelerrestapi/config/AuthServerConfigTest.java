@@ -1,14 +1,16 @@
-package me.moonsoo.traveleroauthserver.config;
+package me.moonsoo.travelerrestapi.config;
 
-import me.moonsoo.traveleroauthserver.BaseControllerTest;
-import me.moonsoo.traveleroauthserver.account.Account;
-import me.moonsoo.traveleroauthserver.account.AccountRole;
-import me.moonsoo.traveleroauthserver.account.AccountService;
-import me.moonsoo.traveleroauthserver.account.Sex;
+import lombok.extern.slf4j.Slf4j;
+import me.moonsoo.travelerrestapi.account.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Set;
 
@@ -18,11 +20,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Import({AuthServerConfig.class, SecurityConfig.class})
-class AuthServerConfigTest extends BaseControllerTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Slf4j
+@Import({AuthServerConfig.class, ResourceServerConfig.class, SecurityConfig.class})
+class AuthServerConfigTest {
 
     @Autowired
     AccountService accountService;
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Autowired
+    AccountRepository accountRepository;
+
+    @BeforeEach
+    public void setUp() {
+        accountRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("인증 토큰을 발급 받는 테스트")

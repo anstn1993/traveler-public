@@ -45,16 +45,12 @@
             <artifactId>modelmapper</artifactId>
             <version>2.3.7</version>
         </dependency>
-
-        <dependency>
-            <groupId>me.moonsoo</groupId>
-            <artifactId>common-module</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
+            <!--Asciidoctor plugin-->
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
@@ -80,9 +76,37 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+
+            <!--
+          resource 플러그인은 asciidoctor플러그인과 동일한 단계(prepare-package)에서 함께 묶이기 때문에
+          asciidoctor플러그인 선언 후 반드시 선언해줘야 한다. resource플러그인은 반드시 ascii플러그인이 실행된 뒤에 실행되어야 한다.
+          ascii플러그인으로 생성된 문서는 project.build.outputDirectory/statis/docs(jar파일에 포함된 경로)로 복사된다.
+          -->
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.build.outputDirectory}/static/docs
+                            </outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>
+                                        ${project.build.directory}/generated-docs
+                                    </directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

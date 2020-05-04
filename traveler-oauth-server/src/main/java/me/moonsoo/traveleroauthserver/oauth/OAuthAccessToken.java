@@ -1,13 +1,11 @@
-package me.moonsoo.commonmodule.oauth;
+package me.moonsoo.traveleroauthserver.oauth;
 
 import lombok.Getter;
 import org.hibernate.annotations.Type;
-import org.springframework.jdbc.core.support.SqlLobValue;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import java.sql.Blob;
 
 @Entity(name = "oauth_access_token")
 @Getter

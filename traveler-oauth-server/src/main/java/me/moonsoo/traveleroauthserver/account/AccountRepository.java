@@ -1,4 +1,4 @@
-package me.moonsoo.commonmodule.account;
+package me.moonsoo.traveleroauthserver.account;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

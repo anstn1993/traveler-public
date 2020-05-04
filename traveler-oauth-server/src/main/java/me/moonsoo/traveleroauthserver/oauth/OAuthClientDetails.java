@@ -1,4 +1,4 @@
-package me.moonsoo.commonmodule.oauth;
+package me.moonsoo.traveleroauthserver.oauth;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

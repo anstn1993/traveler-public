@@ -1,6 +1,6 @@
-package me.moonsoo.commonmodule.account;
+package me.moonsoo.traveleroauthserver.account;
 
-import me.moonsoo.commonmodule.BaseControllerTest;
+import me.moonsoo.traveleroauthserver.BaseControllerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
