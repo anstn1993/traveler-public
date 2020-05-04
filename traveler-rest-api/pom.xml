@@ -9,10 +9,10 @@
     </parent>
     <groupId>me.moonsoo</groupId>
     <artifactId>traveler-rest-api</artifactId>
+    <packaging>jar</packaging>
     <version>0.0.1-SNAPSHOT</version>
     <name>traveler-rest-api</name>
     <description>traveler rest api</description>
-    <packaging>jar</packaging>
     <properties>
         <java.version>11</java.version>
     </properties>

@@ -1,8 +1,8 @@
 package me.moonsoo.travelerrestapi.accompany;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.moonsoo.commonmodule.account.*;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
-import me.moonsoo.travelerrestapi.account.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,14 +18,17 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,19 +37,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AccompanyControllerTest extends BaseControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    AccountService accountService;
+    private AccountService accountService;
 
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
-    AccompanyRepository accompanyRepository;
+    private AccompanyRepository accompanyRepository;
+
+    private Account account;
 
     @BeforeEach
     public void setUp() {
@@ -56,11 +61,11 @@ class AccompanyControllerTest extends BaseControllerTest {
 
     @Test
     @DisplayName("동행 구하기 게시물 생성 테스트")
-    public void createAccompany() throws Exception {
+    public void createAccompanyDto() throws Exception {
         //Given
         String email = "user@email.com";
         String password = "user";
-        AccompanyDto accompanyDto = createAccompany(0);
+        AccompanyDto accompanyDto = createAccompanyDto(0);
 
         ConstrainedFields fields = new ConstrainedFields(Accompany.class);
 
@@ -95,11 +100,7 @@ class AccompanyControllerTest extends BaseControllerTest {
                                 linkWithRel("delete-accompany").description("업로드된 동행 게시물을 삭제할 수 있는 링크"),
                                 linkWithRel("profile").description("api 문서 링크")
                         ),
-                        requestHeaders(
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("요청 본문의 컨텐츠 타입"),
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
-                        ),
+                        requestHeaders,
                         requestFields(
                                 fields.withPath("title").description("동행 게시물의 제목"),
                                 fields.withPath("article").description("동행 게시물의 본문"),
@@ -109,9 +110,8 @@ class AccompanyControllerTest extends BaseControllerTest {
                                 fields.withPath("latitude").description("동행 장소의 위도"),
                                 fields.withPath("longitude").description("동행 장소의 경도")
                         ),
-                        responseHeaders(
-                                headerWithName(HttpHeaders.LOCATION).description("업로드한 게시물의 리소스 url"),
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("응답 본문의 컨텐츠 타입")
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.LOCATION).description("업로드한 게시물의 리소스 url")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("동행 게시물의 id"),
@@ -220,12 +220,119 @@ class AccompanyControllerTest extends BaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("미인증 상태에서 동행게시물 목록 요청 테스트-60개의 게시물, 한 페이지에 10개씩 가져온다고 할 때 두 번째 페이지 가져오기")
+    public void getAccompanies_Without_Auth() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        Account account = createAccount(email, password);
+        IntStream.range(0, 60).forEach(i -> {
+            createAccompany(account, i);
+        });
+
+
+        mockMvc.perform(get("/api/accompanies")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON_VALUE)
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,DESC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.accompanyList").exists())
+                .andExpect(jsonPath("_embedded.accompanyList[0]._links.self").exists())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 동행게시물 목록 요청 테스트(작성자 검색어 적용)-60개의 게시물, 한 페이지에 10개씩 가져온다고 할 때 두 번째 페이지 가져오기")
+    public void getAccompanies_With_Auth() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+        IntStream.range(0, 30).forEach(i -> {
+            createAccompany(account, i);
+        });
+
+
+        mockMvc.perform(get("/api/accompanies")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON_VALUE)
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,DESC")
+                .param("filter", "location")
+                .param("search", "some"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.accompanyList").exists())
+                .andExpect(jsonPath("_embedded.accompanyList[0]._links.self").exists())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+                .andExpect(jsonPath("_links.create-accompany").exists())
+                .andDo(document("get-accompanies",
+                        pagingLinks.and(
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("create-accompany").description("동행 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        ),
+                        requestHeaders,
+                        requestParameters(
+                                parameterWithName("page").optional().description("페이지 번호"),
+                                parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
+                                parameterWithName("sort").optional().description("정렬 기준"),
+                                parameterWithName("filter").optional().description("검색어 필터(writer-작성자, article-본문, title-제목, location-장소명)"),
+                                parameterWithName("search").optional().description("검색어")
+                        )
+                        , responseHeaders
+                        , responseFields(
+                                fieldWithPath("_embedded.accompanyList[0].id").description("동행 게시물의 id"),
+                                fieldWithPath("_embedded.accompanyList[0].account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("_embedded.accompanyList[0].title").description("동행 게시물의 제목"),
+                                fieldWithPath("_embedded.accompanyList[0].article").description("동행 게시물의 본문"),
+                                fieldWithPath("_embedded.accompanyList[0].startDate").description("동행 시작 시간"),
+                                fieldWithPath("_embedded.accompanyList[0].endDate").description("동행 종료 시간"),
+                                fieldWithPath("_embedded.accompanyList[0].location").description("동행 장소명"),
+                                fieldWithPath("_embedded.accompanyList[0].latitude").description("동행 장소의 위도"),
+                                fieldWithPath("_embedded.accompanyList[0].longitude").description("동행 장소의 경도"),
+                                fieldWithPath("_embedded.accompanyList[0].regDate").description("동행 게시물 작성 시간"),
+                                fieldWithPath("_embedded.accompanyList[0]._links.self.href").description("동행 게시물 리소스 요청 url"),
+                                fieldWithPath("_links.first.href").description("첫 번째 페이지 리소스 요청 url"),
+                                fieldWithPath("_links.prev.href").description("이전 페이지 리소스 요청 url"),
+                                fieldWithPath("_links.self.href").description("현재 페이지 리소스 요청 url"),
+                                fieldWithPath("_links.next.href").description("다음 페이지 리소스 요청 url"),
+                                fieldWithPath("_links.last.href").description("마지막 페이지 리소스 요청 url"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크"),
+                                fieldWithPath("_links.create-accompany.href").description("동행 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)"),
+                                fieldWithPath("page.size").description("한 페이지에 보여줄 동행 게시물의 수"),
+                                fieldWithPath("page.totalElements").description("모든 동행 게시물의 수"),
+                                fieldWithPath("page.totalPages").description("전체 페이지 수"),
+                                fieldWithPath("page.number").description("현재 페이지 번호")
+                        )
+                ))
+        ;
+    }
+
 
     @Test
     @DisplayName("동행 구하기 게시물 생성 실패 테스트-401(unauthorized)")
     public void createAccompanyFail_Unauthorized() throws Exception {
         //Given
-        AccompanyDto accompany = createAccompany(0);
+        AccompanyDto accompany = createAccompanyDto(0);
 
         mockMvc.perform(post("/api/accompanies")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -250,7 +357,7 @@ class AccompanyControllerTest extends BaseControllerTest {
         return accountService.saveAccount(account);
     }
 
-    private AccompanyDto createAccompany(int index) {
+    private AccompanyDto createAccompanyDto(int index) {
         return AccompanyDto.builder()
                 .title("title" + index)
                 .article("article")
@@ -262,12 +369,27 @@ class AccompanyControllerTest extends BaseControllerTest {
                 .build();
     }
 
+    private Accompany createAccompany(Account account, int index) {
+        Accompany accompany = Accompany.builder()
+                .title("title" + index)
+                .article("article" + index)
+                .location("somewhere")
+                .latitude(30.1111)
+                .longitude(120.1111)
+                .startDate(LocalDateTime.of(2020, 4, 24, 13, 00, 00))
+                .endDate(LocalDateTime.of(2020, 4, 25, 13, 00, 00))
+                .account(account)
+                .regDate(LocalDateTime.now())
+                .build();
+        return accompanyRepository.save(accompany);
+    }
+
     //인자로 들어가는 account는 save된 상태
     private String getAuthToken(String email, String password) throws Exception {
         //Given
         String clientId = "traveler";
         String clientPassword = "pass";
-        createAccount(email, password);
+        account = createAccount(email, password);
 
         String contentAsString = mockMvc.perform(post("/oauth/token").with(httpBasic(clientId, clientPassword))
                 .param("username", email)
@@ -278,6 +400,7 @@ class AccompanyControllerTest extends BaseControllerTest {
         Jackson2JsonParser parser = new Jackson2JsonParser();
         return (String) parser.parseMap(contentAsString).get("access_token");
     }
+
 
     private class ConstrainedFields {
 

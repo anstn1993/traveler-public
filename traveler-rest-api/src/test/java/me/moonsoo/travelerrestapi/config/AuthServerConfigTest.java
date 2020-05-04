@@ -1,7 +1,7 @@
 package me.moonsoo.travelerrestapi.config;
 
 import lombok.extern.slf4j.Slf4j;
-import me.moonsoo.travelerrestapi.account.*;
+import me.moonsoo.commonmodule.account.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -7,19 +7,10 @@
         <artifactId>travel</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <packaging>jar</packaging>
     <groupId>me.moonsoo</groupId>
     <artifactId>traveler-oauth-server</artifactId>
+    <packaging>jar</packaging>
     <version>0.0.1-SNAPSHOT</version>
     <name>traveler-oauth-server</name>
     <description>Authorication servoer for traveler application</description>
-
-    <dependencies>
-
-        <dependency>
-            <groupId>me.moonsoo</groupId>
-            <artifactId>common-module</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
 </project>

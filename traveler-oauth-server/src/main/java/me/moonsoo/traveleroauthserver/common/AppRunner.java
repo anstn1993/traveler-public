@@ -1,9 +1,9 @@
 package me.moonsoo.traveleroauthserver.common;
 
-import me.moonsoo.traveleroauthserver.account.Account;
-import me.moonsoo.traveleroauthserver.account.AccountRole;
-import me.moonsoo.traveleroauthserver.account.AccountService;
-import me.moonsoo.traveleroauthserver.account.Sex;
+import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.commonmodule.account.AccountRole;
+import me.moonsoo.commonmodule.account.AccountService;
+import me.moonsoo.commonmodule.account.Sex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

@@ -99,3 +99,10 @@ operation::index[snippets='response-body,http-response,links']
 `POST` 요청을 사용해서 새 동행 게시물을 만들 수 있다.
 
 operation::create-accompany[snippets='request-fields,curl-request,http-request,request-headers,http-response,response-headers,response-fields,links']
+
+[[resources-accompany-get]]
+=== 동행 게시물 목록 조회
+
+'GET' 요청을 사용해서 동행 게시물의 목록을 조회할 수 있다.
+
+operation::get-accompanies[snippets='curl-request,http-request,request-headers,request-parameters,http-response,response-headers,response-fields,links']

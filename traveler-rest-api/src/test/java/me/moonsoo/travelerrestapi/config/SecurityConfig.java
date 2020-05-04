@@ -1,6 +1,6 @@
 package me.moonsoo.travelerrestapi.config;
 
-import me.moonsoo.travelerrestapi.account.AccountService;
+import me.moonsoo.commonmodule.account.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

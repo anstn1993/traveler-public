@@ -8,7 +8,6 @@
         <option value="$PROJECT_DIR$/traveler-oauth-server/pom.xml" />
         <option value="$PROJECT_DIR$/traveler-rest-apii/pom.xml" />
         <option value="$PROJECT_DIR$/traveler-rest-api/pom.xml" />
-        <option value="$PROJECT_DIR$/common-module/pom.xml" />
       </list>
     </option>
   </component>

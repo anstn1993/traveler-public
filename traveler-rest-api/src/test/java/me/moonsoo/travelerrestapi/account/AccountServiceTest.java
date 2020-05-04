@@ -1,5 +1,6 @@
 package me.moonsoo.travelerrestapi.account;
 
+import me.moonsoo.commonmodule.account.*;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

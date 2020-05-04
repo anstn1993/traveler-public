@@ -2,8 +2,8 @@ package me.moonsoo.travelerrestapi.accompany;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
-import me.moonsoo.travelerrestapi.account.Account;
-import me.moonsoo.travelerrestapi.account.AccountSerializer;
+import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.commonmodule.account.AccountSerializer;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

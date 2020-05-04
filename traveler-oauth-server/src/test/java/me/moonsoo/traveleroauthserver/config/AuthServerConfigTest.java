@@ -1,10 +1,8 @@
 package me.moonsoo.traveleroauthserver.config;
 
+import me.moonsoo.commonmodule.account.*;
 import me.moonsoo.traveleroauthserver.BaseControllerTest;
-import me.moonsoo.traveleroauthserver.account.Account;
-import me.moonsoo.traveleroauthserver.account.AccountRole;
-import me.moonsoo.traveleroauthserver.account.AccountService;
-import me.moonsoo.traveleroauthserver.account.Sex;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +21,14 @@ class AuthServerConfigTest extends BaseControllerTest {
 
     @Autowired
     AccountService accountService;
+
+    @Autowired
+    AccountRepository accountRepository;
+
+    @BeforeEach
+    public void setUp() {
+        accountRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("인증 토큰을 발급 받는 테스트")

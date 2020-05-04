@@ -7,12 +7,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="traveler-rest-api" />
-        <module name="common-module" />
         <module name="traveler-oauth-server" />
+        <module name="traveler-rest-api" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="common-module" target="11" />
       <module name="traveler-session" target="11" />
     </bytecodeTargetLevel>
   </component>
