@@ -11,6 +11,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -95,10 +96,10 @@ class AccompanyControllerTest extends BaseControllerTest {
                 .andDo(document("create-accompany",
                         links(
                                 linkWithRel("self").description("업로드된 동행 게시물의 리소스 링크"),
-                                linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 링크"),
-                                linkWithRel("update-accompany").description("업로드된 동행 게시물을 수정할 수 있는 링크"),
-                                linkWithRel("delete-accompany").description("업로드된 동행 게시물을 삭제할 수 있는 링크"),
-                                linkWithRel("profile").description("api 문서 링크")
+                                linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 url"),
+                                linkWithRel("update-accompany").description("업로드된 동행 게시물을 수정할 수 있는 url"),
+                                linkWithRel("delete-accompany").description("업로드된 동행 게시물을 삭제할 수 있는 url"),
+                                linkWithRel("profile").description("api 문서 url")
                         ),
                         requestHeaders,
                         requestFields(
@@ -124,10 +125,10 @@ class AccompanyControllerTest extends BaseControllerTest {
                                 fieldWithPath("latitude").description("동행 장소의 위도"),
                                 fieldWithPath("longitude").description("동행 장소의 경도"),
                                 fieldWithPath("regDate").description("동행 게시물 작성 시간"),
-                                fieldWithPath("_links.self.href").description("업로드된 동행 게시물의 리소스 링크"),
-                                fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 링크"),
-                                fieldWithPath("_links.update-accompany.href").description("업로드된 동행 게시물을 수정할 수 있는 링크"),
-                                fieldWithPath("_links.delete-accompany.href").description("업로드된 동행 게시물을 삭제할 수 있는 링크"),
+                                fieldWithPath("_links.self.href").description("업로드된 동행 게시물의 리소스 url"),
+                                fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 url"),
+                                fieldWithPath("_links.update-accompany.href").description("업로드된 동행 게시물을 수정할 수 있는 url"),
+                                fieldWithPath("_links.delete-accompany.href").description("업로드된 동행 게시물을 삭제할 수 있는 url"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크")
                         )
                 ))
@@ -221,6 +222,20 @@ class AccompanyControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @DisplayName("동행 구하기 게시물 생성 실패 테스트-401(unauthorized)")
+    public void createAccompanyFail_Unauthorized() throws Exception {
+        //Given
+        AccompanyDto accompany = createAccompanyDto(0);
+
+        mockMvc.perform(post("/api/accompanies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(accompany)))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     @DisplayName("미인증 상태에서 동행게시물 목록 요청 테스트-60개의 게시물, 한 페이지에 10개씩 가져온다고 할 때 두 번째 페이지 가져오기")
     public void getAccompanies_Without_Auth() throws Exception {
         //Given
@@ -266,8 +281,8 @@ class AccompanyControllerTest extends BaseControllerTest {
 
         mockMvc.perform(get("/api/accompanies")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON_VALUE)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,DESC")
@@ -327,19 +342,111 @@ class AccompanyControllerTest extends BaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("동행 게시물 하나 가져오기(미인증 상태)")
+    public void getAccompany_Without_Auth() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        account = createAccount(email, password);
+        Accompany savedAccompany = createAccompany(account, 0);
+
+        mockMvc.perform(get("/api/accompanies/{id}", savedAccompany.getId())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("title").exists())
+                .andExpect(jsonPath("article").exists())
+                .andExpect(jsonPath("startDate").exists())
+                .andExpect(jsonPath("endDate").exists())
+                .andExpect(jsonPath("location").exists())
+                .andExpect(jsonPath("latitude").exists())
+                .andExpect(jsonPath("longitude").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.get-accompanies").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+        ;
+    }
 
     @Test
-    @DisplayName("동행 구하기 게시물 생성 실패 테스트-401(unauthorized)")
-    public void createAccompanyFail_Unauthorized() throws Exception {
+    @DisplayName("동행 게시물 하나 가져오기(인증 상태에서 자신의 게시물을 조회하는 경우)")
+    public void getAccompany_With_Auth() throws Exception {
         //Given
-        AccompanyDto accompany = createAccompanyDto(0);
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+        Accompany savedAccompany = createAccompany(account, 0);
 
-        mockMvc.perform(post("/api/accompanies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaTypes.HAL_JSON)
-                .content(objectMapper.writeValueAsString(accompany)))
+        //pathParameters를 사용하여 문서화흘 하기 위해서 RestDocumentationRequestBuilders.get을 사용
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{id}", savedAccompany.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("title").exists())
+                .andExpect(jsonPath("article").exists())
+                .andExpect(jsonPath("startDate").exists())
+                .andExpect(jsonPath("endDate").exists())
+                .andExpect(jsonPath("location").exists())
+                .andExpect(jsonPath("latitude").exists())
+                .andExpect(jsonPath("longitude").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.get-accompanies").exists())
+                .andExpect(jsonPath("_links.update-accompany").exists())
+                .andExpect(jsonPath("_links.delete-accompany").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+        .andDo(document("get-accompany",
+                links(
+                        linkWithRel("self").description("조회한 동행 게시물의 리소스 url"),
+                        linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 url"),
+                        linkWithRel("update-accompany").description("동행 게시물을 수정할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                        linkWithRel("delete-accompany").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                        linkWithRel("profile").description("api 문서 url")
+                ),
+                requestHeaders,
+                pathParameters(
+                        parameterWithName("id").description("동행 게시물의 id")
+                ),
+                responseHeaders,
+                responseFields(
+                        fieldWithPath("id").description("동행 게시물의 id"),
+                        fieldWithPath("account.id").description("게시물 작성자의 id"),
+                        fieldWithPath("title").description("동행 게시물의 제목"),
+                        fieldWithPath("article").description("동행 게시물의 본문"),
+                        fieldWithPath("startDate").description("동행 시작 시간"),
+                        fieldWithPath("endDate").description("동행 종료 시간"),
+                        fieldWithPath("location").description("동행 장소명"),
+                        fieldWithPath("latitude").description("동행 장소의 위도"),
+                        fieldWithPath("longitude").description("동행 장소의 경도"),
+                        fieldWithPath("regDate").description("동행 게시물 작성 시간"),
+                        fieldWithPath("_links.self.href").description("조회한 동행 게시물의 리소스 url"),
+                        fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 url"),
+                        fieldWithPath("_links.update-accompany.href").description("동행 게시물을 수정할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                        fieldWithPath("_links.delete-accompany.href").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                        fieldWithPath("_links.profile.href").description("api 문서 url")
+                )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 하나 가져오기 실패-404 not found")
+    public void getAccompany() throws Exception {
+
+        mockMvc.perform(get("/api/accompanies/404")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
     }
 
 

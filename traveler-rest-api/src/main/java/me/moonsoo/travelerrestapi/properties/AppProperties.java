@@ -19,4 +19,10 @@ public class AppProperties {
     @NotEmpty
     private String profileUri;
 
+    private String createAccompanyAnchor;
+
+    private String getAccompaniesAnchor;
+
+    private String getAccompanyAnchor;
+
 }

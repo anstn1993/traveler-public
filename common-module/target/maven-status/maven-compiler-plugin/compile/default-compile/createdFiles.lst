@@ -7,4 +7,5 @@ me\moonsoo\commonmodule\config\CommonBeanConfig.class
 me\moonsoo\commonmodule\Application.class
 me\moonsoo\commonmodule\account\AccountService.class
 me\moonsoo\commonmodule\account\Sex.class
+me\moonsoo\commonmodule\account\CurrentAccount.class
 me\moonsoo\commonmodule\account\AccountRole.class
