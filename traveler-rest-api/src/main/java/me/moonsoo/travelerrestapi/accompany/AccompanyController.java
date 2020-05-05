@@ -3,6 +3,7 @@ package me.moonsoo.travelerrestapi.accompany;
 import lombok.extern.slf4j.Slf4j;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountAdapter;
+import me.moonsoo.commonmodule.account.AccountRepository;
 import me.moonsoo.commonmodule.account.CurrentAccount;
 import me.moonsoo.travelerrestapi.errors.ErrorsModel;
 import me.moonsoo.travelerrestapi.properties.AppProperties;
@@ -11,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
@@ -49,6 +52,7 @@ public class AccompanyController {
     @Autowired
     AppProperties appProperties;
 
+    //게시물 생성 핸들러
     @PostMapping
     public ResponseEntity createAccompany(@RequestBody @Valid AccompanyDto accompanyDto,
                                           Errors errors,
@@ -79,6 +83,7 @@ public class AccompanyController {
         return ResponseEntity.created(uri).body(accompanyModel);
     }
 
+    //게시물 목록 조회 핸들러
     @GetMapping
     public ResponseEntity getAccompanies(Pageable pageable,
                                          PagedResourcesAssembler<Accompany> assembler,
@@ -124,10 +129,12 @@ public class AccompanyController {
         return ResponseEntity.ok(accompanyModels);
     }
 
+    //게시물 조회 핸들러
     @GetMapping("/{id}")
     public ResponseEntity getAccompany(@PathVariable Integer id, @CurrentAccount Account account) {
         Optional<Accompany> accompanyOtp = accompanyRepository.findById(id);
-        if (accompanyOtp.isEmpty()) {//요청한 id에 해당하는 게시물이 없는 경우
+        //요청한 리소스가 존재하지 않는 경우
+        if (accompanyOtp.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Accompany accompany = accompanyOtp.get();
@@ -142,5 +149,63 @@ public class AccompanyController {
         }
         accompanyModel.add(profileLink, getAccompaniesLink);
         return ResponseEntity.ok(accompanyModel);
+    }
+
+    //게시물 수정 핸들러
+    @PutMapping("/{id}")
+    public ResponseEntity updateAccompany(@PathVariable Integer id,
+                                          @RequestBody @Valid AccompanyDto accompanyDto,
+                                          Errors errors,
+                                          @CurrentAccount Account account) {
+        Optional<Accompany> accompanyOtp = accompanyRepository.findById(id);
+        //요청한 리소스가 존재하지 않는 경우
+        if(accompanyOtp.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Accompany accompany = accompanyOtp.get();
+        //다른 사용자의 게시물을 수정하려고 하는 경우
+        if(!accompany.getAccount().equals(account)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        //요청 본문의 값들이 유효하지 않은 경우
+        if(errors.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        //요청 본문의 값들이 비즈니스 로직에 부합하지 않는 경우
+        accompanyValidator.validate(accompanyDto, errors);
+        if(errors.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        modelMapper.map(accompanyDto, accompany);//기존 리소스 객체에 요청 본문으로 넘어온 데이터를 write
+
+        Accompany updatedAccompany = accompanyRepository.save(accompany);
+        AccompanyModel accompanyModel = new AccompanyModel(updatedAccompany);
+        Link getEventsLink = linkTo(AccompanyController.class).withRel("get-accompanies");//게시물 조회 링크
+        Link deleteEventLink = linkTo(AccompanyController.class).slash(updatedAccompany.getId()).withRel("delete-accompany");//게시물 삭제 링크
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getUpdateAccompanyAnchor()).withRel("profile");
+        accompanyModel.add(getEventsLink, deleteEventLink, profileLink);
+        return ResponseEntity.ok(accompanyModel);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteAccompany(@PathVariable Integer id, @CurrentAccount Account account) {
+        Optional<Accompany> accompantOpt = accompanyRepository.findById(id);
+        //요청한 리소스가 존재하지 않는 경우
+        if(accompantOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Accompany accompany = accompantOpt.get();
+        //요청한 리소스가 사용자의 리소스가 아닌 경우
+        if(!accompany.getAccount().equals(account)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        accompanyRepository.delete(accompany);//리소스 삭제
+        return ResponseEntity.noContent().build();
     }
 }

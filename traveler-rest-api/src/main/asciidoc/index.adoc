@@ -113,3 +113,16 @@ operation::get-accompanies[snippets='curl-request,http-request,request-headers,r
 'GET' 요청을 사용해서 동행 게시물을 조회할 수 있다.
 
 operation::get-accompany[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-accompany-update]]
+=== 동행 게시물 수정
+
+'PUT' 요청을 사용해서 자신의 동행 게시물을 수정할 수 있다.
+
+operation::update-accompany[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+=== 동행 게시물 삭제
+
+'DELETE' 요청을 사용해서 자신의 동행 게시물을 삭제할 수 있다.
+
+operation::delete-accompany[snippets='curl-request,http-request,request-headers,path-parameters,http-response']

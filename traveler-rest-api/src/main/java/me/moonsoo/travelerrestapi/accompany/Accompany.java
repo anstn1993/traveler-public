@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 //동행 구하기 게시판의 게시물을 저장하는 엔티티
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-@Builder
+@Builder @EqualsAndHashCode(of = "id")
 @Entity
 public class Accompany {
 

@@ -29,8 +29,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -112,7 +111,8 @@ class AccompanyControllerTest extends BaseControllerTest {
                                 fields.withPath("longitude").description("동행 장소의 경도")
                         ),
                         responseHeaders.and(
-                                headerWithName(HttpHeaders.LOCATION).description("업로드한 게시물의 리소스 url")
+                                headerWithName(HttpHeaders.LOCATION).description("업로드한 게시물의 리소스 url"),
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("동행 게시물의 id"),
@@ -313,7 +313,9 @@ class AccompanyControllerTest extends BaseControllerTest {
                                 parameterWithName("filter").optional().description("검색어 필터(writer-작성자, article-본문, title-제목, location-장소명)"),
                                 parameterWithName("search").optional().description("검색어")
                         )
-                        , responseHeaders
+                        , responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        )
                         , responseFields(
                                 fieldWithPath("_embedded.accompanyList[0].id").description("동행 게시물의 id"),
                                 fieldWithPath("_embedded.accompanyList[0].account.id").description("게시물 작성자의 id"),
@@ -403,44 +405,45 @@ class AccompanyControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("_links.update-accompany").exists())
                 .andExpect(jsonPath("_links.delete-accompany").exists())
                 .andExpect(jsonPath("_links.profile").exists())
-        .andDo(document("get-accompany",
-                links(
-                        linkWithRel("self").description("조회한 동행 게시물의 리소스 url"),
-                        linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 url"),
-                        linkWithRel("update-accompany").description("동행 게시물을 수정할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
-                        linkWithRel("delete-accompany").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
-                        linkWithRel("profile").description("api 문서 url")
-                ),
-                requestHeaders,
-                pathParameters(
-                        parameterWithName("id").description("동행 게시물의 id")
-                ),
-                responseHeaders,
-                responseFields(
-                        fieldWithPath("id").description("동행 게시물의 id"),
-                        fieldWithPath("account.id").description("게시물 작성자의 id"),
-                        fieldWithPath("title").description("동행 게시물의 제목"),
-                        fieldWithPath("article").description("동행 게시물의 본문"),
-                        fieldWithPath("startDate").description("동행 시작 시간"),
-                        fieldWithPath("endDate").description("동행 종료 시간"),
-                        fieldWithPath("location").description("동행 장소명"),
-                        fieldWithPath("latitude").description("동행 장소의 위도"),
-                        fieldWithPath("longitude").description("동행 장소의 경도"),
-                        fieldWithPath("regDate").description("동행 게시물 작성 시간"),
-                        fieldWithPath("_links.self.href").description("조회한 동행 게시물의 리소스 url"),
-                        fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 url"),
-                        fieldWithPath("_links.update-accompany.href").description("동행 게시물을 수정할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
-                        fieldWithPath("_links.delete-accompany.href").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
-                        fieldWithPath("_links.profile.href").description("api 문서 url")
-                )
+                .andDo(document("get-accompany",
+                        links(
+                                linkWithRel("self").description("조회한 동행 게시물의 리소스 url"),
+                                linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 url"),
+                                linkWithRel("update-accompany").description("동행 게시물을 수정할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                linkWithRel("delete-accompany").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                linkWithRel("profile").description("api 문서 url")
+                        ),
+                        requestHeaders,
+                        pathParameters(
+                                parameterWithName("id").description("동행 게시물의 id")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("동행 게시물의 id"),
+                                fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("title").description("동행 게시물의 제목"),
+                                fieldWithPath("article").description("동행 게시물의 본문"),
+                                fieldWithPath("startDate").description("동행 시작 시간"),
+                                fieldWithPath("endDate").description("동행 종료 시간"),
+                                fieldWithPath("location").description("동행 장소명"),
+                                fieldWithPath("latitude").description("동행 장소의 위도"),
+                                fieldWithPath("longitude").description("동행 장소의 경도"),
+                                fieldWithPath("regDate").description("동행 게시물 작성 시간"),
+                                fieldWithPath("_links.self.href").description("조회한 동행 게시물의 리소스 url"),
+                                fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 url"),
+                                fieldWithPath("_links.update-accompany.href").description("동행 게시물을 수정할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.delete-accompany.href").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.profile.href").description("api 문서 url")
+                        )
                 ))
         ;
     }
 
     @Test
     @DisplayName("동행 게시물 하나 가져오기 실패-404 not found")
-    public void getAccompany() throws Exception {
-
+    public void getAccompany_Not_Found() throws Exception {
         mockMvc.perform(get("/api/accompanies/404")
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -449,6 +452,267 @@ class AccompanyControllerTest extends BaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("동행 게시물 수정")
+    public void updateAccompany() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+        Accompany savedAccompany = createAccompany(account, 0);
+        //수정할 데이터
+        String title = "updated title";
+        String article = "updated article";
+
+        //When
+        AccompanyDto accompanyDto = modelMapper.map(savedAccompany, AccompanyDto.class);
+        //게시물 수정
+        accompanyDto.setTitle(title);
+        accompanyDto.setArticle(article);
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{id}", savedAccompany.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(accompanyDto)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("title").value(title))
+                .andExpect(jsonPath("article").value(article))
+                .andExpect(jsonPath("startDate").exists())
+                .andExpect(jsonPath("endDate").exists())
+                .andExpect(jsonPath("location").exists())
+                .andExpect(jsonPath("latitude").exists())
+                .andExpect(jsonPath("longitude").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.get-accompanies").exists())
+                .andExpect(jsonPath("_links.delete-accompany").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("update-accompany",
+                        links(
+                                linkWithRel("self").description("조회한 동행 게시물의 리소스 url"),
+                                linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 url"),
+                                linkWithRel("delete-accompany").description("동행 게시물을 삭제할 수 있는 url"),
+                                linkWithRel("profile").description("api 문서 url")
+                        ),
+                        requestHeaders,
+                        pathParameters(
+                                parameterWithName("id").description("리소스의 id")
+                        ),
+                        requestFields(
+                                fieldWithPath("title").description("동행 게시물의 제목"),
+                                fieldWithPath("article").description("동행 게시물의 본문"),
+                                fieldWithPath("startDate").description("동행 시작 시간"),
+                                fieldWithPath("endDate").description("동행 종료 시간"),
+                                fieldWithPath("location").description("동행 장소명"),
+                                fieldWithPath("latitude").description("동행 장소의 위도"),
+                                fieldWithPath("longitude").description("동행 장소의 경도")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("동행 게시물의 id"),
+                                fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("title").description("동행 게시물의 제목"),
+                                fieldWithPath("article").description("동행 게시물의 본문"),
+                                fieldWithPath("startDate").description("동행 시작 시간"),
+                                fieldWithPath("endDate").description("동행 종료 시간"),
+                                fieldWithPath("location").description("동행 장소명"),
+                                fieldWithPath("latitude").description("동행 장소의 위도"),
+                                fieldWithPath("longitude").description("동행 장소의 경도"),
+                                fieldWithPath("regDate").description("동행 게시물 작성 시간"),
+                                fieldWithPath("_links.self.href").description("업로드된 동행 게시물의 리소스 url"),
+                                fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 url"),
+                                fieldWithPath("_links.delete-accompany.href").description("업로드된 동행 게시물을 삭제할 수 있는 url"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )))
+        ;
+
+    }
+
+    @Test
+    @DisplayName("동행 게시물 수정 실패-요청 본문을 전달하지 않은 경우(400 bad request)")
+    public void updateAccompanyFail_Empty_Value() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+        Accompany savedAccompany = createAccompany(account, 0);
+        AccompanyDto accompanyDto = AccompanyDto.builder().build();//빈 요청 본문 Dto
+
+        mockMvc.perform(put("/api/accompanies/{id}", savedAccompany.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(accompanyDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("동행 게시물 수정 실패-요청 본문의 값이 잘못된 경우(400 bad request)")
+    public void updateAccompanyFail_Wrong_Value() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+        Accompany savedAccompany = createAccompany(account, 0);
+        //유효하지 않은 데이터 조합(시작 날짜보다 종료 날짜가 빠른 경우)
+        LocalDateTime startDate = LocalDateTime.of(2020, 5, 5, 12, 12, 12);
+        LocalDateTime endDate = LocalDateTime.of(2020, 5, 4, 12, 12, 12);
+
+        //when
+        AccompanyDto accompanyDto = modelMapper.map(savedAccompany, AccompanyDto.class);
+        accompanyDto.setStartDate(startDate);
+        accompanyDto.setEndDate(endDate);
+        mockMvc.perform(put("/api/accompanies/{id}", savedAccompany.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(accompanyDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("동행 게시물 수정 실패-존재하지 않는 게시물을 수정하는 경우(404 not found)")
+    public void updateAccompany_Not_Found() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+        Accompany savedAccompany = createAccompany(account, 0);
+
+        //When
+        AccompanyDto accompanyDto = modelMapper.map(savedAccompany, AccompanyDto.class);
+        mockMvc.perform(put("/api/accompanies/404")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(accompanyDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("동행 게시물 수정 실패-다른 사용자의 게시물을 수정하려고 하는 경우(403 forbidden)")
+    public void updateAccompany_Forbidden() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+
+        Account otherAccount = Account.builder()
+                .email("otheruser@email.com")
+                .password("otheruser")
+                .name("김랑")
+                .nickname("rang")
+                .roles(Set.of(AccountRole.USER))
+                .sex(Sex.FEMALE)
+                .build();
+        accountRepository.save(otherAccount);
+
+        //수정할 데이터
+        String title = "updated title";
+        String article = "updated article";
+        Accompany savedAccompany = createAccompany(otherAccount, 0);//다른 사용자가 만든 게시물
+        AccompanyDto accompanyDto = modelMapper.map(savedAccompany, AccompanyDto.class);
+        //게시물 수정
+        accompanyDto.setTitle(title);
+        accompanyDto.setArticle(article);
+        mockMvc.perform(put("/api/accompanies/{id}", savedAccompany.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(accompanyDto)))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("게시물 삭제")
+    public void deleteAccompany() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+        Accompany savedAccompany = createAccompany(account, 0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{id}", savedAccompany.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-accompany",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                        ),
+                        pathParameters(
+                                parameterWithName("id").description("리소스 id")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("게시물 삭제 실패-인증하지 않은 경우(401 unauthorized)")
+    public void deleteAccompanyFaid_Without_Auth() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        createAccount(email, password);
+        Accompany savedAccompany = createAccompany(account, 0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{id}", savedAccompany.getId()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @DisplayName("게시물 삭제 실패-존재하지 않는 게시물(404 not found)")
+    public void deleteAccompanyFail_Not_Found() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+        Accompany savedAccompany = createAccompany(account, 0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/404")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("게시물 삭제 실패-다른 사용자의 게시물 삭제(403 forbidden)")
+    public void deleteAccompanyFail_Forbidden() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+
+        Account otherAccount = Account.builder()
+                .email("otheruser@email.com")
+                .password("otheruser")
+                .name("김랑")
+                .nickname("rang")
+                .roles(Set.of(AccountRole.USER))
+                .sex(Sex.FEMALE)
+                .build();
+        accountRepository.save(otherAccount);
+
+        Accompany savedAccompany = createAccompany(otherAccount, 0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{id}", savedAccompany.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+    }
 
     private Account createAccount(String email, String password) {
         //Given

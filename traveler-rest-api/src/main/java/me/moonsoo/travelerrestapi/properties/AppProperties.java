@@ -25,4 +25,6 @@ public class AppProperties {
 
     private String getAccompanyAnchor;
 
+    private String updateAccompanyAnchor;
+
 }
