@@ -3,6 +3,9 @@ package me.moonsoo.travelerrestapi;
 import ch.qos.logback.classic.spi.EventArgUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.commonmodule.account.AccountRepository;
+import me.moonsoo.commonmodule.account.AccountService;
 import me.moonsoo.travelerrestapi.config.AuthServerConfig;
 import me.moonsoo.travelerrestapi.config.ResourceServerConfig;
 import me.moonsoo.travelerrestapi.config.RestDocsConfig;
@@ -18,12 +21,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.headers.RequestHeadersSnippet;
 import org.springframework.restdocs.headers.ResponseHeadersSnippet;
 import org.springframework.restdocs.hypermedia.LinksSnippet;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 
 @SpringBootTest
 @AutoConfigureRestDocs
@@ -43,6 +49,14 @@ public class BaseControllerTest {
     @Autowired
     protected ModelMapper modelMapper;
 
+    @Autowired
+    protected AccountRepository accountRepository;
+
+    @Autowired
+    protected AccountService accountService;
+
+    protected Account account;
+
     //페이징 링크 조각
     protected final LinksSnippet pagingLinks = links(
             linkWithRel("first").description("첫 번째 페이지 리소스 요청 url"),
@@ -59,5 +73,18 @@ public class BaseControllerTest {
 
     protected final ResponseHeadersSnippet responseHeaders = responseHeaders(
             headerWithName(HttpHeaders.CONTENT_TYPE).description("응답 본문의 컨텐츠 타입"));
+
+    protected final ResponseFieldsSnippet responsePageFields = responseFields(
+            fieldWithPath("_links.first.href").description("첫 번째 페이지 리소스 요청 url"),
+            fieldWithPath("_links.prev.href").description("이전 페이지 리소스 요청 url"),
+            fieldWithPath("_links.self.href").description("현재 페이지 리소스 요청 url"),
+            fieldWithPath("_links.next.href").description("다음 페이지 리소스 요청 url"),
+            fieldWithPath("_links.last.href").description("마지막 페이지 리소스 요청 url"),
+            fieldWithPath("_links.profile.href").description("api 문서 링크"),
+            fieldWithPath("page.size").description("한 페이지에 보여줄 동행 게시물의 수"),
+            fieldWithPath("page.totalElements").description("모든 동행 게시물의 수"),
+            fieldWithPath("page.totalPages").description("전체 페이지 수"),
+            fieldWithPath("page.number").description("현재 페이지 번호")
+    );
 
 }

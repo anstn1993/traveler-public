@@ -27,4 +27,8 @@ public class AppProperties {
 
     private String updateAccompanyAnchor;
 
+    private String createAccompanyCommentAnchor;
+
+    private String getAccompanyCommentsAnchor;
+
 }

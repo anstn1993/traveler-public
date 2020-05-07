@@ -126,3 +126,18 @@ operation::update-accompany[snippets='request-fields,curl-request,http-request,r
 'DELETE' 요청을 사용해서 자신의 동행 게시물을 삭제할 수 있다.
 
 operation::delete-accompany[snippets='curl-request,http-request,request-headers,path-parameters,http-response']
+
+[[resources-accompany-comment]]
+== 동행 게시물의 댓글
+
+동행 게시물의 댓글 리소스는 동행 게시물에 댓글을 생성, 수정, 삭제, 조회할 때 사용한다.
+
+[[resources-accompany-create]]
+=== 동행 게시물에 댓글 생성
+
+operation::create-accompany-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-accompany-comments]]
+== 동행 게시물의 댓글 목록 조회
+
+operation::get-accompany-comments[snippets='curl-request,http-request,request-headers,path-parameters,request-parameters,http-response,response-headers,response-fields,links']

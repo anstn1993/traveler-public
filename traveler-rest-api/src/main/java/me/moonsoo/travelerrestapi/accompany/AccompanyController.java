@@ -3,7 +3,6 @@ package me.moonsoo.travelerrestapi.accompany;
 import lombok.extern.slf4j.Slf4j;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountAdapter;
-import me.moonsoo.commonmodule.account.AccountRepository;
 import me.moonsoo.commonmodule.account.CurrentAccount;
 import me.moonsoo.travelerrestapi.errors.ErrorsModel;
 import me.moonsoo.travelerrestapi.properties.AppProperties;
@@ -12,16 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -70,14 +68,18 @@ public class AccompanyController {
 
         Accompany accompany = modelMapper.map(accompanyDto, Accompany.class);
         accompany.setAccount(accountAdapter.getAccount());
+        accompany.setViewCount(0);
         accompany.setRegDate(LocalDateTime.now());//게시물 생성 시간 등록
         Accompany savedAccompany = accompanyRepository.save(accompany);
-        URI uri = linkTo(AccompanyController.class).slash(savedAccompany.getId()).toUri();//헤더에 리소스 location 추가
-        //hateoas적용을 위해서 link정보들을 추가할 수 있는 Model 객체 생성
         AccompanyModel accompanyModel = new AccompanyModel(savedAccompany);
-        Link getEventsLink = linkTo(AccompanyController.class).withRel("get-accompanies");//게시물 조회 링크
-        Link updateEventLink = linkTo(AccompanyController.class).slash(savedAccompany.getId()).withRel("update-accompany");//게시물 수정 링크
-        Link deleteEventLink = linkTo(AccompanyController.class).slash(savedAccompany.getId()).withRel("delete-accompany");//게시물 삭제 링크
+
+        //Hateoas 적용
+        WebMvcLinkBuilder linkBuilder = linkTo(AccompanyController.class);
+        URI uri = linkBuilder.slash(savedAccompany.getId()).toUri();//헤더에 리소스 location 추가
+        //hateoas적용을 위해서 link정보들을 추가할 수 있는 Model 객체 생성
+        Link getEventsLink = linkBuilder.withRel("get-accompanies");//게시물 조회 링크
+        Link updateEventLink = linkBuilder.slash(savedAccompany.getId()).withRel("update-accompany");//게시물 수정 링크
+        Link deleteEventLink = linkBuilder.slash(savedAccompany.getId()).withRel("delete-accompany");//게시물 삭제 링크
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getCreateAccompanyAnchor()).withRel("profile");//profile 링크
         accompanyModel.add(getEventsLink, updateEventLink, deleteEventLink, profileLink);//링크 추가
         return ResponseEntity.created(uri).body(accompanyModel);
@@ -138,13 +140,16 @@ public class AccompanyController {
             return ResponseEntity.notFound().build();
         }
         Accompany accompany = accompanyOtp.get();
-        AccompanyModel accompanyModel = new AccompanyModel(accompany);
+        accompany.setViewCount(accompany.getViewCount() + 1);//조회수 1증가
+        Accompany updatedAccompany = accompanyRepository.save(accompany);
+        AccompanyModel accompanyModel = new AccompanyModel(updatedAccompany);
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccompanyAnchor()).withRel("profile");
         Link getAccompaniesLink = linkTo(AccompanyController.class).withRel("get-accompanies");
         //인증 && 자신의 게시물인 경우 update, delete link 제공
-        if (account != null && accompany.getAccount().getId() == account.getId()) {
-            Link updateLink = linkTo(AccompanyController.class).slash(accompany.getId()).withRel("update-accompany");
-            Link deleteLink = linkTo(AccompanyController.class).slash(accompany.getId()).withRel("delete-accompany");
+        if (account != null && updatedAccompany.getAccount().getId() == account.getId()) {
+            WebMvcLinkBuilder linkBuilder = linkTo(AccompanyController.class).slash(updatedAccompany.getId());
+            Link updateLink = linkBuilder.withRel("update-accompany");
+            Link deleteLink = linkBuilder.withRel("delete-accompany");
             accompanyModel.add(updateLink, deleteLink);
         }
         accompanyModel.add(profileLink, getAccompaniesLink);
@@ -171,23 +176,23 @@ public class AccompanyController {
 
         //요청 본문의 값들이 유효하지 않은 경우
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
 
         //요청 본문의 값들이 비즈니스 로직에 부합하지 않는 경우
         accompanyValidator.validate(accompanyDto, errors);
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
 
         modelMapper.map(accompanyDto, accompany);//기존 리소스 객체에 요청 본문으로 넘어온 데이터를 write
 
         Accompany updatedAccompany = accompanyRepository.save(accompany);
         AccompanyModel accompanyModel = new AccompanyModel(updatedAccompany);
-        Link getEventsLink = linkTo(AccompanyController.class).withRel("get-accompanies");//게시물 조회 링크
-        Link deleteEventLink = linkTo(AccompanyController.class).slash(updatedAccompany.getId()).withRel("delete-accompany");//게시물 삭제 링크
+        Link getAccompaniesLink = linkTo(AccompanyController.class).withRel("get-accompanies");//게시물 조회 링크
+        Link deleteAccompanyLink = linkTo(AccompanyController.class).slash(updatedAccompany.getId()).withRel("delete-accompany");//게시물 삭제 링크
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getUpdateAccompanyAnchor()).withRel("profile");
-        accompanyModel.add(getEventsLink, deleteEventLink, profileLink);
+        accompanyModel.add(getAccompaniesLink, deleteAccompanyLink, profileLink);
         return ResponseEntity.ok(accompanyModel);
     }
 

@@ -46,4 +46,7 @@ public class Accompany {
 
     @Column(nullable = false)
     private LocalDateTime regDate;//게시물 등록 시간
+
+    @Column(columnDefinition = "integer default 0")
+    private Integer viewCount;//조회수
 }

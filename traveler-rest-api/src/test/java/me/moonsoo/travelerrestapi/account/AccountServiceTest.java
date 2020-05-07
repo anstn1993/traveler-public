@@ -2,6 +2,8 @@ package me.moonsoo.travelerrestapi.account;
 
 import me.moonsoo.commonmodule.account.*;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
+import org.aspectj.lang.annotation.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +29,7 @@ class AccountServiceTest extends BaseControllerTest {
     @Autowired
     AccountRepository accountRepository;
 
-    @BeforeEach
+    @AfterEach
     public void setUp() {
         accountRepository.deleteAll();
     }

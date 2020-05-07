@@ -1,6 +1,7 @@
 package me.moonsoo.travelerrestapi.errors;
 
 import me.moonsoo.travelerrestapi.index.IndexController;
+import org.codehaus.jackson.annotate.JsonUnwrapped;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.validation.Errors;
 

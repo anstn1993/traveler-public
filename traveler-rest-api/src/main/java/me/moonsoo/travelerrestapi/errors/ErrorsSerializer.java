@@ -1,5 +1,5 @@
 package me.moonsoo.travelerrestapi.errors;
-
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
