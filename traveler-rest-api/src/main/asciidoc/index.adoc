@@ -137,7 +137,22 @@ operation::delete-accompany[snippets='curl-request,http-request,request-headers,
 
 operation::create-accompany-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
-[[resources-accompany-comments]]
+[[resources-accompany-comments-get]]
 == 동행 게시물의 댓글 목록 조회
 
 operation::get-accompany-comments[snippets='curl-request,http-request,request-headers,path-parameters,request-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-accompany-comment-get]]
+== 동행 게시물의 댓글 조회
+
+operation::get-accompany-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-accompany-comment-update]]
+== 동행 게시물의 댓글 수정
+
+operation::update-accompany-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-accompany-comment-delete]]
+== 동행 게시물의 댓글 삭제
+
+operation::delete-accompany-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response']
