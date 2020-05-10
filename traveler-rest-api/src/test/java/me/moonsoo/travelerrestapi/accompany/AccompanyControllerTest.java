@@ -3,6 +3,7 @@ package me.moonsoo.travelerrestapi.accompany;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountRole;
 import me.moonsoo.commonmodule.account.Sex;
+import me.moonsoo.travelerrestapi.accompany.comment.Comment;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -633,6 +634,25 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 parameterWithName("id").description("리소스 id")
                         )
                 ))
+        ;
+    }
+
+    @Test
+    @DisplayName("댓글이 달린 게시물 삭제")
+    public void deleteAccompany_With_Comment() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password);
+        Accompany savedAccompany = createAccompany(account, 0);
+        IntStream.range(0, 50).forEach(i -> {
+            createComment(account, savedAccompany, i);//게시물에 댓글 추가
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{id}", savedAccompany.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent())
         ;
     }
 

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
@@ -91,7 +92,7 @@ public class CommentController {
     public ResponseEntity getComment(@PathVariable("accompanyId") Accompany accompany,
                                      @PathVariable("commentId") Comment comment,
                                      @CurrentAccount Account account) {
-        if (accompany == null || comment == null) {//동행 게시물 리소스가 존재하지 않는 경우
+        if (accompany == null || comment == null || !comment.getAccompany().equals(accompany)) {//존재하지 않는 게시물, 댓글 리소스이거나 해당 게시물의 댓글이 아닌 경우
             return ResponseEntity.notFound().build();
         }
 
@@ -116,7 +117,7 @@ public class CommentController {
                                         @RequestBody @Valid CommentDto commentDto,
                                         Errors errors,
                                         @CurrentAccount Account account) {
-        if(accompany == null || comment == null) {//존재하지 않는 리소스인 경우
+        if(accompany == null || comment == null || !comment.getAccompany().equals(accompany)) {//존재하지 않는 게시물, 댓글 리소스이거나 해당 게시물의 댓글이 아닌 경우
             return ResponseEntity.notFound().build();
         }
 
@@ -145,7 +146,7 @@ public class CommentController {
     public ResponseEntity deleteComment(@PathVariable("accompanyId") Accompany accompany,
                                         @PathVariable("commentId") Comment comment,
                                         @CurrentAccount Account account) {
-        if(accompany == null || comment == null) {//리소스가 존재하지 않는 경우
+        if(accompany == null || comment == null || !comment.getAccompany().equals(accompany)) {//리소스가 존재하지 않거나 요청한 게시물에 달린 댓글이 아닌 경우
             return ResponseEntity.notFound().build();
         }
 

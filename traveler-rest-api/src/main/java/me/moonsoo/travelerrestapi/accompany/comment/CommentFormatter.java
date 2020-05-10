@@ -19,6 +19,7 @@ public class CommentFormatter implements Converter<String, Comment> {
         if(commentOtp.isEmpty()) {
             return null;
         }
+
         return commentOtp.get();
     }
 }

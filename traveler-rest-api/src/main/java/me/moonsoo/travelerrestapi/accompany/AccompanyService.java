@@ -1,16 +1,23 @@
 package me.moonsoo.travelerrestapi.accompany;
 
 import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.travelerrestapi.accompany.comment.Comment;
+import me.moonsoo.travelerrestapi.accompany.comment.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class AccompanyService {
+
+    @Autowired
+    CommentRepository commentRepository;
 
     @Autowired
     AccompanyRepository accompanyRepository;
@@ -51,7 +58,13 @@ public class AccompanyService {
         }
     }
 
+    @Transactional
     public void delete(Accompany accompany) {
+        List<Comment> comments = commentRepository.findAllByAccompany(accompany);
+
+        if(comments.size() != 0) {
+            commentRepository.deleteAllByAccompany(accompany);
+        }
         accompanyRepository.delete(accompany);
     }
 

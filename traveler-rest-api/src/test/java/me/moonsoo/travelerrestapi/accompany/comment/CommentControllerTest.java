@@ -32,9 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class CommentControllerTest extends AccompanyBaseControllerTest {
 
-    @Autowired
-    CommentRepository commentRepository;
-
     @AfterEach
     public void setUp() {
         commentRepository.deleteAll();
@@ -436,6 +433,27 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
     }
 
     @Test
+    @DisplayName("동행 게시물 댓글 하나 조회 실패-게시물에 존재하지 않는 댓글(404 Not found)")
+    public void getAccompanyCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        Accompany accompany2 = createAccompany(account, 1);//댓글이 달릴 동행 게시물
+        Comment comment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
+
+        //accompany2에서 accompany1에 달린 댓글을 조회
+        mockMvc.perform(get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany2.getId(), comment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
     @DisplayName("동행 게시물 댓글 수정")
     public void updateAccompanyComment() throws Exception {
         //Given
@@ -625,6 +643,30 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 댓글 수정 실패-게시물에 존재하지 않는 댓글(404 Not found)")
+    public void updateAccompanyCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        Accompany accompany2= createAccompany(account, 1);//댓글이 달릴 동행 게시물
+        Comment comment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
+
+        CommentDto commentDto = modelMapper.map(comment, CommentDto.class);
+
+        //accompany2에서 accompany1에 달린 댓글 조회
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany2.getId(), comment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(commentDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
 
     }
 
@@ -741,16 +783,28 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("동행 게시물 댓글 삭제 실패-게시물에 존재하지 않는 댓글(404 Not found)")
+    public void deleteAccompanyCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        Accompany accompany2 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        Comment comment = createComment(account, accompany1, 0);
 
-    private Comment createComment(Account account, Accompany accompany, int index) {
-        Comment comment = Comment.builder()
-                .comment("This is comment" + index)
-                .account(account)
-                .accompany(accompany)
-                .regDate(LocalDateTime.now())
-                .build();
-        return commentRepository.save(comment);
+        //accompany2에서 accompany1에서 달린 댓글 조회
+        mockMvc.perform(delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany2.getId(), comment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
     }
+
+
 
     private CommentDto createCommentDto(int index) {
         return CommentDto.builder()
