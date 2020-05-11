@@ -7,15 +7,15 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class CommentFormatter implements Converter<String, Comment> {
+public class AccompanyCommentFormatter implements Converter<String, AccompanyComment> {
 
     @Autowired
-    CommentRepository commentRepository;
+    AccompanyCommentRepository accompanyCommentRepository;
 
     @Override
-    public Comment convert(String commentIdStr) {
+    public AccompanyComment convert(String commentIdStr) {
         Integer commentId = Integer.parseInt(commentIdStr);
-        Optional<Comment> commentOtp = commentRepository.findById(commentId);
+        Optional<AccompanyComment> commentOtp = accompanyCommentRepository.findById(commentId);
         if(commentOtp.isEmpty()) {
             return null;
         }

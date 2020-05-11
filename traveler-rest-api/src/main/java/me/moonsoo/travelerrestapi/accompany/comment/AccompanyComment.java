@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "accompany_comment")
-public class Comment {
+public class AccompanyComment {
     @Id @GeneratedValue
     private Integer id;//댓글 id
 

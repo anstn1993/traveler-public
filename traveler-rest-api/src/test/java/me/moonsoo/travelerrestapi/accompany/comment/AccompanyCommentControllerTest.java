@@ -8,7 +8,6 @@ import me.moonsoo.travelerrestapi.accompany.AccompanyBaseControllerTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,11 +29,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class CommentControllerTest extends AccompanyBaseControllerTest {
+class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
 
     @AfterEach
     public void setUp() {
-        commentRepository.deleteAll();
+        accompanyCommentRepository.deleteAll();
         accompanyRepository.deleteAll();
         accountRepository.deleteAll();
     }
@@ -48,13 +47,13 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
 
-        CommentDto commentDto = createCommentDto(0);
+        AccompanyCommentDto accompanyCommentDto = createCommentDto(0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/accompanies/{accompanyId}/comments", accompany.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .content(objectMapper.writeValueAsString(commentDto)))
+                .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
@@ -130,7 +129,7 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);
 
-        Comment comment = Comment.builder()
+        AccompanyComment accompanyComment = AccompanyComment.builder()
                 .id(100)//허용되지 않은 값
                 .account(account)//허용되지 않은 값
                 .accompany(accompany)//허용되지 않은 값
@@ -143,7 +142,7 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .content(objectMapper.writeValueAsString(comment)))
+                .content(objectMapper.writeValueAsString(accompanyComment)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
@@ -155,13 +154,13 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String email = "anstn1993@email.com";
         String password = "1111";
         String accessToken = getAuthToken(email, password);
-        CommentDto commentDto = createCommentDto(0);
+        AccompanyCommentDto accompanyCommentDto = createCommentDto(0);
 
         mockMvc.perform(post("/api/accompanies/{accompanyId}/comments", 404)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .content(objectMapper.writeValueAsString(commentDto)))
+                .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("content[0].objectName").exists())
@@ -180,13 +179,13 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         account = createAccount(email, password);
         Accompany accompany = createAccompany(account, 0);
 
-        CommentDto commentDto = createCommentDto(0);
+        AccompanyCommentDto accompanyCommentDto = createCommentDto(0);
 
 
         mockMvc.perform(post("/api/accompanies/{accompanyId}/comments", accompany.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
-                .content(objectMapper.writeValueAsString(commentDto)))
+                .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
@@ -213,12 +212,12 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
                 .param("sort", "id,ASC"))//sort cirteria: id, regDate
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.commentList[0].id").exists())
-                .andExpect(jsonPath("_embedded.commentList[0].account.id").exists())
-                .andExpect(jsonPath("_embedded.commentList[0].accompany.id").exists())
-                .andExpect(jsonPath("_embedded.commentList[0].comment").exists())
-                .andExpect(jsonPath("_embedded.commentList[0].regDate").exists())
-                .andExpect(jsonPath("_embedded.commentList[0]._links.self.href").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0].id").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0].account.id").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0].accompany.id").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0].comment").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0].regDate").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0]._links.self.href").exists())
                 .andExpect(jsonPath("page").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.first").exists())
@@ -251,12 +250,12 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
                 .param("sort", "id,ASC"))//sort cirteria: id, regDate
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.commentList[0].id").exists())
-                .andExpect(jsonPath("_embedded.commentList[0].account.id").exists())
-                .andExpect(jsonPath("_embedded.commentList[0].accompany.id").exists())
-                .andExpect(jsonPath("_embedded.commentList[0].comment").exists())
-                .andExpect(jsonPath("_embedded.commentList[0].regDate").exists())
-                .andExpect(jsonPath("_embedded.commentList[0]._links.self.href").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0].id").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0].account.id").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0].accompany.id").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0].comment").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0].regDate").exists())
+                .andExpect(jsonPath("_embedded.accompanyCommentList[0]._links.self.href").exists())
                 .andExpect(jsonPath("page").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.create-accompany-comment").exists())
@@ -283,12 +282,12 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
                                 headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
                         )
                         , responsePageFields.and(
-                                fieldWithPath("_embedded.commentList[0].id").description("댓글 id"),
-                                fieldWithPath("_embedded.commentList[0].account.id").description("댓글 작성자의 id"),
-                                fieldWithPath("_embedded.commentList[0].accompany.id").description("댓글이 달린 동행 게시물 id"),
-                                fieldWithPath("_embedded.commentList[0].comment").description("댓글"),
-                                fieldWithPath("_embedded.commentList[0].regDate").description("댓글 추가 시간"),
-                                fieldWithPath("_embedded.commentList[0]._links.self.href").description("댓글 리소스 url"),
+                                fieldWithPath("_embedded.accompanyCommentList[0].id").description("댓글 id"),
+                                fieldWithPath("_embedded.accompanyCommentList[0].account.id").description("댓글 작성자의 id"),
+                                fieldWithPath("_embedded.accompanyCommentList[0].accompany.id").description("댓글이 달린 동행 게시물 id"),
+                                fieldWithPath("_embedded.accompanyCommentList[0].comment").description("댓글"),
+                                fieldWithPath("_embedded.accompanyCommentList[0].regDate").description("댓글 추가 시간"),
+                                fieldWithPath("_embedded.accompanyCommentList[0]._links.self.href").description("댓글 리소스 url"),
                                 fieldWithPath("_links.create-accompany-comment.href").description("댓글 추가 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         )
                 ))
@@ -319,9 +318,9 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), comment.getId())
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -375,9 +374,9 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), comment.getId())
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
@@ -403,9 +402,9 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        mockMvc.perform(get("/api/accompanies/404/comments/{commentId}", comment.getId())
+        mockMvc.perform(get("/api/accompanies/404/comments/{commentId}", accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -441,10 +440,10 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2 = createAccompany(account, 1);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
+        AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
 
         //accompany2에서 accompany1에 달린 댓글을 조회
-        mockMvc.perform(get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany2.getId(), comment.getId())
+        mockMvc.perform(get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany2.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -461,15 +460,15 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        CommentDto commentDto = modelMapper.map(comment, CommentDto.class);
+        AccompanyCommentDto accompanyCommentDto = modelMapper.map(accompanyComment, AccompanyCommentDto.class);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), comment.getId())
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
-                .content(objectMapper.writeValueAsString(commentDto)))
+                .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -521,9 +520,9 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), comment.getId())
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -540,13 +539,13 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), comment.getId())
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
-                .content(objectMapper.writeValueAsString(comment)))
+                .content(objectMapper.writeValueAsString(accompanyComment)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -560,9 +559,9 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         account = createAccount(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), comment.getId())
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
@@ -587,14 +586,14 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
                 .build();
         accountRepository.save(otherAccount);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(otherAccount, accompany, 0);//다른 사용자가 작성한 댓글
-        CommentDto commentDto = modelMapper.map(comment, CommentDto.class);
+        AccompanyComment accompanyComment = createComment(otherAccount, accompany, 0);//다른 사용자가 작성한 댓글
+        AccompanyCommentDto accompanyCommentDto = modelMapper.map(accompanyComment, AccompanyCommentDto.class);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), comment.getId())
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
-                .content(objectMapper.writeValueAsString(commentDto)))
+                .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isForbidden())
         ;
@@ -608,15 +607,15 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        CommentDto commentDto = modelMapper.map(comment, CommentDto.class);
+        AccompanyCommentDto accompanyCommentDto = modelMapper.map(accompanyComment, AccompanyCommentDto.class);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/404/comments/{commentId}", comment.getId())
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/404/comments/{commentId}", accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
-                .content(objectMapper.writeValueAsString(commentDto)))
+                .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -631,15 +630,15 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        CommentDto commentDto = modelMapper.map(comment, CommentDto.class);
+        AccompanyCommentDto accompanyCommentDto = modelMapper.map(accompanyComment, AccompanyCommentDto.class);
 
         mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/404", accompany.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
-                .content(objectMapper.writeValueAsString(commentDto)))
+                .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -654,16 +653,16 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2= createAccompany(account, 1);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
+        AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
 
-        CommentDto commentDto = modelMapper.map(comment, CommentDto.class);
+        AccompanyCommentDto accompanyCommentDto = modelMapper.map(accompanyComment, AccompanyCommentDto.class);
 
         //accompany2에서 accompany1에 달린 댓글 조회
-        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany2.getId(), comment.getId())
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany2.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
-                .content(objectMapper.writeValueAsString(commentDto)))
+                .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -678,9 +677,9 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), comment.getId())
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -707,8 +706,8 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         account = createAccount(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
-        mockMvc.perform(delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), comment.getId())
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
+        mockMvc.perform(delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
@@ -733,9 +732,9 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
                 .build();
         accountRepository.save(otherAccount);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(otherAccount, accompany, 0);//다른 사용자가 만든 댓글
+        AccompanyComment accompanyComment = createComment(otherAccount, accompany, 0);//다른 사용자가 만든 댓글
 
-        mockMvc.perform(delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), comment.getId())
+        mockMvc.perform(delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -753,9 +752,9 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
-        mockMvc.perform(delete("/api/accompanies/404/comments/{commentId}", comment.getId())
+        mockMvc.perform(delete("/api/accompanies/404/comments/{commentId}", accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -772,7 +771,7 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
         mockMvc.perform(delete("/api/accompanies/{accompanyId}/comments/404", accompany.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -792,10 +791,10 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        Comment comment = createComment(account, accompany1, 0);
+        AccompanyComment accompanyComment = createComment(account, accompany1, 0);
 
         //accompany2에서 accompany1에서 달린 댓글 조회
-        mockMvc.perform(delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany2.getId(), comment.getId())
+        mockMvc.perform(delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany2.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -806,8 +805,8 @@ class CommentControllerTest extends AccompanyBaseControllerTest {
 
 
 
-    private CommentDto createCommentDto(int index) {
-        return CommentDto.builder()
+    private AccompanyCommentDto createCommentDto(int index) {
+        return AccompanyCommentDto.builder()
                 .comment("This is comment" + index)
                 .build();
     }

@@ -7,13 +7,13 @@ import org.springframework.hateoas.Link;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
-public class CommentModel extends EntityModel<Comment> {
+public class AccompanyCommentModel extends EntityModel<AccompanyComment> {
 
     @Autowired
     AppProperties appProperties;
 
-    public CommentModel(Comment comment, Link... links) {
-        super(comment, links);
-        add(linkTo(CommentController.class).slash(comment.getAccompany().getId()).slash("comments").slash(comment.getId()).withSelfRel());
+    public AccompanyCommentModel(AccompanyComment accompanyComment, Link... links) {
+        super(accompanyComment, links);
+        add(linkTo(AccompanyCommentController.class).slash(accompanyComment.getAccompany().getId()).slash("comments").slash(accompanyComment.getId()).withSelfRel());
     }
 }

@@ -15,7 +15,7 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentDto {
+public class AccompanyCommentDto {
 
     @NotBlank
     private String comment;

@@ -132,7 +132,7 @@ operation::delete-accompany[snippets='curl-request,http-request,request-headers,
 
 동행 게시물의 댓글 리소스는 동행 게시물에 댓글을 생성, 수정, 삭제, 조회할 때 사용한다.
 
-[[resources-accompany-create]]
+[[resources-accompany-comment-create]]
 === 동행 게시물에 댓글 생성
 
 operation::create-accompany-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
@@ -156,3 +156,13 @@ operation::update-accompany-comment[snippets='request-fields,curl-request,http-r
 == 동행 게시물의 댓글 삭제
 
 operation::delete-accompany-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response']
+
+[[resources-accompany-child-comment]]
+=== 동행 게시물의 대댓글
+
+동행 게시물의 대댓글 리소스는 동행 게시물에 달린 댓글에 하위 댓글을 생성, 수정, 삭제, 조회할 때 사용된다.
+
+[[resources-accompany-child-comment-create]]
+== 동행 게시물의 대댓글 생성
+
+operation::create-accompany-child-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']

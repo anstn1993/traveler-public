@@ -1,0 +1,74 @@
+package me.moonsoo.travelerrestapi.accompany.childcomment;
+
+
+import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.commonmodule.account.CurrentAccount;
+import me.moonsoo.travelerrestapi.accompany.Accompany;
+import me.moonsoo.travelerrestapi.accompany.comment.AccompanyComment;
+import me.moonsoo.travelerrestapi.errors.ErrorsModel;
+import me.moonsoo.travelerrestapi.properties.AppProperties;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+import java.net.URI;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+@RestController
+@RequestMapping("/api/accompanies")
+public class AccompanyChildCommentController {
+
+    @Autowired
+    ModelMapper modelMapper;
+
+    @Autowired
+    AccompanyChildCommentService accompanyChildCommentService;
+
+    @Autowired
+    AppProperties appProperties;
+
+    @PostMapping("/{accompanyId}/comments/{commentId}/child-comments")
+    public ResponseEntity createChildComment(@PathVariable("accompanyId") Accompany accompany,
+                                             @PathVariable("commentId") AccompanyComment comment,
+                                             @RequestBody @Valid AccompanyChildCommentDto commentDto,
+                                             Errors errors,
+                                             @CurrentAccount Account account) {
+
+        if (errors.hasErrors()) {//요청 본문이 잘못된 경우
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+        if (accompany == null || comment == null || !comment.getAccompany().equals(accompany)) {//동행 게시물, 댓글이 존재하지 않거나 댓글이 해당 동행 게시물에 달린 댓글이 아닌 경우
+            errors.reject("resource not found error", "Url resource you requested was not found.");
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+        AccompanyChildComment childComment = modelMapper.map(commentDto, AccompanyChildComment.class);
+        AccompanyChildComment savedChildComment = accompanyChildCommentService.save(childComment, comment, account);//대댓글 db에 저장
+
+        //Hateoas적용
+        AccompanyChildCommentModel childCommentModel = new AccompanyChildCommentModel(savedChildComment);
+
+        Link getAccompanyChildCommentsLink = linkTo(AccompanyChildCommentController.class)//대댓글 목록 조회 링크
+                .slash(accompany.getId())
+                .slash("comments")
+                .slash(comment.getId())
+                .slash("child-comments")
+                .withRel("get-accompany-child-comments");
+        Link selfLink = childCommentModel.getLink("self").get();
+        URI uri = selfLink.toUri();//LOCATION header uri
+        Link updateAccompanyChildCommentLink = selfLink.withRel("update-accompany-child-comment");//대댓글 수정 링크
+        Link deleteAccompanyChildCommentLink = selfLink.withRel("delete-accompany-child-comment");//대댓글 삭제 링크
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getCreateAccompanyChildCommentAnchor()).withRel("profile");//프로필 링크
+        childCommentModel.add(getAccompanyChildCommentsLink, updateAccompanyChildCommentLink, deleteAccompanyChildCommentLink, profileLink);
+        return ResponseEntity.created(uri).body(childCommentModel);
+    }
+
+}

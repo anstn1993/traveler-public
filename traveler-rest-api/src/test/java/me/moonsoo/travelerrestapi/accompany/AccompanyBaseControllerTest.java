@@ -4,8 +4,9 @@ import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountRole;
 import me.moonsoo.commonmodule.account.Sex;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
-import me.moonsoo.travelerrestapi.accompany.comment.Comment;
-import me.moonsoo.travelerrestapi.accompany.comment.CommentRepository;
+import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildCommentRepository;
+import me.moonsoo.travelerrestapi.accompany.comment.AccompanyComment;
+import me.moonsoo.travelerrestapi.accompany.comment.AccompanyCommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 
@@ -21,7 +22,10 @@ public class AccompanyBaseControllerTest extends BaseControllerTest {
     protected AccompanyRepository accompanyRepository;
 
     @Autowired
-    protected CommentRepository commentRepository;
+    protected AccompanyCommentRepository accompanyCommentRepository;
+
+    @Autowired
+    protected AccompanyChildCommentRepository accompanyChildCommentRepository;
 
 
     protected Account createAccount(String email, String password) {
@@ -83,14 +87,14 @@ public class AccompanyBaseControllerTest extends BaseControllerTest {
         return (String) parser.parseMap(contentAsString).get("access_token");
     }
 
-    protected Comment createComment(Account account, Accompany accompany, int index) {
-        Comment comment = Comment.builder()
+    protected AccompanyComment createComment(Account account, Accompany accompany, int index) {
+        AccompanyComment accompanyComment = AccompanyComment.builder()
                 .comment("This is comment" + index)
                 .account(account)
                 .accompany(accompany)
                 .regDate(LocalDateTime.now())
                 .build();
-        return commentRepository.save(comment);
+        return accompanyCommentRepository.save(accompanyComment);
     }
 
 }

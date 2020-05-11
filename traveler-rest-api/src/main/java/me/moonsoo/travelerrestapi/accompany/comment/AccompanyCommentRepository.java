@@ -11,10 +11,10 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface CommentRepository extends JpaRepository<Comment, Integer> {
-    Page<Comment> findAllByAccompany(Accompany accompany, Pageable pageable);
+public interface AccompanyCommentRepository extends JpaRepository<AccompanyComment, Integer> {
+    Page<AccompanyComment> findAllByAccompany(Accompany accompany, Pageable pageable);
 
-    List<Comment> findAllByAccompany(Accompany accompany);
+    List<AccompanyComment> findAllByAccompany(Accompany accompany);
 
     @Modifying
     @Query("delete from accompany_comment c where c.accompany = :accompany ")
