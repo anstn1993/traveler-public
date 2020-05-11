@@ -314,8 +314,8 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     }
 
     @Test
-    @DisplayName("인증 상태에서 동행 게시물 댓글 하나 조회")
-    public void getAccompanyComment_With_Auth() throws Exception {
+    @DisplayName("인증 상태에서 자신의 동행 게시물 댓글 하나 조회")
+    public void getMyAccompanyComment_With_Auth() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -340,10 +340,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(jsonPath("_links.profile").exists())
                 .andDo(document("get-accompany-comment",
                         links(
-                                linkWithRel("self").description("동행 게시물 댓글의 리소스 링크"),
+                                linkWithRel("self").description("조회한 동행 게시물 댓글의 리소스 링크"),
                                 linkWithRel("get-accompany-comments").description("동행 게시물 댓글 리스트를 조회할 수 있는 url"),
-                                linkWithRel("update-accompany-comment").description("댓글을 수정할 수 있는 url(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)"),
-                                linkWithRel("delete-accompany-comment").description("댓글을 삭제할 수 있는 url(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)"),
+                                linkWithRel("update-accompany-comment").description("조회한 댓글을 수정할 수 있는 url(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
+                                linkWithRel("delete-accompany-comment").description("조회한 댓글을 삭제할 수 있는 url(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
                                 linkWithRel("profile").description("api 문서 url")
                         ),
                         requestHeaders(
@@ -361,13 +361,51 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                                 fieldWithPath("accompany.id").description("동행 게시물의 id"),
                                 fieldWithPath("comment").description("댓글"),
                                 fieldWithPath("regDate").description("댓글 추가 시간"),
-                                fieldWithPath("_links.self.href").description("댓글 리소스 url"),
+                                fieldWithPath("_links.self.href").description("조회한 댓글 리소스 url"),
                                 fieldWithPath("_links.get-accompany-comments.href").description("댓글 목록을 조회할 수 있는 url"),
-                                fieldWithPath("_links.update-accompany-comment.href").description("댓글을 수정할 수 있는 url(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)"),
-                                fieldWithPath("_links.delete-accompany-comment.href").description("댓글을 삭제할 수 있는 url(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)"),
+                                fieldWithPath("_links.update-accompany-comment.href").description("조회한 댓글을 수정할 수 있는 url(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.delete-accompany-comment.href").description("조회한 댓글을 삭제할 수 있는 url(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크")
                         )
                 ))
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 다른 사용자의 동행 게시물 댓글 하나 조회")
+    public void getOthersAccompanyComment_With_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Account otherAccount = Account.builder()//다른 사용자
+                .email("otheruser@email.com")
+                .password("otheruser")
+                .name("김랑")
+                .nickname("rang")
+                .roles(Set.of(AccountRole.USER))
+                .sex(Sex.FEMALE)
+                .build();
+        accountRepository.save(otherAccount);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(otherAccount, accompany, 0);//다른 사용자가 단 댓글
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("accompany.id").exists())
+                .andExpect(jsonPath("comment").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.get-accompany-comments").exists())
+                .andExpect(jsonPath("_links.update-accompany-comment").doesNotExist())
+                .andExpect(jsonPath("_links.delete-accompany-comment").doesNotExist())
+                .andExpect(jsonPath("_links.profile").exists())
+
         ;
     }
 

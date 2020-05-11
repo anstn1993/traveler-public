@@ -36,7 +36,6 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .mvcMatchers(HttpMethod.GET, "/api/**").permitAll()
-                .antMatchers("/test/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()

@@ -99,7 +99,8 @@ public class AccompanyCommentController {
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccompanyCommentAnchor()).withRel("profile");
         Link getAccompanyComments = linkBuilder.withRel("get-accompany-comments");
         accompanyCommentModel.add(getAccompanyComments, profileLink);
-        if (account != null) {
+        //인증한 상태에서 자신의 댓글을 조회하는 경우
+        if (account != null && accompanyComment.getAccount().equals(account)) {
             Link updateAccompanyComment = linkBuilder.slash(accompanyComment.getId()).withRel("update-accompany-comment");
             Link deleteAccompanyComment = linkBuilder.slash(accompanyComment.getId()).withRel("delete-accompany-comment");
             accompanyCommentModel.add(updateAccompanyComment, deleteAccompanyComment);

@@ -20,11 +20,9 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
 import java.net.URI;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/accompanies")
@@ -39,6 +37,7 @@ public class AccompanyChildCommentController {
     @Autowired
     AppProperties appProperties;
 
+    //대댓글 생성
     @PostMapping("/{accompanyId}/comments/{commentId}/child-comments")
     public ResponseEntity createChildComment(@PathVariable("accompanyId") Accompany accompany,
                                              @PathVariable("commentId") AccompanyComment comment,
@@ -76,6 +75,7 @@ public class AccompanyChildCommentController {
         return ResponseEntity.created(uri).body(childCommentModel);
     }
 
+    //대댓글 목록 조회
     @GetMapping("/{accompanyId}/comments/{commentId}/child-comments")
     public ResponseEntity getChildComments(Pageable pageable,
                                            @PathVariable("accompanyId") Accompany accompany,
@@ -102,6 +102,36 @@ public class AccompanyChildCommentController {
         }
         childCommentModels.add(profileLink);
         return ResponseEntity.ok(childCommentModels);
+    }
+
+    //대댓글 하나 조회
+    @GetMapping("/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}")
+    public ResponseEntity getChildComment(@PathVariable("accompanyId") Accompany accompany,
+                                          @PathVariable("commentId") AccompanyComment comment,
+                                          @PathVariable("childCommentId") AccompanyChildComment childComment,
+                                          @CurrentAccount Account account) {
+        //동행 게시물, 댓글, 대댓글 리소스가 존재하지 않거나, 해당 게시물에 달린 댓글이 아니거나, 해당 댓글에 달린 대댓글이 아닌 경우
+        if(accompany == null || comment == null || childComment == null || !comment.getAccompany().equals(accompany) || !childComment.getAccompanyComment().equals(comment)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //Hateoas 적용
+        AccompanyChildCommentModel childCommentModel = new AccompanyChildCommentModel(childComment);
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccompanyChildCommentAnchor()).withRel("profile");//프로필 링크
+        Link getAccompanyChildCommentsLink = linkTo(AccompanyChildCommentController.class)//대댓글 목록 조회 링크
+                .slash(accompany.getId())
+                .slash("comments")
+                .slash(comment.getId())
+                .slash("child-comments")
+                .withRel("get-accompany-child-comments");
+        childCommentModel.add(profileLink, getAccompanyChildCommentsLink);
+        //인증 && 자신의 대댓글인 경우
+        if(account != null && childComment.getAccount().equals(account)) {
+            Link updateAccompanyChildCommentLink = childCommentModel.getLink("self").get().withRel("update-accompany-child-comment");//대댓글 수정 링크
+            Link deleteAccompanyChildCommentLink = childCommentModel.getLink("self").get().withRel("delete-accompany-child-comment");//대댓글 삭제 링크
+            childCommentModel.add(updateAccompanyChildCommentLink, deleteAccompanyChildCommentLink);
+        }
+        return ResponseEntity.ok(childCommentModel);
     }
 
 }
