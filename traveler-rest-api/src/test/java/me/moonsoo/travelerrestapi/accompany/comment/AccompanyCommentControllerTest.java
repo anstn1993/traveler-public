@@ -243,7 +243,6 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments", accompany.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .param("page", "1")
                 .param("size", "10")
@@ -258,6 +257,7 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(jsonPath("_embedded.accompanyCommentList[0]._links.self.href").exists())
                 .andExpect(jsonPath("page").exists())
                 .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
                 .andExpect(jsonPath("_links.create-accompany-comment").exists())
                 .andExpect(jsonPath("_links.first").exists())
                 .andExpect(jsonPath("_links.prev").exists())
@@ -269,7 +269,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                                 linkWithRel("profile").description("api 문서 링크"),
                                 linkWithRel("create-accompany-comment").description("댓글 추가 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         ),
-                        requestHeaders,
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
                         pathParameters(
                                 parameterWithName("accompanyId").description("댓글을 추가할 동행 게시물 id")
                         ),
@@ -322,7 +325,6 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -344,7 +346,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                                 linkWithRel("delete-accompany-comment").description("댓글을 삭제할 수 있는 url(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)"),
                                 linkWithRel("profile").description("api 문서 url")
                         ),
-                        requestHeaders,
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
                         pathParameters(
                                 parameterWithName("accompanyId").description("동행 게시물 id"),
                                 parameterWithName("commentId").description("댓글 id")

@@ -9,7 +9,12 @@ import me.moonsoo.travelerrestapi.errors.ErrorsModel;
 import me.moonsoo.travelerrestapi.properties.AppProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -69,6 +74,34 @@ public class AccompanyChildCommentController {
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getCreateAccompanyChildCommentAnchor()).withRel("profile");//프로필 링크
         childCommentModel.add(getAccompanyChildCommentsLink, updateAccompanyChildCommentLink, deleteAccompanyChildCommentLink, profileLink);
         return ResponseEntity.created(uri).body(childCommentModel);
+    }
+
+    @GetMapping("/{accompanyId}/comments/{commentId}/child-comments")
+    public ResponseEntity getChildComments(Pageable pageable,
+                                           @PathVariable("accompanyId") Accompany accompany,
+                                           @PathVariable("commentId") AccompanyComment comment,
+                                           PagedResourcesAssembler<AccompanyChildComment> pagedResourcesAssembler,
+                                           @CurrentAccount Account account) {
+
+        //동행 게시물이나 댓글이 존재하지 않거나 댓글이 해당 동행 게시물에 달린 댓글이 아닌 경우
+        if (accompany == null || comment == null || !comment.getAccompany().equals(accompany)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Page<AccompanyChildComment> childComments = accompanyChildCommentService.findAllByAccompanyComment(comment, pageable);//대댓글 리스트 조회
+        //Hateoas 적용
+        PagedModel<EntityModel<AccompanyChildComment>> childCommentModels = pagedResourcesAssembler.toModel(childComments, c -> new AccompanyChildCommentModel(c));//각 요소에 self링크 추가
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccompanyChildCommentsAnchor()).withRel("profile");//프로필 링크
+        if(account != null) {
+            Link createAccompanyChildCommentLink = linkTo(AccompanyChildCommentController.class)
+                    .slash(accompany.getId())
+                    .slash("comments")
+                    .slash(comment.getId())
+                    .slash("child-comments").withRel("create-accompany-child-comment");
+            childCommentModels.add(createAccompanyChildCommentLink);
+        }
+        childCommentModels.add(profileLink);
+        return ResponseEntity.ok(childCommentModels);
     }
 
 }

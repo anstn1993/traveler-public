@@ -166,3 +166,8 @@ operation::delete-accompany-comment[snippets='curl-request,http-request,request-
 == 동행 게시물의 대댓글 생성
 
 operation::create-accompany-child-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-accompany-child-comments-get]]
+== 동행 게시물의 대댓글 목록 조회
+
+operation::get-accompany-child-comments[snippets='curl-request,http-request,request-headers,path-parameters,request-parameters,http-response,response-headers,response-fields,links']

@@ -37,4 +37,6 @@ public class AppProperties {
 
     private String createAccompanyChildCommentAnchor;
 
+    private String getAccompanyChildCommentsAnchor;
+
 }

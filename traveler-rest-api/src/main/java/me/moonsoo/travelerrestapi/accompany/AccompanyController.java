@@ -117,7 +117,7 @@ public class AccompanyController {
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccompanyAnchor()).withRel("profile");
         Link getAccompaniesLink = linkTo(AccompanyController.class).withRel("get-accompanies");
         //인증 && 자신의 게시물인 경우 update, delete link 제공
-        if (account != null && updatedAccompany.getAccount().getId() == account.getId()) {
+        if (account != null && updatedAccompany.getAccount().equals(account)) {
             WebMvcLinkBuilder linkBuilder = linkTo(AccompanyController.class).slash(updatedAccompany.getId());
             Link updateLink = linkBuilder.withRel("update-accompany");
             Link deleteLink = linkBuilder.withRel("delete-accompany");

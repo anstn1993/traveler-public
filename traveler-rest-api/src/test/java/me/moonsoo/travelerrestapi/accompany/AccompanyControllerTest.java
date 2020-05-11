@@ -264,7 +264,6 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
 
         mockMvc.perform(get("/api/accompanies")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .param("page", "1")
                 .param("size", "10")
@@ -288,7 +287,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 linkWithRel("profile").description("api 문서 링크"),
                                 linkWithRel("create-accompany").description("동행 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         ),
-                        requestHeaders,
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
                         requestParameters(
                                 parameterWithName("page").optional().description("페이지 번호"),
                                 parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
@@ -361,7 +363,6 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //pathParameters를 사용하여 문서화흘 하기 위해서 RestDocumentationRequestBuilders.get을 사용
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{id}", savedAccompany.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -389,7 +390,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 linkWithRel("delete-accompany").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
                                 linkWithRel("profile").description("api 문서 url")
                         ),
-                        requestHeaders,
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
                         pathParameters(
                                 parameterWithName("id").description("동행 게시물의 id")
                         ),
@@ -676,7 +680,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         String email = "user@email.com";
         String password = "user";
         String accessToken = getAuthToken(email, password);
-        Accompany savedAccompany = createAccompany(account, 0);
+        createAccompany(account, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/404")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
