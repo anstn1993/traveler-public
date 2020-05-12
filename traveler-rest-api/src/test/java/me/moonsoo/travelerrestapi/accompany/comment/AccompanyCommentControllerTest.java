@@ -5,6 +5,7 @@ import me.moonsoo.commonmodule.account.AccountRole;
 import me.moonsoo.commonmodule.account.Sex;
 import me.moonsoo.travelerrestapi.accompany.Accompany;
 import me.moonsoo.travelerrestapi.accompany.AccompanyBaseControllerTest;
+import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildComment;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
 
     @AfterEach
     public void setUp() {
+        accompanyChildCommentRepository.deleteAll();
         accompanyCommentRepository.deleteAll();
         accompanyRepository.deleteAll();
         accountRepository.deleteAll();
@@ -723,9 +725,7 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andDo(print())
                 .andExpect(status().isNoContent())
                 .andDo(document("delete-accompany-comment",
@@ -739,6 +739,23 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 ))
         ;
 
+    }
+
+    @Test
+    @DisplayName("대댓글이 있는 동행 게시물 댓글 삭제")
+    public void deleteAccompanyComment_With_Child_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);
+        createChildComment(account, accompany, accompanyComment, 0);//대댓글 생성
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+        ;
     }
 
     @Test

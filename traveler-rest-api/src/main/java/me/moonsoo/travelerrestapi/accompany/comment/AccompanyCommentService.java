@@ -2,16 +2,22 @@ package me.moonsoo.travelerrestapi.accompany.comment;
 
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.accompany.Accompany;
+import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildCommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 
 @Service
 public class AccompanyCommentService {
     @Autowired
     AccompanyCommentRepository accompanyCommentRepository;
+
+    @Autowired
+    AccompanyChildCommentRepository accompanyChildCommentRepository;
 
     //동행 게시물에 댓글 추가
     public AccompanyComment save(Accompany accompany, Account account, AccompanyComment accompanyComment) {
@@ -30,7 +36,9 @@ public class AccompanyCommentService {
         return accompanyCommentRepository.save(accompanyComment);
     }
 
+    @Transactional
     public void delete(AccompanyComment accompanyComment) {
-        accompanyCommentRepository.delete(accompanyComment);
+        accompanyChildCommentRepository.deleteAllByAccompanyComment(accompanyComment);//대댓글 삭제
+        accompanyCommentRepository.delete(accompanyComment);//댓글 삭제
     }
 }

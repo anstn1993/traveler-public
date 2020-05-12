@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountSerializer;
+import me.moonsoo.travelerrestapi.accompany.Accompany;
+import me.moonsoo.travelerrestapi.accompany.AccompanySerializer;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyComment;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyCommentSerializer;
 
@@ -16,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Builder
-@Entity
+@Entity(name = "accompany_child_comment")
 public class AccompanyChildComment {
 
     @Id @GeneratedValue
@@ -25,6 +27,10 @@ public class AccompanyChildComment {
     @ManyToOne(targetEntity = Account.class)
     @JsonSerialize(using = AccountSerializer.class)
     private Account account;
+
+    @ManyToOne
+    @JsonSerialize(using = AccompanySerializer.class)
+    private Accompany accompany;
 
     @ManyToOne(targetEntity = AccompanyComment.class)
     @JsonSerialize(using = AccompanyCommentSerializer.class)

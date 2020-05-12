@@ -176,3 +176,13 @@ operation::get-accompany-child-comments[snippets='curl-request,http-request,requ
 == 동행 게시물의 대댓글 조회
 
 operation::get-accompany-child-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-accompany-child-comment-update]]
+== 동행 게시물의 대댓글 수정
+
+operation::update-accompany-child-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-accompany-child-comment-delete]]
+== 동행 게시물의 대댓글 삭제
+
+operation::delete-accompany-child-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response']

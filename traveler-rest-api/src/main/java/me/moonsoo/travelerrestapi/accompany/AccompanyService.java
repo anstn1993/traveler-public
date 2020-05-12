@@ -1,6 +1,8 @@
 package me.moonsoo.travelerrestapi.accompany;
 
 import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildComment;
+import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildCommentRepository;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyComment;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyCommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ public class AccompanyService {
 
     @Autowired
     AccompanyCommentRepository accompanyCommentRepository;
+
+    @Autowired
+    AccompanyChildCommentRepository accompanyChildCommentRepository;
 
     @Autowired
     AccompanyRepository accompanyRepository;
@@ -59,11 +64,8 @@ public class AccompanyService {
 
     @Transactional
     public void delete(Accompany accompany) {
-        List<AccompanyComment> accompanyComments = accompanyCommentRepository.findAllByAccompany(accompany);
-
-        if(accompanyComments.size() != 0) {
-            accompanyCommentRepository.deleteAllByAccompany(accompany);
-        }
+        accompanyChildCommentRepository.deleteAllByAccompany(accompany);//대댓글 삭제
+        accompanyCommentRepository.deleteAllByAccompany(accompany);//댓글 삭제
         accompanyRepository.delete(accompany);
     }
 

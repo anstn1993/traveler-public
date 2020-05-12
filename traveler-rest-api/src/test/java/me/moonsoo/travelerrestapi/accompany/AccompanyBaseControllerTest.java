@@ -4,6 +4,7 @@ import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountRole;
 import me.moonsoo.commonmodule.account.Sex;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
+import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildComment;
 import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildCommentRepository;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyComment;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyCommentRepository;
@@ -95,6 +96,17 @@ public class AccompanyBaseControllerTest extends BaseControllerTest {
                 .regDate(LocalDateTime.now())
                 .build();
         return accompanyCommentRepository.save(accompanyComment);
+    }
+
+    protected AccompanyChildComment createChildComment(Account account, Accompany accompany, AccompanyComment accompanyComment, int index) {
+        AccompanyChildComment accompanyChildComment = AccompanyChildComment.builder()
+                .account(account)
+                .accompany(accompany)
+                .accompanyComment(accompanyComment)
+                .comment("This is child comment" + index)
+                .regDate(LocalDateTime.now())
+                .build();
+        return accompanyChildCommentRepository.save(accompanyChildComment);
     }
 
 }

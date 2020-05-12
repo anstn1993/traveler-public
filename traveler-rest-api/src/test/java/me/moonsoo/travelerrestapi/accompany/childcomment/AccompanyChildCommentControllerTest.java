@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.headers.HeaderDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.time.LocalDateTime;
@@ -62,6 +61,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("accompany.id").exists())
                 .andExpect(jsonPath("accompanyComment.id").exists())
                 .andExpect(jsonPath("comment").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -93,6 +93,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("대댓글 id"),
                                 fieldWithPath("account.id").description("작성자 id"),
+                                fieldWithPath("accompany.id").description("동행 게시물 id"),
                                 fieldWithPath("accompanyComment.id").description("부모 댓글 id"),
                                 fieldWithPath("comment").description("대댓글"),
                                 fieldWithPath("regDate").description("작성 시간"),
@@ -137,7 +138,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
-        AccompanyChildComment childComment = createChildComment(account, accompanyComment, 0);
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -230,7 +231,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         //accompanyComment에 대댓글 100개 생성
         IntStream.range(0, 100).forEach(i -> {
-            createChildComment(account, accompanyComment, i);
+            createChildComment(account, accompany, accompanyComment, i);
         });
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments", accompany.getId(), accompanyComment.getId())
@@ -243,6 +244,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].account.id").exists())
+                .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].accompany.id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].accompanyComment.id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].comment").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].regDate").exists())
@@ -282,6 +284,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                         responsePageFields.and(
                                 fieldWithPath("_embedded.accompanyChildCommentList[0].id").description("대댓글 id"),
                                 fieldWithPath("_embedded.accompanyChildCommentList[0].account.id").description("대댓글 작성자의 id"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[0].accompany.id").description("동행 게시물 id"),
                                 fieldWithPath("_embedded.accompanyChildCommentList[0].accompanyComment.id").description("부모 댓글 id"),
                                 fieldWithPath("_embedded.accompanyChildCommentList[0].comment").description("대댓글"),
                                 fieldWithPath("_embedded.accompanyChildCommentList[0].regDate").description("대댓글 추가 시간"),
@@ -304,7 +307,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         //accompanyComment에 대댓글 100개 생성
         IntStream.range(0, 100).forEach(i -> {
-            createChildComment(account, accompanyComment, i);
+            createChildComment(account, accompany, accompanyComment, i);
         });
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments", accompany.getId(), accompanyComment.getId())
@@ -316,6 +319,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].account.id").exists())
+                .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].accompany.id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].accompanyComment.id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].comment").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].regDate").exists())
@@ -345,7 +349,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         //accompanyComment에 대댓글 100개 생성
         IntStream.range(0, 100).forEach(i -> {
-            createChildComment(account, accompanyComment, i);
+            createChildComment(account, accompany, accompanyComment, i);
         });
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments", 404, accompanyComment.getId())
@@ -370,7 +374,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         //accompanyComment에 대댓글 100개 생성
         IntStream.range(0, 100).forEach(i -> {
-            createChildComment(account, accompanyComment, i);
+            createChildComment(account, accompany, accompanyComment, i);
         });
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments", accompany.getId(), 404)
@@ -396,7 +400,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
         //accompanyComment에 대댓글 100개 생성
         IntStream.range(0, 100).forEach(i -> {
-            createChildComment(account, accompanyComment, i);
+            createChildComment(account, accompany1, accompanyComment, i);
         });
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments", accompany2.getId(), accompanyComment.getId())
@@ -419,7 +423,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
-        AccompanyChildComment childComment = createChildComment(account, accompanyComment, 0);
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -428,6 +432,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("accompany.id").exists())
                 .andExpect(jsonPath("accompanyComment.id").exists())
                 .andExpect(jsonPath("comment").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -436,36 +441,39 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(jsonPath("_links.get-accompany-child-comments").exists())
                 .andExpect(jsonPath("_links.update-accompany-child-comment").exists())
                 .andExpect(jsonPath("_links.delete-accompany-child-comment").exists())
-        .andDo(document("get-accompany-child-comment",
-                links(
-                        linkWithRel("self").description("조회한 대댓글의 리소스 링크"),
-                        linkWithRel("profile").description("api 문서 링크"),
-                        linkWithRel("get-accompany-child-comments").description("대댓글의 목록을 조회할 수 있는 링크"),
-                        linkWithRel("update-accompany-child-comment").description("조회한 대댓글을 수정할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
-                        linkWithRel("delete-accompany-child-comment").description("조회한 대댓글을 삭제할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)")
-                ),
-                requestHeaders(
-                        headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                        headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
-                ),
-                pathParameters(
-                        parameterWithName("accompanyId").description("동행 게시물 id"),
-                        parameterWithName("commentId").description("댓글 id"),
-                        parameterWithName("childCommentId").description("대댓글 id")
-                ),
-                responseHeaders,
-                responseFields(
-                        fieldWithPath("id").description("대댓글의 id"),
-                        fieldWithPath("account.id").description("댓글 작성자 id"),
-                        fieldWithPath("accompanyComment.id").description("부모 댓글의 id"),
-                        fieldWithPath("comment").description("대댓글"),
-                        fieldWithPath("regDate").description("대댓글 추가 시간"),
-                        fieldWithPath("_links.self.href").description("조회한 대댓글 리소스 url"),
-                        fieldWithPath("_links.get-accompany-child-comments.href").description("대댓글 목록을 조회할 수 있는 url"),
-                        fieldWithPath("_links.update-accompany-child-comment.href").description("조회한 대댓글을 수정할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
-                        fieldWithPath("_links.delete-accompany-child-comment.href").description("조회한 대댓글을 삭제할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
-                        fieldWithPath("_links.profile.href").description("api 문서 링크")
-                )
+                .andDo(document("get-accompany-child-comment",
+                        links(
+                                linkWithRel("self").description("조회한 대댓글의 리소스 링크"),
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("get-accompany-child-comments").description("대댓글의 목록을 조회할 수 있는 링크"),
+                                linkWithRel("update-accompany-child-comment").description("조회한 대댓글을 수정할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
+                                linkWithRel("delete-accompany-child-comment").description("조회한 대댓글을 삭제할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        pathParameters(
+                                parameterWithName("accompanyId").description("동행 게시물 id"),
+                                parameterWithName("commentId").description("댓글 id"),
+                                parameterWithName("childCommentId").description("대댓글 id")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("대댓글의 id"),
+                                fieldWithPath("account.id").description("댓글 작성자 id"),
+                                fieldWithPath("accompany.id").description("동행 게시물 id"),
+                                fieldWithPath("accompanyComment.id").description("부모 댓글의 id"),
+                                fieldWithPath("comment").description("대댓글"),
+                                fieldWithPath("regDate").description("대댓글 추가 시간"),
+                                fieldWithPath("_links.self.href").description("조회한 대댓글 리소스 url"),
+                                fieldWithPath("_links.get-accompany-child-comments.href").description("대댓글 목록을 조회할 수 있는 url"),
+                                fieldWithPath("_links.update-accompany-child-comment.href").description("조회한 대댓글을 수정할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.delete-accompany-child-comment.href").description("조회한 대댓글을 삭제할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
                 ))
         ;
     }
@@ -488,7 +496,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         accountRepository.save(otherAccount);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
-        AccompanyChildComment childComment = createChildComment(otherAccount, accompanyComment, 0);//다른 사용자가 단 대댓글
+        AccompanyChildComment childComment = createChildComment(otherAccount, accompany, accompanyComment, 0);//다른 사용자가 단 대댓글
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -497,6 +505,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("accompany.id").exists())
                 .andExpect(jsonPath("accompanyComment.id").exists())
                 .andExpect(jsonPath("comment").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -518,7 +527,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         account = createAccount(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
-        AccompanyChildComment childComment = createChildComment(account, accompanyComment, 0);
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId())
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -526,6 +535,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("accompany.id").exists())
                 .andExpect(jsonPath("accompanyComment.id").exists())
                 .andExpect(jsonPath("comment").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -547,7 +557,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
-        AccompanyChildComment childComment = createChildComment(account, accompanyComment, 0);
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", 404, accompanyComment.getId(), childComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -566,7 +576,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
-        AccompanyChildComment childComment = createChildComment(account, accompanyComment, 0);
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), 404, childComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -585,7 +595,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
-        createChildComment(account, accompanyComment, 0);
+        createChildComment(account, accompany, accompanyComment, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -605,7 +615,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
-        AccompanyChildComment childComment = createChildComment(account, accompanyComment, 0);
+        AccompanyChildComment childComment = createChildComment(account, accompany1, accompanyComment, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany2.getId(), accompanyComment.getId(), childComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -625,7 +635,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment1 = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyComment accompanyComment2 = createComment(account, accompany, 1);//accompany에 달린 댓글
-        AccompanyChildComment childComment = createChildComment(account, accompanyComment1, 0);//accomoanyComment1에 달린 대댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment1, 0);//accomoanyComment1에 달린 대댓글
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment2.getId(), childComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -635,16 +645,454 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("동행 게시물 대댓글 수정")
+    public void updateAccompanyChildComment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
 
-    public AccompanyChildComment createChildComment(Account account, AccompanyComment accompanyComment, int index) {
-        AccompanyChildComment accompanyChildComment = AccompanyChildComment.builder()
-                .account(account)
-                .accompanyComment(accompanyComment)
-                .comment("This is child comment" + index)
-                .regDate(LocalDateTime.now())
-                .build();
-        return accompanyChildCommentRepository.save(accompanyChildComment);
+        AccompanyChildCommentDto childCommentDto = createChildCommentDto("This is updated comment");
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(childCommentDto)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("accompany.id").exists())
+                .andExpect(jsonPath("accompanyComment.id").exists())
+                .andExpect(jsonPath("comment").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.get-accompany-child-comments").exists())
+                .andExpect(jsonPath("_links.delete-accompany-child-comment").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("update-accompany-child-comment",
+                        links(
+                                linkWithRel("self").description("수정한 대댓글의 리소스 링크"),
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("get-accompany-child-comments").description("대댓글의 목록을 조회할 수 있는 링크"),
+                                linkWithRel("delete-accompany-child-comment").description("수정한 대댓글을 삭제할 수 있는 링크")
+                        ),
+                        requestHeaders,
+                        pathParameters(
+                                parameterWithName("accompanyId").description("동행 게시물 id"),
+                                parameterWithName("commentId").description("댓글 id"),
+                                parameterWithName("childCommentId").description("대댓글 id")
+                        ),
+                        requestFields(
+                                fieldWithPath("comment").description("대댓글")
+                        ),
+                        responseHeaders,
+                        responseFields(
+                                fieldWithPath("id").description("대댓글 id"),
+                                fieldWithPath("account.id").description("작성자 id"),
+                                fieldWithPath("accompany.id").description("작성자 id"),
+                                fieldWithPath("accompanyComment.id").description("부모 댓글 id"),
+                                fieldWithPath("comment").description("대댓글"),
+                                fieldWithPath("regDate").description("작성 시간"),
+                                fieldWithPath("_links.self.href").description("추가된 동행 게시물 대댓글 리소스 링크"),
+                                fieldWithPath("_links.get-accompany-child-comments.href").description("동행 게시물의 대댓글 목록 조회 링크"),
+                                fieldWithPath("_links.delete-accompany-child-comment.href").description("동행 게시물의 대댓글 삭제 링크"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
+                ))
+        ;
     }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 수정 실패-요청 본문이 비어있는 경우(400 Bad request)")
+    public void updateAccompanyChildCommentFail_Empty_Value() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 수정 실패-요청 본문에 허용되지 않은 값이 포함되는 경우(400 Bad request)")
+    public void updateAccompanyChildCommentFail_Wrong_Value() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(childComment)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 수정 실패-인증하지 않은 경우(401 Unauthorized)")
+    public void updateAccompanyChildCommentFail_Without_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        account = createAccount(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+        AccompanyChildCommentDto childCommentDto = createChildCommentDto("This is updated comment");
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(childCommentDto)))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 수정 실패-타인의 대댓글을 수정하려고 하는 경우(403 Forbidden)")
+    public void updateAccompanyChildCommentFail_Forbidden() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        Account otherAccount = Account.builder()//다른 사용자
+                .email("otheruser@email.com")
+                .password("otheruser")
+                .name("김랑")
+                .nickname("rang")
+                .roles(Set.of(AccountRole.USER))
+                .sex(Sex.FEMALE)
+                .build();
+        accountRepository.save(otherAccount);
+        AccompanyChildComment childComment = createChildComment(otherAccount, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+        AccompanyChildCommentDto childCommentDto = createChildCommentDto("This is updated comment");
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(childCommentDto)))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 수정 실패-존재하지 않는 동행 게시물(404 Not found)")
+    public void updateAccompanyChildCommentFail_Not_Existing_Accompany() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+        AccompanyChildCommentDto childCommentDto = createChildCommentDto("This is updated comment");
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", 404, accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(childCommentDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 수정 실패-존재하지 않는 댓글(404 Not found)")
+    public void updateAccompanyChildCommentFail_Not_Existing_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+        AccompanyChildCommentDto childCommentDto = createChildCommentDto("This is updated comment");
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), 404, childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(childCommentDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 수정 실패-존재하지 않는 대댓글(404 Not found)")
+    public void updateAccompanyChildCommentFail_Not_Existing_Child_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+        AccompanyChildCommentDto childCommentDto = createChildCommentDto("This is updated comment");
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(childCommentDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 수정 실패-게시물에 존재하지 않는 댓글(404 Not found)")
+    public void updateAccompanyChildCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        Accompany accompany2 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany1, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+        AccompanyChildCommentDto childCommentDto = createChildCommentDto("This is updated comment");
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany2.getId(), accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(childCommentDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 수정 실패-부모댓글에 존재하지 않는 대댓글(404 Not found)")
+    public void updateAccompanyChildCommentFail_Not_Existing_Child_Comment_In_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment1 = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyComment accompanyComment2 = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment1, 0);//accomoanyComment1에 달린 대댓글
+
+        AccompanyChildCommentDto childCommentDto = createChildCommentDto("This is updated comment");
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment2.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(childCommentDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 삭제")
+    public void deleteAccompanyChildComment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment1에 달린 대댓글
+
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-accompany-child-comment",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                        ),
+                        pathParameters(
+                                parameterWithName("accompanyId").description("동행 게시물 id"),
+                                parameterWithName("commentId").description("댓글 id"),
+                                parameterWithName("childCommentId").description("대댓글 id")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 삭제 실패-인증하지 않은 경우(401 Unauthorized)")
+    public void deleteAccompanyChildCommentFail_Unauthorized() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        account = createAccount(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment1에 달린 대댓글
+
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 삭제 실패-타인의 대댓글을 삭제하려고 하는 경우(403 Forbidden)")
+    public void deleteAccompanyChildCommentFail_Forbidden() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        Account otherAccount = Account.builder()//다른 사용자
+                .email("otheruser@email.com")
+                .password("otheruser")
+                .name("김랑")
+                .nickname("rang")
+                .roles(Set.of(AccountRole.USER))
+                .sex(Sex.FEMALE)
+                .build();
+        accountRepository.save(otherAccount);
+        AccompanyChildComment childComment = createChildComment(otherAccount, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 삭제 실패-존재하지 않는 동행 게시물(404 Not found)")
+    public void deleteAccompanyChildCommentFail_Not_Existing_Accompany() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", 404, accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 삭제 실패-존재하지 않는 댓글(404 Not found)")
+    public void deleteAccompanyChildCommentFail_Not_Existing_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), 404, childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 삭제 실패-존재하지 않는 대댓글(404 Not found)")
+    public void deleteAccompanyChildCommentFail_Not_Existing_Child_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 삭제 실패-게시물에 존재하지 않는 댓글(404 Not found)")
+    public void deleteAccompanyChildCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        Accompany accompany2 = createAccompany(account, 1);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany1, accompanyComment, 0);//accomoanyComment에 달린 대댓글
+
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany2.getId(), accompanyComment.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("동행 게시물 대댓글 삭제 실패-해당 댓글에 달리지 않은 대댓글(404 Not found)")
+    public void deleteAccompanyChildCommentFail_Not_Existing_Child_Comment_In_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password);
+        Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
+        AccompanyComment accompanyComment1 = createComment(account, accompany, 0);//accompany1에 달린 댓글
+        AccompanyComment accompanyComment2 = createComment(account, accompany, 0);//accompany1에 달린 댓글
+        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment1, 0);//accomoanyComment1에 달린 대댓글
+
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment2.getId(), childComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+
+
 
     public AccompanyChildCommentDto createChildCommentDto(String comment) {
         return AccompanyChildCommentDto.builder()
