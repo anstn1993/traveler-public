@@ -22,6 +22,7 @@ import javax.validation.Valid;
 import java.net.URI;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping(value = "/api/accompanies")
@@ -76,7 +77,15 @@ public class AccompanyCommentController {
             return ResponseEntity.notFound().build();
         }
         Page<AccompanyComment> accompanyComments = accompanyCommentService.findAllByAccompany(accompany, pageable);
-        PagedModel<AccompanyCommentModel> commentModels = assembler.toModel(accompanyComments, c -> new AccompanyCommentModel(c));
+        PagedModel<AccompanyCommentModel> commentModels
+                = assembler.toModel(
+                accompanyComments,
+                c -> new AccompanyCommentModel(
+                        c, linkTo(AccompanyCommentController.class)
+                        .slash(accompany.getId())
+                        .slash("comments")
+                        .slash(c.getId())
+                        .slash("child-comments").withRel("get-accompany-child-comments")));
         commentModels.add(new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccompanyCommentsAnchor()).withRel("profile"));
         if (account != null) {//인증된 사용자의 요청인 경우
             commentModels.add(linkTo(AccompanyCommentController.class).slash(accompany.getId()).slash("comments").withRel("create-accompany-comment"));
@@ -97,8 +106,9 @@ public class AccompanyCommentController {
         AccompanyCommentModel accompanyCommentModel = new AccompanyCommentModel(accompanyComment);
         WebMvcLinkBuilder linkBuilder = linkTo(AccompanyCommentController.class).slash(accompany.getId()).slash("comments");
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccompanyCommentAnchor()).withRel("profile");
-        Link getAccompanyComments = linkBuilder.withRel("get-accompany-comments");
-        accompanyCommentModel.add(getAccompanyComments, profileLink);
+        Link getAccompanyChildCommentsLink = linkBuilder.slash(accompanyComment.getId()).slash("child-comments").withRel("get-accompany-child-comments");
+        Link getAccompanyCommentsLink = linkBuilder.withRel("get-accompany-comments");
+        accompanyCommentModel.add(getAccompanyChildCommentsLink, getAccompanyCommentsLink, profileLink);
         //인증한 상태에서 자신의 댓글을 조회하는 경우
         if (account != null && accompanyComment.getAccount().equals(account)) {
             Link updateAccompanyComment = linkBuilder.slash(accompanyComment.getId()).withRel("update-accompany-comment");
@@ -115,15 +125,15 @@ public class AccompanyCommentController {
                                         @RequestBody @Valid AccompanyCommentDto accompanyCommentDto,
                                         Errors errors,
                                         @CurrentAccount Account account) {
-        if(accompany == null || accompanyComment == null || !accompanyComment.getAccompany().equals(accompany)) {//존재하지 않는 게시물, 댓글 리소스이거나 해당 게시물의 댓글이 아닌 경우
+        if (accompany == null || accompanyComment == null || !accompanyComment.getAccompany().equals(accompany)) {//존재하지 않는 게시물, 댓글 리소스이거나 해당 게시물의 댓글이 아닌 경우
             return ResponseEntity.notFound().build();
         }
 
-        if(!accompanyComment.getAccount().equals(account)) {//다른 사용자의 댓글을 수정하려고 하는 경우
+        if (!accompanyComment.getAccount().equals(account)) {//다른 사용자의 댓글을 수정하려고 하는 경우
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        if(errors.hasErrors()) {//요청 본문이 유효하지 않은 경우
+        if (errors.hasErrors()) {//요청 본문이 유효하지 않은 경우
             return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
 
@@ -144,11 +154,11 @@ public class AccompanyCommentController {
     public ResponseEntity deleteComment(@PathVariable("accompanyId") Accompany accompany,
                                         @PathVariable("commentId") AccompanyComment accompanyComment,
                                         @CurrentAccount Account account) {
-        if(accompany == null || accompanyComment == null || !accompanyComment.getAccompany().equals(accompany)) {//리소스가 존재하지 않거나 요청한 게시물에 달린 댓글이 아닌 경우
+        if (accompany == null || accompanyComment == null || !accompanyComment.getAccompany().equals(accompany)) {//리소스가 존재하지 않거나 요청한 게시물에 달린 댓글이 아닌 경우
             return ResponseEntity.notFound().build();
         }
 
-        if(!accompanyComment.getAccount().equals(account)) {//자신의 댓글이 아닌 경우
+        if (!accompanyComment.getAccount().equals(account)) {//자신의 댓글이 아닌 경우
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

@@ -3,9 +3,7 @@ package me.moonsoo.travelerrestapi;
 import ch.qos.logback.classic.spi.EventArgUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import me.moonsoo.commonmodule.account.Account;
-import me.moonsoo.commonmodule.account.AccountRepository;
-import me.moonsoo.commonmodule.account.AccountService;
+import me.moonsoo.commonmodule.account.*;
 import me.moonsoo.travelerrestapi.config.AuthServerConfig;
 import me.moonsoo.travelerrestapi.config.ResourceServerConfig;
 import me.moonsoo.travelerrestapi.config.RestDocsConfig;
@@ -22,14 +20,19 @@ import org.springframework.restdocs.headers.RequestHeadersSnippet;
 import org.springframework.restdocs.headers.ResponseHeadersSnippet;
 import org.springframework.restdocs.hypermedia.LinksSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Set;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest
 @AutoConfigureRestDocs
@@ -86,5 +89,38 @@ public class BaseControllerTest {
             fieldWithPath("page.totalPages").description("전체 페이지 수"),
             fieldWithPath("page.number").description("현재 페이지 번호")
     );
+
+    //계정 생성
+    protected Account createAccount(String email, String password, int index) {
+        //Given
+        Account account = Account.builder()
+                .email(index + email)
+                .password(password)
+                .name("user" + index)
+                .nickname("user" + index)
+                .emailAuth(false)
+                .sex(Sex.MALE)
+                .roles(Set.of(AccountRole.USER))
+                .build();
+        return accountService.saveAccount(account);
+    }
+
+    //인자로 들어가는 account는 save된 상태
+    protected String getAuthToken(String email, String password, int index) throws Exception {
+        //Given
+        String clientId = "traveler";
+        String clientPassword = "pass";
+        account = createAccount(email, password, index);
+
+        String contentAsString = mockMvc.perform(post("/oauth/token").with(httpBasic(clientId, clientPassword))
+                .param("username", index + email)
+                .param("password", password)
+                .param("grant_type", "password"))
+                .andReturn().getResponse().getContentAsString();
+
+        Jackson2JsonParser parser = new Jackson2JsonParser();
+        return (String) parser.parseMap(contentAsString).get("access_token");
+    }
+
 
 }

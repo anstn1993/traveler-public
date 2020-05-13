@@ -46,7 +46,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
 
@@ -114,7 +114,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
 
@@ -135,7 +135,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);
@@ -157,7 +157,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
 
@@ -180,7 +180,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
 
@@ -203,7 +203,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2 = createAccompany(account, 1);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
@@ -226,7 +226,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         //accompanyComment에 대댓글 100개 생성
@@ -302,7 +302,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password);
+        account = createAccount(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         //accompanyComment에 대댓글 100개 생성
@@ -344,7 +344,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         //accompanyComment에 대댓글 100개 생성
@@ -369,7 +369,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         //accompanyComment에 대댓글 100개 생성
@@ -394,7 +394,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2 = createAccompany(account, 1);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
@@ -420,7 +420,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);
@@ -484,7 +484,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Account otherAccount = Account.builder()//다른 사용자
                 .email("otheruser@email.com")
                 .password("otheruser")
@@ -524,7 +524,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password);
+        account = createAccount(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);
@@ -554,7 +554,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);
@@ -573,7 +573,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);
@@ -592,7 +592,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
         createChildComment(account, accompany, accompanyComment, 0);
@@ -611,7 +611,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
@@ -631,7 +631,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment1 = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyComment accompanyComment2 = createComment(account, accompany, 1);//accompany에 달린 댓글
@@ -651,7 +651,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
@@ -714,7 +714,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
@@ -734,7 +734,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
@@ -755,7 +755,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password);
+        account = createAccount(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
@@ -776,7 +776,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         Account otherAccount = Account.builder()//다른 사용자
@@ -808,7 +808,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
@@ -831,7 +831,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
@@ -854,7 +854,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
@@ -877,7 +877,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
@@ -901,7 +901,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment1 = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyComment accompanyComment2 = createComment(account, accompany, 0);//accompany에 달린 댓글
@@ -925,7 +925,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment1에 달린 대댓글
@@ -954,7 +954,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password);
+        account = createAccount(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment1에 달린 대댓글
@@ -972,7 +972,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         Account otherAccount = Account.builder()//다른 사용자
@@ -1000,7 +1000,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
@@ -1019,7 +1019,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
@@ -1038,7 +1038,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
@@ -1057,7 +1057,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2 = createAccompany(account, 1);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
@@ -1077,7 +1077,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment1 = createComment(account, accompany, 0);//accompany1에 달린 댓글
         AccompanyComment accompanyComment2 = createComment(account, accompany, 0);//accompany1에 달린 댓글

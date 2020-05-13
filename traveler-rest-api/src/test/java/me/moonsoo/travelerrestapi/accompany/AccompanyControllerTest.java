@@ -51,7 +51,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         ConstrainedFields fields = new ConstrainedFields(Accompany.class);
 
         mockMvc.perform(post("/api/accompanies")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password, 0))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(accompanyDto)))
@@ -127,7 +127,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         AccompanyDto accompanyDto = AccompanyDto.builder().build();//값이 모두 빈 객체
 
         mockMvc.perform(post("/api/accompanies")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password, 0))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(accompanyDto)))
@@ -163,7 +163,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/accompanies")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password, 0))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(accompany)))
@@ -191,7 +191,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/accompanies")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password, 0))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(accompany)))
@@ -225,7 +225,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        Account account = createAccount(email, password);
+        Account account = createAccount(email, password, 0);
         IntStream.range(0, 60).forEach(i -> {
             createAccompany(account, i);
         });
@@ -241,6 +241,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.accompanyList").exists())
                 .andExpect(jsonPath("_embedded.accompanyList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.accompanyList[0]._links.get-accompany-comments").exists())
                 .andExpect(jsonPath("page").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())
@@ -257,7 +258,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         IntStream.range(0, 30).forEach(i -> {
             createAccompany(account, i);
         });
@@ -275,6 +276,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.accompanyList").exists())
                 .andExpect(jsonPath("_embedded.accompanyList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.accompanyList[0]._links.get-accompany-comments").exists())
                 .andExpect(jsonPath("page").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())
@@ -315,6 +317,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 fieldWithPath("_embedded.accompanyList[0].regDate").description("동행 게시물 작성 시간"),
                                 fieldWithPath("_embedded.accompanyList[0].viewCount").description("동행 게시물 조회수"),
                                 fieldWithPath("_embedded.accompanyList[0]._links.self.href").description("동행 게시물 리소스 요청 url"),
+                                fieldWithPath("_embedded.accompanyList[0]._links.get-accompany-comments.href").description("동행 게시물의 댓글 목록 요청 url"),
                                 fieldWithPath("_links.create-accompany.href").description("동행 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         )
                 ))
@@ -327,7 +330,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        account = createAccount(email, password);
+        account = createAccount(email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
 
         mockMvc.perform(get("/api/accompanies/{id}", savedAccompany.getId())
@@ -347,6 +350,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(jsonPath("regDate").exists())
                 .andExpect(jsonPath("viewCount").value(savedAccompany.getViewCount() + 1))//조회시 조회수 1 증가
                 .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.get-accompany-comments").exists())
                 .andExpect(jsonPath("_links.get-accompanies").exists())
                 .andExpect(jsonPath("_links.profile").exists())
         ;
@@ -358,7 +362,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
 
         //pathParameters를 사용하여 문서화흘 하기 위해서 RestDocumentationRequestBuilders.get을 사용
@@ -379,6 +383,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(jsonPath("regDate").exists())
                 .andExpect(jsonPath("viewCount").value(savedAccompany.getViewCount() + 1))//조회시 조회수 1 증가
                 .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.get-accompany-comments").exists())
                 .andExpect(jsonPath("_links.get-accompanies").exists())
                 .andExpect(jsonPath("_links.update-accompany").exists())
                 .andExpect(jsonPath("_links.delete-accompany").exists())
@@ -386,7 +391,8 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andDo(document("get-accompany",
                         links(
                                 linkWithRel("self").description("조회한 동행 게시물의 리소스 url"),
-                                linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 url"),
+                                linkWithRel("get-accompany-comments").description("조회한 동행 게시물의 댓글 목록을 조회할 수 있는 url"),
+                                linkWithRel("get-accompanies").description("동행 게시물 목록을 조회할 수 있는 url"),
                                 linkWithRel("update-accompany").description("동행 게시물을 수정할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
                                 linkWithRel("delete-accompany").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
                                 linkWithRel("profile").description("api 문서 url")
@@ -414,6 +420,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 fieldWithPath("regDate").description("동행 게시물 작성 시간"),
                                 fieldWithPath("viewCount").description("동행 게시물 조회수"),
                                 fieldWithPath("_links.self.href").description("조회한 동행 게시물의 리소스 url"),
+                                fieldWithPath("_links.get-accompany-comments.href").description("조회한 동행 게시물의 댓글 목록을 조회할 수 있는 url"),
                                 fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 url"),
                                 fieldWithPath("_links.update-accompany.href").description("동행 게시물을 수정할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
                                 fieldWithPath("_links.delete-accompany.href").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
@@ -440,7 +447,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
         //수정할 데이터
         String title = "updated title";
@@ -523,7 +530,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
         AccompanyDto accompanyDto = AccompanyDto.builder().build();//빈 요청 본문 Dto
 
@@ -542,7 +549,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
         //유효하지 않은 데이터 조합(시작 날짜보다 종료 날짜가 빠른 경우)
         LocalDateTime startDate = LocalDateTime.of(2020, 5, 5, 12, 12, 12);
@@ -567,7 +574,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
 
         //When
@@ -587,7 +594,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
 
         Account otherAccount = Account.builder()
                 .email("otheruser@email.com")
@@ -622,7 +629,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{id}", savedAccompany.getId())
@@ -646,7 +653,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
         IntStream.range(0, 50).forEach(i -> {
             createComment(account, savedAccompany, i);//게시물에 댓글 추가
@@ -665,7 +672,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
         AccompanyComment comment = createComment(account, savedAccompany, 0);//게시물에 댓글 추가
 
@@ -686,7 +693,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        createAccount(email, password);
+        createAccount(email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{id}", savedAccompany.getId()))
@@ -701,7 +708,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
         createAccompany(account, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/404")
@@ -717,7 +724,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         //Given
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password);
+        String accessToken = getAuthToken(email, password, 0);
 
         Account otherAccount = Account.builder()
                 .email("otheruser@email.com")
@@ -737,8 +744,6 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isForbidden())
         ;
     }
-
-
 
 
     private class ConstrainedFields {

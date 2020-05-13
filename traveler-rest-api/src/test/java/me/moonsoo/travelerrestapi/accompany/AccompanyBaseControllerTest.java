@@ -29,19 +29,6 @@ public class AccompanyBaseControllerTest extends BaseControllerTest {
     protected AccompanyChildCommentRepository accompanyChildCommentRepository;
 
 
-    protected Account createAccount(String email, String password) {
-        //Given
-        Account account = Account.builder()
-                .email(email)
-                .password(password)
-                .name("김문수")
-                .nickname("만수")
-                .emailAuth(false)
-                .sex(Sex.MALE)
-                .roles(Set.of(AccountRole.USER))
-                .build();
-        return accountService.saveAccount(account);
-    }
 
     protected AccompanyDto createAccompanyDto(int index) {
         return AccompanyDto.builder()
@@ -71,22 +58,7 @@ public class AccompanyBaseControllerTest extends BaseControllerTest {
         return accompanyRepository.save(accompany);
     }
 
-    //인자로 들어가는 account는 save된 상태
-    protected String getAuthToken(String email, String password) throws Exception {
-        //Given
-        String clientId = "traveler";
-        String clientPassword = "pass";
-        account = createAccount(email, password);
 
-        String contentAsString = mockMvc.perform(post("/oauth/token").with(httpBasic(clientId, clientPassword))
-                .param("username", email)
-                .param("password", password)
-                .param("grant_type", "password"))
-                .andReturn().getResponse().getContentAsString();
-
-        Jackson2JsonParser parser = new Jackson2JsonParser();
-        return (String) parser.parseMap(contentAsString).get("access_token");
-    }
 
     protected AccompanyComment createComment(Account account, Accompany accompany, int index) {
         AccompanyComment accompanyComment = AccompanyComment.builder()

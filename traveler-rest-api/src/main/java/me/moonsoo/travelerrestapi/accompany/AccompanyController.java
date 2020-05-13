@@ -93,7 +93,7 @@ public class AccompanyController {
         PagedModel<AccompanyModel> accompanyModels =
                 assembler.toModel(
                         accompanies,
-                        a -> new AccompanyModel(a),
+                        a -> new AccompanyModel(a, linkTo(AccompanyController.class).slash(a.getId()).slash("comments").withRel("get-accompany-comments")),
                         //page링크에 filter, search 같은 request param을 함께 붙이기 위해서 필요한 링크
                         linkTo(methodOn(AccompanyController.class).getAccompanies(pageable, assembler, params, account)).withSelfRel()
                 );//a: accompany
@@ -115,6 +115,7 @@ public class AccompanyController {
         Accompany updatedAccompany = accompanyService.updateViewCount(accompany);//조회수 1증가 처리
         AccompanyModel accompanyModel = new AccompanyModel(updatedAccompany);
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccompanyAnchor()).withRel("profile");
+        Link getCommentsLink = linkTo(AccompanyController.class).slash(accompany.getId()).slash("comments").withRel("get-accompany-comments");//게시물의 댓글 목록 조회 링크
         Link getAccompaniesLink = linkTo(AccompanyController.class).withRel("get-accompanies");
         //인증 && 자신의 게시물인 경우 update, delete link 제공
         if (account != null && updatedAccompany.getAccount().equals(account)) {
@@ -123,7 +124,7 @@ public class AccompanyController {
             Link deleteLink = linkBuilder.withRel("delete-accompany");
             accompanyModel.add(updateLink, deleteLink);
         }
-        accompanyModel.add(profileLink, getAccompaniesLink);
+        accompanyModel.add(profileLink, getCommentsLink, getAccompaniesLink);
         return ResponseEntity.ok(accompanyModel);
     }
 

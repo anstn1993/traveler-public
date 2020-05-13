@@ -3,6 +3,8 @@ package me.moonsoo.travelerrestapi.accompany;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 
+import java.util.Arrays;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 public class AccompanyModel extends EntityModel<Accompany> {

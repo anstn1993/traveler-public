@@ -43,4 +43,6 @@ public class AppProperties {
 
     private String updateAccompanyChildCommentAnchor;
 
+    private String createFollow;
+
 }

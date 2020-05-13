@@ -1,5 +1,7 @@
 package me.moonsoo.commonmodule.config;
 
+import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.commonmodule.account.AccountFormatter;
 import me.moonsoo.commonmodule.account.AccountService;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -49,5 +51,10 @@ public class CommonBeanConfig {
                 .build();
         factory.setHttpClient(httpClient);
         return new RestTemplate(factory);
+    }
+
+    @Bean
+    AccountFormatter accountFormatter () {
+        return new AccountFormatter();
     }
 }

@@ -29,7 +29,7 @@ public class Account implements Serializable {
     private String password;
 
     @Column(unique = true)
-    private String profileImageName;
+    private String profileImagePath;
 
     @Column(nullable = false)
     @NotNull
