@@ -45,4 +45,6 @@ public class AppProperties {
 
     private String createFollow;
 
+    private String getAccountFollowingsAnchor;
+
 }

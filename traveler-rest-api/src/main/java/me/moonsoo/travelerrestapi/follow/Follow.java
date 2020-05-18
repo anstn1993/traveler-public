@@ -1,10 +1,10 @@
 package me.moonsoo.travelerrestapi.follow;
 
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import me.moonsoo.commonmodule.account.Account;
-import me.moonsoo.commonmodule.account.AccountSerializer;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,11 +24,11 @@ public class Follow {
     @GeneratedValue
     Integer id;
 
-    @ManyToOne(targetEntity = Account.class)
+    @ManyToOne
     @JsonSerialize(using = FollowAccountSerializer.class)
     Account followingAccount;
 
-    @ManyToOne(targetEntity = Account.class)
+    @ManyToOne
     @JsonSerialize(using = FollowAccountSerializer.class)
     Account followedAccount;
 

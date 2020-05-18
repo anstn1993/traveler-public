@@ -1,5 +1,7 @@
 package me.moonsoo.commonmodule.account;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,6 +28,7 @@ public class Account implements Serializable {
 
     @Column(nullable = false)
     @NotNull
+    @JsonIgnore
     private String password;
 
     @Column(unique = true)
@@ -43,10 +46,12 @@ public class Account implements Serializable {
     @NotNull
     private Sex sex;
 
+    @JsonIgnore
     private boolean emailAuth;//회원가입 시 이메일 인증 여부
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
+    @JsonIgnore
     private Set<AccountRole> roles;//권한
 
 }

@@ -11,14 +11,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -210,19 +215,140 @@ class FollowControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @DisplayName("특정 사용자의 팔로잉 목록 조회(한 페이지에 10개씩, 1페이지 조회, id를 기준으로 오름차순)")
-    public void getFollowings() throws Exception {
+    @DisplayName("특정 사용자 팔로우 실패-이미 팔로우 중인 사용자를 팔로우하는 경우(400 Bad request)")
+    public void followUserFail_Already_Following() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
         String accessToken = getAuthToken(email, password, 0);
-        //사용자 100개 추가 후 100명 팔로우
-        IntStream.rangeClosed(1, 100).forEach(i -> {
+        Account followedAccount = createAccount(email, password, 1);
+        createFollow(account, followedAccount);//account가 followedAccount를 follow
+
+        FollowDto followDto = createFollowDto(followedAccount);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/accounts/{accountId}/followings", account.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(followDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 특정 사용자의 팔로잉 목록 조회(한 페이지에 10개씩, 1페이지 조회, id를 기준으로 오름차순)")
+    public void getFollowings_With_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+//        사용자 10개 추가 후 10명 팔로우
+        IntStream.rangeClosed(1, 30).forEach(i -> {
+            Account followedAccount = createAccount(email, password, i);
+            Follow follow = createFollow(account, followedAccount);
+        });
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings", account.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("size", "10")
+                .param("page", "1")
+                .param("sort", "id,ASC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.accountList").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.delete-account-follow").exists())
+                .andExpect(jsonPath("page.size").exists())
+                .andExpect(jsonPath("page.totalElements").exists())
+                .andExpect(jsonPath("page.totalPages").exists())
+                .andExpect(jsonPath("page.number").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+        .andDo(document("get-account-followings",
+                pagingLinks.and(
+                        linkWithRel("profile").description("api 문서 링크")
+                ),
+                requestHeaders(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                        headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                ),
+                pathParameters(
+                        parameterWithName("accountId").description("팔로잉 목록 소유자 id")
+                ),
+                requestParameters(
+                        parameterWithName("page").optional().description("페이지 번호"),
+                        parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
+                        parameterWithName("sort").optional().description("정렬 기준(id)")
+                ),
+                responseHeaders,
+                responsePageFields.and(
+                        fieldWithPath("_embedded.accountList[0].id").description("사용자의 id"),
+                        fieldWithPath("_embedded.accountList[0].email").description("사용자의 email"),
+                        fieldWithPath("_embedded.accountList[0].nickname").description("사용자의 닉네임"),
+                        fieldWithPath("_embedded.accountList[0].name").description("사용자의 이미지"),
+                        fieldWithPath("_embedded.accountList[0].profileImagePath").description("사용자의 프로필 사진 경로"),
+                        fieldWithPath("_embedded.accountList[0].sex").description("사용자의 성별"),
+                        fieldWithPath("_embedded.accountList[0]._links.self.href").description("해당 사용자 정보 조회 링크"),
+                        fieldWithPath("_embedded.accountList[0]._links.delete-account-follow.href").description("해당 사용자 unfollow 링크, 만약 팔로우 상태인 경우에는 팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("미인증 상태에서 특정 사용자의 팔로잉 목록 조회(한 페이지에 10개씩, 1페이지 조회, id를 기준으로 오름차순)")
+    public void getFollowings_Without_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        account = createAccount(email, password, 0);
+        //사용자 30개 추가 후 30명 팔로우
+        IntStream.rangeClosed(1, 30).forEach(i -> {
             Account followedAccount = createAccount(email, password, i);
             createFollow(account, followedAccount);
         });
 
-//        mockMvc.perform
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings", account.getId())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .param("size", "10")
+                .param("page", "1")
+                .param("sort", "id,ASC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.accountList").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.delete-account-follow").doesNotExist())
+                .andExpect(jsonPath("page.size").exists())
+                .andExpect(jsonPath("page.totalElements").exists())
+                .andExpect(jsonPath("page.totalPages").exists())
+                .andExpect(jsonPath("page.number").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+        ;
+    }
+
+    @Test
+    public void getOneFollow() {
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        Account followingAccount = createAccount(email, password, 0);
+        Account followedAccount = createAccount(email, password, 1);
+        createFollow(followingAccount, followedAccount);
+        Optional<Follow> followOpt = followRepository.findByFollowingAccountAndAndFollowedAccount(followingAccount, followedAccount);
+        Follow follow = followOpt.orElseThrow(() -> new NullPointerException("null"));
+        assertThat(follow.getFollowingAccount().getEmail()).isEqualTo(followingAccount.getEmail());
+        assertThat(follow.getFollowedAccount().getEmail()).isEqualTo(followedAccount.getEmail());
+
     }
 
     private FollowDto createFollowDto(Account targetAccount) {

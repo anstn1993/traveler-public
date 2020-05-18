@@ -84,8 +84,8 @@ public class BaseControllerTest {
             fieldWithPath("_links.next.href").description("다음 페이지 리소스 요청 url"),
             fieldWithPath("_links.last.href").description("마지막 페이지 리소스 요청 url"),
             fieldWithPath("_links.profile.href").description("api 문서 링크"),
-            fieldWithPath("page.size").description("한 페이지에 보여줄 동행 게시물의 수"),
-            fieldWithPath("page.totalElements").description("모든 동행 게시물의 수"),
+            fieldWithPath("page.size").description("한 페이지에 보여줄 아이템의 수"),
+            fieldWithPath("page.totalElements").description("모든 아이템의 수"),
             fieldWithPath("page.totalPages").description("전체 페이지 수"),
             fieldWithPath("page.number").description("현재 페이지 번호")
     );

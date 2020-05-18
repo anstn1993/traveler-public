@@ -1,6 +1,19 @@
 package me.moonsoo.travelerrestapi.follow;
 
+import io.lettuce.core.dynamic.annotation.Param;
+import me.moonsoo.commonmodule.account.Account;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
 
 public interface FollowRepository extends JpaRepository<Follow, Integer> {
+
+    Optional<Follow> findByFollowingAccountAndAndFollowedAccount(Account followingAccount, Account followedAccount);
+
+//    @Query(value = "select f from Follow f join Account a on a.id = f.followedAccount.id")
+    Page<Follow> findByFollowingAccount(Account followingAccount, Pageable pageable);
+
 }
