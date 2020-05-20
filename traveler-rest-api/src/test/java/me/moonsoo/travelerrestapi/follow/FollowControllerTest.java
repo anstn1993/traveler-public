@@ -75,41 +75,42 @@ class FollowControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("_links.get-account-followings").exists())
                 .andExpect(jsonPath("_links.get-account-followers").exists())
                 .andExpect(jsonPath("_links.delete-account-following").exists())
-        .andDo(document("create-follow",
-                links(
-                        linkWithRel("self").description("팔로우한 사용자 정보 조회 링크"),
-                        linkWithRel("profile").description("api 문서 링크"),
-                        linkWithRel("get-account-followings").description("사용자 팔로잉 목록 조회 링크"),
-                        linkWithRel("get-account-followers").description("사용자 팔로워 목록 조회 링크"),
-                        linkWithRel("delete-account-following").description("팔로우한 사용자 언팔로우 링크")
-                ),
-                requestHeaders,
-                pathParameters(
-                        parameterWithName("accountId").description("팔로우를 하는 주체가 되는 사용자의 id(요청을 보내는 사용자 자신의 id)")
-                ),
-                requestFields(
-                        fieldWithPath("followedAccount.id").description("팔로우의 대상이 되는 사용자 id")
-                ),
-                responseFields(
-                        fieldWithPath("id").description("팔로우 리소스 id"),
-                        fieldWithPath("followingAccount.id").description("팔로우하는 사용자의 id(사용자 자신의 id)"),
-                        fieldWithPath("followingAccount.email").description("팔로우하는 사용자의 email"),
-                        fieldWithPath("followingAccount.name").description("팔로우하는 사용자의 이름"),
-                        fieldWithPath("followingAccount.nickname").description("팔로우하는 사용자의 닉네임"),
-                        fieldWithPath("followingAccount.profileImagePath").description("팔로우하는 사용자의 프로필 이미지 경로"),
-                        fieldWithPath("followingAccount.sex").description("팔로우하는 사용자의 성별"),
-                        fieldWithPath("followedAccount.id").description("팔로우의 대상이 되는 사용자의 id"),
-                        fieldWithPath("followedAccount.email").description("팔로우의 대상이 되는 사용자의 이메일"),
-                        fieldWithPath("followedAccount.name").description("팔로우의 대상이 되는 사용자의 이름"),
-                        fieldWithPath("followedAccount.nickname").description("팔로우의 대상이 되는 사용자의 닉네임"),
-                        fieldWithPath("followedAccount.profileImagePath").description("팔로우의 대상이 되는 사용자의 프로필 이미지 경로"),
-                        fieldWithPath("followedAccount.sex").description("팔로우의 대상이 되는 사용자의 성별"),
-                        fieldWithPath("_links.self.href").description("팔로우의 대상이 되는 사용자 정보 조회 링크"),
-                        fieldWithPath("_links.profile.href").description("api 문서 링크"),
-                        fieldWithPath("_links.get-account-followings.href").description("사용자 팔로잉 목록 조회 링크"),
-                        fieldWithPath("_links.get-account-followers.href").description("사용자 팔로워 목록 조회 링크"),
-                        fieldWithPath("_links.delete-account-following.href").description("팔로우한 사용자 언팔로우 링크")
-                )
+                .andDo(document("create-follow",
+                        links(
+                                linkWithRel("self").description("팔로우한 사용자 정보 조회 링크"),
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("get-account-followings").description("사용자 팔로잉 목록 조회 링크"),
+                                linkWithRel("get-account-followers").description("사용자 팔로워 목록 조회 링크"),
+                                linkWithRel("delete-account-following").description("팔로우한 사용자 언팔로우 링크")
+                        ),
+                        requestHeaders,
+                        pathParameters(
+                                parameterWithName("accountId").description("팔로우를 하는 주체가 되는 사용자의 id(요청을 보내는 사용자 자신의 id)")
+                        ),
+                        requestFields(
+                                fieldWithPath("followedAccount.id").description("팔로우의 대상이 되는 사용자 id")
+                        ),
+                        responseHeaders,
+                        responseFields(
+                                fieldWithPath("id").description("팔로우 리소스 id"),
+                                fieldWithPath("followingAccount.id").description("팔로우하는 사용자의 id(사용자 자신의 id)"),
+                                fieldWithPath("followingAccount.email").description("팔로우하는 사용자의 email"),
+                                fieldWithPath("followingAccount.name").description("팔로우하는 사용자의 이름"),
+                                fieldWithPath("followingAccount.nickname").description("팔로우하는 사용자의 닉네임"),
+                                fieldWithPath("followingAccount.profileImagePath").description("팔로우하는 사용자의 프로필 이미지 경로"),
+                                fieldWithPath("followingAccount.sex").description("팔로우하는 사용자의 성별"),
+                                fieldWithPath("followedAccount.id").description("팔로우의 대상이 되는 사용자의 id"),
+                                fieldWithPath("followedAccount.email").description("팔로우의 대상이 되는 사용자의 이메일"),
+                                fieldWithPath("followedAccount.name").description("팔로우의 대상이 되는 사용자의 이름"),
+                                fieldWithPath("followedAccount.nickname").description("팔로우의 대상이 되는 사용자의 닉네임"),
+                                fieldWithPath("followedAccount.profileImagePath").description("팔로우의 대상이 되는 사용자의 프로필 이미지 경로"),
+                                fieldWithPath("followedAccount.sex").description("팔로우의 대상이 되는 사용자의 성별"),
+                                fieldWithPath("_links.self.href").description("팔로우의 대상이 되는 사용자 정보 조회 링크"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크"),
+                                fieldWithPath("_links.get-account-followings.href").description("사용자 팔로잉 목록 조회 링크"),
+                                fieldWithPath("_links.get-account-followers.href").description("사용자 팔로워 목록 조회 링크"),
+                                fieldWithPath("_links.delete-account-following.href").description("팔로우한 사용자 언팔로우 링크")
+                        )
                 ))
         ;
     }
@@ -270,33 +271,33 @@ class FollowControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("_links.next").exists())
                 .andExpect(jsonPath("_links.last").exists())
                 .andExpect(jsonPath("_links.profile").exists())
-        .andDo(document("get-account-followings",
-                pagingLinks.and(
-                        linkWithRel("profile").description("api 문서 링크")
-                ),
-                requestHeaders(
-                        headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                        headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
-                ),
-                pathParameters(
-                        parameterWithName("accountId").description("팔로잉 목록 소유자 id")
-                ),
-                requestParameters(
-                        parameterWithName("page").optional().description("페이지 번호"),
-                        parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
-                        parameterWithName("sort").optional().description("정렬 기준(id)")
-                ),
-                responseHeaders,
-                responsePageFields.and(
-                        fieldWithPath("_embedded.accountList[0].id").description("사용자의 id"),
-                        fieldWithPath("_embedded.accountList[0].email").description("사용자의 email"),
-                        fieldWithPath("_embedded.accountList[0].nickname").description("사용자의 닉네임"),
-                        fieldWithPath("_embedded.accountList[0].name").description("사용자의 이미지"),
-                        fieldWithPath("_embedded.accountList[0].profileImagePath").description("사용자의 프로필 사진 경로"),
-                        fieldWithPath("_embedded.accountList[0].sex").description("사용자의 성별"),
-                        fieldWithPath("_embedded.accountList[0]._links.self.href").description("해당 사용자 정보 조회 링크"),
-                        fieldWithPath("_embedded.accountList[0]._links.delete-account-follow.href").description("해당 사용자 unfollow 링크, 만약 팔로우 상태인 경우에는 팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
-                )
+                .andDo(document("get-account-followings",
+                        pagingLinks.and(
+                                linkWithRel("profile").description("api 문서 링크")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        pathParameters(
+                                parameterWithName("accountId").description("팔로잉 목록 소유자 id")
+                        ),
+                        requestParameters(
+                                parameterWithName("page").optional().description("페이지 번호"),
+                                parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
+                                parameterWithName("sort").optional().description("정렬 기준(id)")
+                        ),
+                        responseHeaders,
+                        responsePageFields.and(
+                                fieldWithPath("_embedded.accountList[0].id").description("사용자의 id"),
+                                fieldWithPath("_embedded.accountList[0].email").description("사용자의 email"),
+                                fieldWithPath("_embedded.accountList[0].nickname").description("사용자의 닉네임"),
+                                fieldWithPath("_embedded.accountList[0].name").description("사용자의 이미지"),
+                                fieldWithPath("_embedded.accountList[0].profileImagePath").description("사용자의 프로필 사진 경로"),
+                                fieldWithPath("_embedded.accountList[0].sex").description("사용자의 성별"),
+                                fieldWithPath("_embedded.accountList[0]._links.self.href").description("해당 사용자 정보 조회 링크"),
+                                fieldWithPath("_embedded.accountList[0]._links.delete-account-follow.href").description("해당 사용자 언팔로우 링크, 만약 언팔로우 상태인 경우에는 팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        )
                 ))
         ;
     }
@@ -338,18 +339,336 @@ class FollowControllerTest extends BaseControllerTest {
     }
 
     @Test
-    public void getOneFollow() {
+    @DisplayName("인증 상태에서 특정 사용자가 팔로잉하고 있는 사용자 조회")
+    public void getFollowing_With_Auth() throws Exception {
+        //Given
         String email = "anstn1993@email.com";
         String password = "1111";
-        Account followingAccount = createAccount(email, password, 0);
-        Account followedAccount = createAccount(email, password, 1);
-        createFollow(followingAccount, followedAccount);
-        Optional<Follow> followOpt = followRepository.findByFollowingAccountAndAndFollowedAccount(followingAccount, followedAccount);
-        Follow follow = followOpt.orElseThrow(() -> new NullPointerException("null"));
-        assertThat(follow.getFollowingAccount().getEmail()).isEqualTo(followingAccount.getEmail());
-        assertThat(follow.getFollowedAccount().getEmail()).isEqualTo(followedAccount.getEmail());
+        String accessToken = getAuthToken(email, password, 0);
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
 
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings/{followedId}", followingAccount.getId(), followedAccount.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("email").exists())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("profileImagePath").hasJsonPath())
+                .andExpect(jsonPath("sex").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.create-account-follow").exists())
+                .andDo(document("get-account-following",
+                        links(
+                                linkWithRel("self").description("현재 리소스 조회 링크"),
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("create-account-follow").description("조회한 사용자를 팔로우하는 링크. 만약 팔로우 상태인 경우에는 언팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        pathParameters(
+                                parameterWithName("accountId").description("사용자 id"),
+                                parameterWithName("followedId").description("accountId에 해당하는 사용자가 팔로잉하고 있는 사용자 id")
+                        ),
+                        responseHeaders,
+                        responseFields(
+                                fieldWithPath("id").description("사용자의 id"),
+                                fieldWithPath("email").description("사용자의 email"),
+                                fieldWithPath("name").description("사용자의 이름"),
+                                fieldWithPath("nickname").description("사용자의 닉네임"),
+                                fieldWithPath("profileImagePath").description("사용자의 프로필 이미지 경로"),
+                                fieldWithPath("sex").description("사용자의 성별"),
+                                fieldWithPath("_links.self.href").description("현재 리소스 조회 링크"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크"),
+                                fieldWithPath("_links.create-account-follow.href").description("조회한 사용자를 팔로우하는 링크. 만약 팔로우 상태인 경우에는 언팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        )
+                ))
+        ;
     }
+
+    @Test
+    @DisplayName("미인증 상태에서 특정 사용자가 팔로잉하고 있는 사용자 조회")
+    public void getFollowing_Without_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings/{followedId}", followingAccount.getId(), followedAccount.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("email").exists())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("profileImagePath").hasJsonPath())
+                .andExpect(jsonPath("sex").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.delete-account-follow").doesNotExist())
+        ;
+    }
+
+    @Test
+    @DisplayName("특정 사용자가 팔로잉하고 있는 사용자 조회 실패-존재하지 않는 accountId 리소스(404 Not found)")
+    public void getFollowingFail_Not_Found_Account() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings/{followedId}", 404, followedAccount.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("특정 사용자가 팔로잉하고 있는 사용자 조회 실패-존재하지 않는 followedId 리소스(404 Not found)")
+    public void getFollowingFail_Not_Found_FollowedAccount() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings/{followedId}", followingAccount.getId(), 404)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 특정 사용자의 팔로워 목록 조회(한 페이지에 10개씩, 1페이지 조회, id를 기준으로 오름차순)")
+    public void getAccountFollowers_With_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+//        사용자 10개 추가 후 10명 팔로우
+        IntStream.rangeClosed(1, 30).forEach(i -> {
+            Account followingAccount = createAccount(email, password, i);//account를 팔로잉하는 사용자
+            createFollow(followingAccount, account);
+        });
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers", account.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("size", "10")
+                .param("page", "1")
+                .param("sort", "id,ASC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.accountList").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.create-account-follow").exists())
+                .andExpect(jsonPath("page.size").exists())
+                .andExpect(jsonPath("page.totalElements").exists())
+                .andExpect(jsonPath("page.totalPages").exists())
+                .andExpect(jsonPath("page.number").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("get-account-followers",
+                        pagingLinks.and(
+                                linkWithRel("profile").description("api 문서 링크")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        pathParameters(
+                                parameterWithName("accountId").description("팔로워 목록 소유자 id")
+                        ),
+                        requestParameters(
+                                parameterWithName("page").optional().description("페이지 번호"),
+                                parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
+                                parameterWithName("sort").optional().description("정렬 기준(id)")
+                        ),
+                        responseHeaders,
+                        responsePageFields.and(
+                                fieldWithPath("_embedded.accountList[0].id").description("사용자의 id"),
+                                fieldWithPath("_embedded.accountList[0].email").description("사용자의 email"),
+                                fieldWithPath("_embedded.accountList[0].nickname").description("사용자의 닉네임"),
+                                fieldWithPath("_embedded.accountList[0].name").description("사용자의 이미지"),
+                                fieldWithPath("_embedded.accountList[0].profileImagePath").description("사용자의 프로필 사진 경로"),
+                                fieldWithPath("_embedded.accountList[0].sex").description("사용자의 성별"),
+                                fieldWithPath("_embedded.accountList[0]._links.self.href").description("해당 사용자 정보 조회 링크"),
+                                fieldWithPath("_embedded.accountList[0]._links.create-account-follow.href").description("해당 사용자 팔로우 링크, 만약 팔로우 상태인 경우에는 언팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("미인증 상태에서 특정 사용자의 팔로워 목록 조회(한 페이지에 10개씩, 1페이지 조회, id를 기준으로 오름차순)")
+    public void getAccountFollowers_Without_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+//        사용자 10개 추가 후 10명 팔로우
+        IntStream.rangeClosed(1, 30).forEach(i -> {
+            Account followingAccount = createAccount(email, password, i);//account를 팔로잉하는 사용자
+            createFollow(followingAccount, account);
+        });
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers", account.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("size", "10")
+                .param("page", "1")
+                .param("sort", "id,ASC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.accountList").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.create-account-follow").doesNotExist())
+                .andExpect(jsonPath("page.size").exists())
+                .andExpect(jsonPath("page.totalElements").exists())
+                .andExpect(jsonPath("page.totalPages").exists())
+                .andExpect(jsonPath("page.number").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 특정 사용자의 팔로워 조회")
+    public void getFollower_With_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers/{followingId}", followedAccount.getId(), followingAccount.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("email").exists())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("profileImagePath").hasJsonPath())
+                .andExpect(jsonPath("sex").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.create-account-follow").exists())
+                .andDo(document("get-account-follower",
+                        links(
+                                linkWithRel("self").description("현재 리소스 조회 링크"),
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("create-account-follow").description("조회한 사용자를 팔로우하는 링크. 만약 팔로우 상태인 경우에는 언팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        pathParameters(
+                                parameterWithName("accountId").description("사용자 id"),
+                                parameterWithName("followingId").description("accountId에 해당하는 사용자를 팔로잉하고 있는 사용자 id")
+                        ),
+                        responseHeaders,
+                        responseFields(
+                                fieldWithPath("id").description("사용자의 id"),
+                                fieldWithPath("email").description("사용자의 email"),
+                                fieldWithPath("name").description("사용자의 이름"),
+                                fieldWithPath("nickname").description("사용자의 닉네임"),
+                                fieldWithPath("profileImagePath").description("사용자의 프로필 이미지 경로"),
+                                fieldWithPath("sex").description("사용자의 성별"),
+                                fieldWithPath("_links.self.href").description("현재 리소스 조회 링크"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크"),
+                                fieldWithPath("_links.create-account-follow.href").description("조회한 사용자를 팔로우하는 링크. 만약 팔로우 상태인 경우에는 언팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("미인증 상태에서 특정 사용자의 팔로워 조회")
+    public void getFollower_Without_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers/{followingId}", followedAccount.getId(), followingAccount.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("email").exists())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("profileImagePath").hasJsonPath())
+                .andExpect(jsonPath("sex").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.delete-account-follow").doesNotExist())
+        ;
+    }
+
+    @Test
+    @DisplayName("특정 사용자의 팔로워 조회 실패-존재하지 않는 accountId 리소스(404 Not found)")
+    public void getFollowerFail_Not_Found_Account() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers/{followingId}", 404, followingAccount.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("특정 사용자의 팔로워 조회 실패-존재하지 않는 followingId 리소스(404 Not found)")
+    public void getFollowingFail_Not_Found_FollowingAccount() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers/{followingId}", followedAccount.getId(), 404)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
 
     private FollowDto createFollowDto(Account targetAccount) {
         return FollowDto.builder()

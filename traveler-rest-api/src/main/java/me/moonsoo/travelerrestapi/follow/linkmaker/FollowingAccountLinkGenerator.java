@@ -31,8 +31,13 @@ public class FollowingAccountLinkGenerator extends AbstFollowLinkGenerator{
     private FollowService followService;
 
     @Override
-    protected Link makeSelfLink(Account targetUser) {
-        return linkTo(FollowController.class).slash(resourceAccount.getId()).slash("followings").slash(targetUser.getId()).withSelfRel();
+    protected Link makeSelfLink(Account targetUser, String followingOrFollower) {
+        if(followingOrFollower.equals("following")) {
+            return linkTo(FollowController.class).slash(resourceAccount.getId()).slash("followings").slash(targetUser.getId()).withSelfRel();
+        }
+        else {
+            return linkTo(FollowController.class).slash(resourceAccount.getId()).slash("followers").slash(targetUser.getId()).withSelfRel();
+        }
     }
 
     @Override

@@ -33,4 +33,10 @@ public class FollowService {
         Page<Account> followedAccounts = follows.map(follow -> follow.getFollowedAccount());
         return followedAccounts;
     }
+
+    public Page<Account> findAllFollowingAccounts(Account followedAccount, Pageable pageable) {
+        Page<Follow> follows = followRepository.findByFollowedAccount(followedAccount, pageable);
+        Page<Account> followingAccounts = follows.map(follow -> follow.getFollowingAccount());
+        return followingAccounts;
+    }
 }

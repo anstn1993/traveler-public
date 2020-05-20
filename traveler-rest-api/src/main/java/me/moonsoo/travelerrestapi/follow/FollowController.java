@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Links;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +72,7 @@ public class FollowController {
 
         //이미 팔로잉 중인 사용자를 팔로우 하려고 하는 경우
         Optional<Follow> existingFollowOpt = followService.getFollow(followingAccount, followDto.getFollowedAccount());
-        if(existingFollowOpt.isPresent()) {
+        if (existingFollowOpt.isPresent()) {
             errors.reject("bad request", "You are already following that user");
             return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
@@ -110,14 +111,93 @@ public class FollowController {
                 .resourceAccount(followingAccount)
                 .followService(followService)
                 .build();
-        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(linkGenerator);
-        PagedModel<FollowAccountModel> accountModels =
-                assembler.toModel(
-                        followedAccounts,
-                        followAccountModelAssembler);
+        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(linkGenerator, "following");
+        PagedModel<FollowAccountModel> accountModels = assembler.toModel(followedAccounts, followAccountModelAssembler);
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowingsAnchor()).withRel("profile");//profile 링크
         accountModels.add(profileLink);
         return ResponseEntity.ok(accountModels);
+    }
+
+    @GetMapping("/{accountId}/followings/{followedId}")
+    public ResponseEntity getFollowing(@PathVariable("accountId") Account followingAccount,
+                                       @PathVariable("followedId") Account followedAccount,
+                                       @CurrentAccount Account account) {
+        //존재하지 않는 리소스 요청인 경우
+        if(followingAccount == null || followedAccount == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //사용자가 팔로잉하고 있지 않은 경우
+        Optional<Follow> followOpt = followService.getFollow(followingAccount, followedAccount);
+        if(followOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //Hateoas적용
+        AbstFollowLinkGenerator linkGenerator = FollowingAccountLinkGenerator.builder()
+                .currentUser(account)
+                .resourceAccount(followingAccount)
+                .followService(followService)
+                .build();
+
+        Links links = linkGenerator.makeLinks(followedAccount, "following");//self, create-account-follow or delete-account-follow링크 생성
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowingAnchor()).withRel("profile");//profile 링크
+        FollowAccountModel followAccountModel = new FollowAccountModel(followedAccount, links);
+        followAccountModel.add(profileLink);
+        return ResponseEntity.ok(followAccountModel);
+    }
+
+    @GetMapping("/{accountId}/followers")
+    public ResponseEntity getFollowers(Pageable pageable,
+                                       @PathVariable("accountId") Account followedAccount,
+                                       PagedResourcesAssembler<Account> assembler,
+                                       @CurrentAccount Account account) {
+
+        Page<Account> followingAccounts = followService.findAllFollowingAccounts(followedAccount, pageable);
+
+        //Hateoas적용
+        AbstFollowLinkGenerator followLinkGenerator = FollowingAccountLinkGenerator.builder()
+                .followService(followService)
+                .currentUser(account)
+                .resourceAccount(followedAccount)
+                .build();
+
+        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(followLinkGenerator, "follower");
+
+        PagedModel<FollowAccountModel> accountModels = assembler.toModel(followingAccounts, followAccountModelAssembler);
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowersAnchor()).withRel("profile");//profile 링크
+        accountModels.add(profileLink);
+        return ResponseEntity.ok(accountModels);
+
+    }
+
+    @GetMapping("/{accountId}/followers/{followingId}")
+    public ResponseEntity getFollower(@PathVariable("accountId") Account followedAccount,
+                                      @PathVariable("followingId") Account followingAccount,
+                                      @CurrentAccount Account account) {
+        //존재하지 않는 리소스 요청인 경우
+        if(followedAccount == null || followingAccount == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //사용자가 팔로잉하고 있지 않은 경우
+        Optional<Follow> followOpt = followService.getFollow(followingAccount, followedAccount);
+        if(followOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //Hateoas적용
+        AbstFollowLinkGenerator linkGenerator = FollowingAccountLinkGenerator.builder()
+                .currentUser(account)
+                .resourceAccount(followedAccount)
+                .followService(followService)
+                .build();
+
+        Links links = linkGenerator.makeLinks(followingAccount, "follower");//self, create-account-follow or delete-account-follow링크 생성
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowerAnchor()).withRel("profile");//profile 링크
+        FollowAccountModel followAccountModel = new FollowAccountModel(followingAccount, links);
+        followAccountModel.add(profileLink);
+        return ResponseEntity.ok(followAccountModel);
     }
 
 }

@@ -14,13 +14,16 @@ public class FollowAccountModelAssembler implements RepresentationModelAssembler
 
     private AbstFollowLinkGenerator abstFollowLinkGenerator;
 
-    public FollowAccountModelAssembler(AbstFollowLinkGenerator abstFollowLinkGenerator) {
+    private String followingOrFollower;//팔로잉에 대한 요청인지, 팔로워에 대한 요청인지 구분하는 flag 문자열
+
+    public FollowAccountModelAssembler(AbstFollowLinkGenerator abstFollowLinkGenerator, String followingOrFollower) {
         this.abstFollowLinkGenerator = abstFollowLinkGenerator;
+        this.followingOrFollower = followingOrFollower;
     }
 
     @Override
     public FollowAccountModel toModel(Account targetAccount) {
-        Links links = abstFollowLinkGenerator.makeLinks(targetAccount);//self link, follow link(조건에 따라 follow링크가 될 수도 있고, unfollow링크가 될 수도 있다.)
+        Links links = abstFollowLinkGenerator.makeLinks(targetAccount, followingOrFollower);//self link, follow link(조건에 따라 follow링크가 될 수도 있고, unfollow링크가 될 수도 있다.)
         return new FollowAccountModel(targetAccount, links);
     }
 
