@@ -39,4 +39,8 @@ public class FollowService {
         Page<Account> followingAccounts = follows.map(follow -> follow.getFollowingAccount());
         return followingAccounts;
     }
+
+    public void delete(Follow follow) {
+        followRepository.delete(follow);
+    }
 }

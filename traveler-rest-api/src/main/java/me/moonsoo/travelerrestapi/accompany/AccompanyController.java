@@ -15,6 +15,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.DirectFieldBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -23,6 +24,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.ErrorManager;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -71,11 +73,11 @@ public class AccompanyController {
         WebMvcLinkBuilder linkBuilder = linkTo(AccompanyController.class);
         URI uri = linkBuilder.slash(savedAccompany.getId()).toUri();//헤더에 리소스 location 추가
         //hateoas적용을 위해서 link정보들을 추가할 수 있는 Model 객체 생성
-        Link getEventsLink = linkBuilder.withRel("get-accompanies");//게시물 조회 링크
-        Link updateEventLink = linkBuilder.slash(savedAccompany.getId()).withRel("update-accompany");//게시물 수정 링크
-        Link deleteEventLink = linkBuilder.slash(savedAccompany.getId()).withRel("delete-accompany");//게시물 삭제 링크
+        Link getAccompanysLink = linkBuilder.withRel("get-accompanies");//게시물 조회 링크
+        Link updateAccompanyLink = linkBuilder.slash(savedAccompany.getId()).withRel("update-accompany");//게시물 수정 링크
+        Link deleteAccompanyLink = linkBuilder.slash(savedAccompany.getId()).withRel("delete-accompany");//게시물 삭제 링크
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getCreateAccompanyAnchor()).withRel("profile");//profile 링크
-        accompanyModel.add(getEventsLink, updateEventLink, deleteEventLink, profileLink);//링크 추가
+        accompanyModel.add(getAccompanysLink, updateAccompanyLink, deleteAccompanyLink, profileLink);//링크 추가
         return ResponseEntity.created(uri).body(accompanyModel);
     }
 
@@ -141,7 +143,8 @@ public class AccompanyController {
 
         //다른 사용자의 게시물을 수정하려고 하는 경우
         if(!accompany.getAccount().equals(account)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            errors.reject("forbidden", "You can not update other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
         }
 
         //요청 본문의 값들이 유효하지 않은 경우
@@ -175,6 +178,8 @@ public class AccompanyController {
 
         //요청한 리소스가 사용자의 리소스가 아닌 경우
         if(!accompany.getAccount().equals(account)) {
+            Errors errors = new DirectFieldBindingResult(account, "account");
+            errors.reject("forbidden", "You can not delete other user's contents.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

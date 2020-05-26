@@ -19,6 +19,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.DirectFieldBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -91,7 +92,7 @@ public class FollowController {
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getCreateFollow()).withRel("profile");//profile 링크
         Link getAccountFollowingsLink = linkTo(Follow.class).slash(account.getId()).slash("followings").withRel("get-account-followings");
         Link getAccountFollowersLink = linkTo(Follow.class).slash(account.getId()).slash("followers").withRel("get-account-followers");
-        Link deleteAccountFollowingsLink = linkTo(Follow.class).slash(account.getId()).slash("followings").slash(savedFollow.getFollowedAccount()).withRel("delete-account-following");
+        Link deleteAccountFollowingsLink = linkTo(Follow.class).slash(account.getId()).slash("followings").slash(savedFollow.getFollowedAccount().getId()).withRel("delete-account-following");
         followModel.add(profileLink, getAccountFollowingsLink, getAccountFollowersLink, deleteAccountFollowingsLink);
         URI uri = followModel.getLink("self").get().toUri();
         return ResponseEntity.created(uri).body(followModel);
@@ -200,4 +201,40 @@ public class FollowController {
         return ResponseEntity.ok(followAccountModel);
     }
 
+    @DeleteMapping("/{accountId}/followings/{followedId}")
+    public ResponseEntity unfollowUser(@PathVariable("accountId") Account followingAccount,
+                                       @PathVariable("followedId") Account followedAccount,
+                                       @CurrentAccount Account account) {
+
+        //accountId가 존재하지 않거나 자기 자신이 아닌 경우
+        if(followingAccount == null || !followingAccount.equals(account)) {
+            Errors errors = new DirectFieldBindingResult(followingAccount,"followingAccount");
+            errors.reject("forbidden", "You can not control other user's follow process.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        //자기 자신을 언팔로우 하려고 하는 경우
+        if(followingAccount.equals(followedAccount)) {
+            Errors errors = new DirectFieldBindingResult(followingAccount,"followingAccount");
+            errors.reject("forbidden", "You can not unfollow yourself.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        //존재하지 않는 사용자를 언팔로우하는 경우
+        if(followedAccount == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //팔로잉하고 있지 않은 사용자를 언팔로우 하려고 하는 경우
+        Optional<Follow> followOpt = followService.getFollow(followingAccount, followedAccount);
+        if(followOpt.isEmpty()) {
+            Errors errors = new DirectFieldBindingResult(followingAccount, "followingAccount");
+            errors.reject("bad request", "You are not following that user");
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+        Follow follow = followOpt.get();
+        followService.delete(follow);//팔로우 데이터 삭제
+        return ResponseEntity.noContent().build();
+    }
 }

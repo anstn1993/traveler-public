@@ -282,13 +282,13 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                                 headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
                         ),
                         responsePageFields.and(
-                                fieldWithPath("_embedded.accompanyChildCommentList[0].id").description("대댓글 id"),
-                                fieldWithPath("_embedded.accompanyChildCommentList[0].account.id").description("대댓글 작성자의 id"),
-                                fieldWithPath("_embedded.accompanyChildCommentList[0].accompany.id").description("동행 게시물 id"),
-                                fieldWithPath("_embedded.accompanyChildCommentList[0].accompanyComment.id").description("부모 댓글 id"),
-                                fieldWithPath("_embedded.accompanyChildCommentList[0].comment").description("대댓글"),
-                                fieldWithPath("_embedded.accompanyChildCommentList[0].regDate").description("대댓글 추가 시간"),
-                                fieldWithPath("_embedded.accompanyChildCommentList[0]._links.self.href").description("대댓글 리소스 url"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[].id").description("대댓글 id"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[].account.id").description("대댓글 작성자의 id"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[].accompany.id").description("동행 게시물 id"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[].accompanyComment.id").description("부모 댓글 id"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[].comment").description("대댓글"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[].regDate").description("대댓글 추가 시간"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[]._links.self.href").description("대댓글 리소스 url"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크"),
                                 fieldWithPath("_links.create-accompany-child-comment.href").description("대댓글 추가 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         )

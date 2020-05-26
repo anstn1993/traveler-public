@@ -18,6 +18,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.DirectFieldBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -150,7 +151,8 @@ public class AccompanyChildCommentController {
 
         //자신의 대댓글이 아닌 경우
         if (!childComment.getAccount().equals(account)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            errors.reject("forbidden", "You can not update other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
         }
 
         //요청 본문이 유효하지 않은 경우
@@ -186,7 +188,9 @@ public class AccompanyChildCommentController {
 
         //자신의 대댓글이 아닌 경우
         if (!childComment.getAccount().equals(account)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            Errors errors = new DirectFieldBindingResult(account,"account");
+            errors.reject("forbidden", "You can not delete other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
         }
 
         accompanyChildCommentService.delete(childComment);

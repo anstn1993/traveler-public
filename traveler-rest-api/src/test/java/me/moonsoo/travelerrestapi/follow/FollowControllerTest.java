@@ -289,14 +289,14 @@ class FollowControllerTest extends BaseControllerTest {
                         ),
                         responseHeaders,
                         responsePageFields.and(
-                                fieldWithPath("_embedded.accountList[0].id").description("사용자의 id"),
-                                fieldWithPath("_embedded.accountList[0].email").description("사용자의 email"),
-                                fieldWithPath("_embedded.accountList[0].nickname").description("사용자의 닉네임"),
-                                fieldWithPath("_embedded.accountList[0].name").description("사용자의 이미지"),
-                                fieldWithPath("_embedded.accountList[0].profileImagePath").description("사용자의 프로필 사진 경로"),
-                                fieldWithPath("_embedded.accountList[0].sex").description("사용자의 성별"),
-                                fieldWithPath("_embedded.accountList[0]._links.self.href").description("해당 사용자 정보 조회 링크"),
-                                fieldWithPath("_embedded.accountList[0]._links.delete-account-follow.href").description("해당 사용자 언팔로우 링크, 만약 언팔로우 상태인 경우에는 팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                                fieldWithPath("_embedded.accountList[].id").description("사용자의 id"),
+                                fieldWithPath("_embedded.accountList[].email").description("사용자의 email"),
+                                fieldWithPath("_embedded.accountList[].nickname").description("사용자의 닉네임"),
+                                fieldWithPath("_embedded.accountList[].name").description("사용자의 이미지"),
+                                fieldWithPath("_embedded.accountList[].profileImagePath").description("사용자의 프로필 사진 경로"),
+                                fieldWithPath("_embedded.accountList[].sex").description("사용자의 성별"),
+                                fieldWithPath("_embedded.accountList[]._links.self.href").description("해당 사용자 정보 조회 링크"),
+                                fieldWithPath("_embedded.accountList[]._links.delete-account-follow.href").description("해당 사용자 언팔로우 링크, 만약 언팔로우 상태인 경우에는 팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         )
                 ))
         ;
@@ -505,14 +505,14 @@ class FollowControllerTest extends BaseControllerTest {
                         ),
                         responseHeaders,
                         responsePageFields.and(
-                                fieldWithPath("_embedded.accountList[0].id").description("사용자의 id"),
-                                fieldWithPath("_embedded.accountList[0].email").description("사용자의 email"),
-                                fieldWithPath("_embedded.accountList[0].nickname").description("사용자의 닉네임"),
-                                fieldWithPath("_embedded.accountList[0].name").description("사용자의 이미지"),
-                                fieldWithPath("_embedded.accountList[0].profileImagePath").description("사용자의 프로필 사진 경로"),
-                                fieldWithPath("_embedded.accountList[0].sex").description("사용자의 성별"),
-                                fieldWithPath("_embedded.accountList[0]._links.self.href").description("해당 사용자 정보 조회 링크"),
-                                fieldWithPath("_embedded.accountList[0]._links.create-account-follow.href").description("해당 사용자 팔로우 링크, 만약 팔로우 상태인 경우에는 언팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                                fieldWithPath("_embedded.accountList[].id").description("사용자의 id"),
+                                fieldWithPath("_embedded.accountList[].email").description("사용자의 email"),
+                                fieldWithPath("_embedded.accountList[].nickname").description("사용자의 닉네임"),
+                                fieldWithPath("_embedded.accountList[].name").description("사용자의 이미지"),
+                                fieldWithPath("_embedded.accountList[].profileImagePath").description("사용자의 프로필 사진 경로"),
+                                fieldWithPath("_embedded.accountList[].sex").description("사용자의 성별"),
+                                fieldWithPath("_embedded.accountList[]._links.self.href").description("해당 사용자 정보 조회 링크"),
+                                fieldWithPath("_embedded.accountList[]._links.create-account-follow.href").description("해당 사용자 팔로우 링크, 만약 팔로우 상태인 경우에는 언팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         )
                 ))
         ;
@@ -669,6 +669,136 @@ class FollowControllerTest extends BaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("팔로잉 중이던 사용자 언팔로우")
+    public void unfollowUser() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(account, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}/followings/{followedId}", account.getId(), followedAccount.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-follow",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                        ),
+                        pathParameters(
+                                parameterWithName("accountId").description("사용자 id"),
+                                parameterWithName("followedId").description("사용자가 언팔로우할 사용자의 id")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("팔로잉 중이던 사용자 언팔로우 실패-팔로잉 중인 사용자가 아닌 경우(400 Bad request)")
+    public void unfollowUserFail_Not_Following() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}/followings/{followedId}", account.getId(), otherAccount.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+
+    }
+
+    @Test
+    @DisplayName("팔로잉 중이던 사용자 언팔로우 실패-oauth인증에 실패(401 Unauthorized)")
+    public void unfollowUserFail_Unauthorized() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}/followings/{followedId}", followingAccount.getId(), followedAccount.getId()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("팔로잉 중이던 사용자 언팔로우 실패-다른 사용자의 accountId로 요청하는 경우(403 Forbidden)")
+    public void unfollowUserFail_Not_My_Account() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}/followings/{followedId}", followingAccount.getId(), followedAccount.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+
+    }
+
+    @Test
+    @DisplayName("팔로잉 중이던 사용자 언팔로우 실패-존재하지 않는 사용자의 accountId로 요청하는 경우(403 Forbidden)")
+    public void unfollowUserFail_Not_Existing_Account() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account followingAccount = createAccount(email, password, 1);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}/followings/{followedId}", 404, followedAccount.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+    }
+
+    @Test
+    @DisplayName("팔로잉 중이던 사용자 언팔로우 실패-자기 자신을 언팔로우 하는 경우(403 Forbidden)")
+    public void unfollowUserFail_Unfollow_Self() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(account, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}/followings/{followedId}", account.getId(), account.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+
+    }
+
+    @Test
+    @DisplayName("팔로잉 중이던 사용자 언팔로우 실패-존재하지 않는 사용자를 언팔로우 하는 경우(404 Not found)")
+    public void unfollowUserFail_Not_Existing_User() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account followedAccount = createAccount(email, password, 2);
+        createFollow(account, followedAccount);//followingAccount가 followedAccount를 follow
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}/followings/{followedId}", account.getId(), 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+
+    }
 
     private FollowDto createFollowDto(Account targetAccount) {
         return FollowDto.builder()

@@ -135,25 +135,35 @@ operation::delete-accompany[snippets='curl-request,http-request,request-headers,
 [[resources-accompany-comment-create]]
 === 동행 게시물에 댓글 생성
 
+`POST` 요청을 사용해서 특정 동행 게시물에 댓글을 추가할 수 있다.
+
 operation::create-accompany-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-accompany-comments-get]]
 === 동행 게시물의 댓글 목록 조회
+
+'GET' 요청을 사용해서 특정 동행 게시물에 달린 댓글 목록을 조회할 수 있다.
 
 operation::get-accompany-comments[snippets='curl-request,http-request,request-headers,path-parameters,request-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-accompany-comment-get]]
 === 동행 게시물의 댓글 조회
 
+'GET' 요청을 사용해서 특정 동행 게시물에 달린 댓글 하나를 조회할 수 있다.
+
 operation::get-accompany-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-accompany-comment-update]]
 === 동행 게시물의 댓글 수정
 
+'PUT' 요청을 사용해서 특정 동행 게시물에 자신이 단 댓글을 수정할 수 있다.
+
 operation::update-accompany-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-accompany-comment-delete]]
 === 동행 게시물의 댓글 삭제
+
+'DELETE' 요청을 사용해서 특정 동행 게시물에 단 자신의 댓글을 삭제할 수 있다.
 
 operation::delete-accompany-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response']
 
@@ -165,25 +175,35 @@ operation::delete-accompany-comment[snippets='curl-request,http-request,request-
 [[resources-accompany-child-comment-create]]
 === 동행 게시물의 대댓글 생성
 
+`POST` 요청을 사용해서 특정 동행 게시물에 달린 댓글에 대댓글을 추가할 수 있다.
+
 operation::create-accompany-child-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-accompany-child-comments-get]]
 === 동행 게시물의 대댓글 목록 조회
+
+'GET' 요청을 사용해서 특정 동행 게시물에 달린 댓글에 달린 대댓글 목록을 조회할 수 있다.
 
 operation::get-accompany-child-comments[snippets='curl-request,http-request,request-headers,path-parameters,request-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-accompany-child-comment-get]]
 === 동행 게시물의 대댓글 조회
 
+'GET' 요청을 사용해서 특정 동행 게시물에 달린 댓글에 달린 대댓글 하나를 조회할 수 있다.
+
 operation::get-accompany-child-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-accompany-child-comment-update]]
 === 동행 게시물의 대댓글 수정
 
+'PUT' 요청을 사용해서 특정 동행 게시물에 달린 댓글에 자신이 단 대댓글을 수정할 수 있다.
+
 operation::update-accompany-child-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-accompany-child-comment-delete]]
 === 동행 게시물의 대댓글 삭제
+
+'DELETE' 요청을 사용해서 특정 동행 게시물에 달린 댓글에 자신이 단 자신의 대댓글을 삭제할 수 있다.
 
 operation::delete-accompany-child-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response']
 
@@ -196,24 +216,55 @@ operation::delete-accompany-child-comment[snippets='curl-request,http-request,re
 [[resources-follow-create]]
 === 사용자 팔로우(팔로우 리소스 생성)
 
+`POST` 요청을 사용해서 특정 사용자를 팔로우할 수 있다.
+
 operation::create-follow[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-account-followings-get]]
 === 사용자의 팔로잉 목록 조회
+
+'GET' 요청을 사용해서 특정 사용자가 팔로잉하고 있는 사용자 목록을 조회할 수 있다.
 
 operation::get-account-followings[snippets='curl-request,http-request,request-headers,path-parameters,request-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-account-following-get]]
 === 사용자가 팔로잉하고 있는 사용자 조회
 
+'GET' 요청을 사용해서 특정 사용자가 팔로잉하고 있는 사용자를 조회할 수 있다.
+
 operation::get-account-following[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-account-followers-get]]
 === 사용자의 팔로워 목록 조회
+
+'GET' 요청을 사용해서 특정 사용자의 팔로워 목록을 조회할 수 있다.
 
 operation::get-account-followers[snippets='curl-request,http-request,request-headers,path-parameters,request-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-account-follower-get]]
 === 사용자의 팔로워 조회
 
+'GET' 요청을 사용해서 특정 사용자의 팔로워를 조회할 수 있다.
+
 operation::get-account-follower[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-follow-delete]]
+=== 사용자 언팔로우(팔로우 리소스 제거)
+
+'DELETE' 요청을 사용해서 팔로잉 중인 사용자를 언팔로우 할 수 있다.
+
+operation::delete-follow[snippets='curl-request,http-request,request-headers,path-parameters,http-response']
+
+[[resources-schedule]]
+== 일정
+
+일정 리소스는 여행 일정을 추가, 조회, 수정, 삭제할 때 사용된다. 일정 리소스는 여행지들을 추가 할 수 있고 각각의 여행지에 대한 세부 장소들을 추가할 수 있다.
+
+세부 장소 리소스에는 그 장소에서의 세부 계획, 그 장소에서의 일정 시작 시간, 종료 시간을 정해줘야 한다.
+
+[[resources-schedule-create]]
+=== 일정 추가
+
+`POST` 요청을 사용해서 새 동행 게시물을 만들 수 있다.
+
+operation::create-schedule[snippets='request-fields,curl-request,http-request,request-headers,http-response,response-headers,response-fields,links']

@@ -53,4 +53,6 @@ public class AppProperties {
 
     private String getAccountFollowerAnchor;
 
+    private String createScheduleAnchor;
+
 }

@@ -77,10 +77,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andDo(document("create-accompany",
                         links(
                                 linkWithRel("self").description("업로드된 동행 게시물의 리소스 링크"),
-                                linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 url"),
-                                linkWithRel("update-accompany").description("업로드된 동행 게시물을 수정할 수 있는 url"),
-                                linkWithRel("delete-accompany").description("업로드된 동행 게시물을 삭제할 수 있는 url"),
-                                linkWithRel("profile").description("api 문서 url")
+                                linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 링크"),
+                                linkWithRel("update-accompany").description("업로드된 동행 게시물을 수정할 수 있는 링크"),
+                                linkWithRel("delete-accompany").description("업로드된 동행 게시물을 삭제할 수 있는 링크"),
+                                linkWithRel("profile").description("api 문서 링크")
                         ),
                         requestHeaders,
                         requestFields(
@@ -93,7 +93,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 fields.withPath("longitude").description("동행 장소의 경도")
                         ),
                         responseHeaders.and(
-                                headerWithName(HttpHeaders.LOCATION).description("업로드한 게시물의 리소스 url"),
+                                headerWithName(HttpHeaders.LOCATION).description("업로드한 게시물의 리소스 링크"),
                                 headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
                         ),
                         responseFields(
@@ -108,10 +108,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 fieldWithPath("longitude").description("동행 장소의 경도"),
                                 fieldWithPath("regDate").description("동행 게시물 작성 시간"),
                                 fieldWithPath("viewCount").description("게시물 조회수"),
-                                fieldWithPath("_links.self.href").description("업로드된 동행 게시물의 리소스 url"),
-                                fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 url"),
-                                fieldWithPath("_links.update-accompany.href").description("업로드된 동행 게시물을 수정할 수 있는 url"),
-                                fieldWithPath("_links.delete-accompany.href").description("업로드된 동행 게시물을 삭제할 수 있는 url"),
+                                fieldWithPath("_links.self.href").description("업로드된 동행 게시물의 리소스 링크"),
+                                fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 링크"),
+                                fieldWithPath("_links.update-accompany.href").description("업로드된 동행 게시물을 수정할 수 있는 링크"),
+                                fieldWithPath("_links.delete-accompany.href").description("업로드된 동행 게시물을 삭제할 수 있는 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크")
                         )
                 ))
@@ -305,19 +305,19 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
                         )
                         , responsePageFields.and(
-                                fieldWithPath("_embedded.accompanyList[0].id").description("동행 게시물의 id"),
-                                fieldWithPath("_embedded.accompanyList[0].account.id").description("게시물 작성자의 id"),
-                                fieldWithPath("_embedded.accompanyList[0].title").description("동행 게시물의 제목"),
-                                fieldWithPath("_embedded.accompanyList[0].article").description("동행 게시물의 본문"),
-                                fieldWithPath("_embedded.accompanyList[0].startDate").description("동행 시작 시간"),
-                                fieldWithPath("_embedded.accompanyList[0].endDate").description("동행 종료 시간"),
-                                fieldWithPath("_embedded.accompanyList[0].location").description("동행 장소명"),
-                                fieldWithPath("_embedded.accompanyList[0].latitude").description("동행 장소의 위도"),
-                                fieldWithPath("_embedded.accompanyList[0].longitude").description("동행 장소의 경도"),
-                                fieldWithPath("_embedded.accompanyList[0].regDate").description("동행 게시물 작성 시간"),
-                                fieldWithPath("_embedded.accompanyList[0].viewCount").description("동행 게시물 조회수"),
-                                fieldWithPath("_embedded.accompanyList[0]._links.self.href").description("동행 게시물 리소스 요청 url"),
-                                fieldWithPath("_embedded.accompanyList[0]._links.get-accompany-comments.href").description("동행 게시물의 댓글 목록 요청 url"),
+                                fieldWithPath("_embedded.accompanyList[].id").description("동행 게시물의 id"),
+                                fieldWithPath("_embedded.accompanyList[].account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("_embedded.accompanyList[].title").description("동행 게시물의 제목"),
+                                fieldWithPath("_embedded.accompanyList[].article").description("동행 게시물의 본문"),
+                                fieldWithPath("_embedded.accompanyList[].startDate").description("동행 시작 시간"),
+                                fieldWithPath("_embedded.accompanyList[].endDate").description("동행 종료 시간"),
+                                fieldWithPath("_embedded.accompanyList[].location").description("동행 장소명"),
+                                fieldWithPath("_embedded.accompanyList[].latitude").description("동행 장소의 위도"),
+                                fieldWithPath("_embedded.accompanyList[].longitude").description("동행 장소의 경도"),
+                                fieldWithPath("_embedded.accompanyList[].regDate").description("동행 게시물 작성 시간"),
+                                fieldWithPath("_embedded.accompanyList[].viewCount").description("동행 게시물 조회수"),
+                                fieldWithPath("_embedded.accompanyList[]._links.self.href").description("동행 게시물 리소스 요청 url"),
+                                fieldWithPath("_embedded.accompanyList[]._links.get-accompany-comments.href").description("동행 게시물의 댓글 목록 요청 url"),
                                 fieldWithPath("_links.create-accompany.href").description("동행 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         )
                 ))
