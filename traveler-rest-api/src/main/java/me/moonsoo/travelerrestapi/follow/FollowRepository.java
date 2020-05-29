@@ -13,7 +13,6 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
 
     Optional<Follow> findByFollowingAccountAndAndFollowedAccount(Account followingAccount, Account followedAccount);
 
-//    @Query(value = "select f from Follow f join Account a on a.id = f.followedAccount.id")
     Page<Follow> findByFollowingAccount(Account followingAccount, Pageable pageable);
 
     Page<Follow> findByFollowedAccount(Account followedAccount, Pageable pageable);

@@ -6,6 +6,7 @@ me\moonsoo\commonmodule\Application.class
 me\moonsoo\commonmodule\account\AccountService.class
 me\moonsoo\commonmodule\account\Sex.class
 me\moonsoo\commonmodule\account\AccountFormatter.class
+me\moonsoo\commonmodule\account\QAccount.class
 me\moonsoo\commonmodule\account\AccountAdapter.class
 me\moonsoo\commonmodule\account\AccountRepository.class
 me\moonsoo\commonmodule\account\CurrentAccount.class

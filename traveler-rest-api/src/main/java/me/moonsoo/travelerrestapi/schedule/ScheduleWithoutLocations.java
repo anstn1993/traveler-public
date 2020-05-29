@@ -1,5 +1,7 @@
 package me.moonsoo.travelerrestapi.schedule;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import me.moonsoo.commonmodule.account.Account;
@@ -7,17 +9,20 @@ import me.moonsoo.commonmodule.account.AccountSerializer;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-@Getter @Setter
-@AllArgsConstructor @NoArgsConstructor
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Builder
 @Entity
-public class Schedule {
+@Table(name = "schedule")
+public class ScheduleWithoutLocations {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Integer id;
 
     @ManyToOne(targetEntity = Account.class)
@@ -35,12 +40,4 @@ public class Schedule {
 
     @Column(columnDefinition = "integer default 0")
     private Integer viewCount;//조회수
-
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
-    private List<ScheduleLocation> scheduleLocations = new ArrayList<>();
-
-    public void addScheduleLocation(ScheduleLocation scheduleLocation) {
-        scheduleLocation.setSchedule(this);
-        this.scheduleLocations.add(scheduleLocation);
-    }
 }
