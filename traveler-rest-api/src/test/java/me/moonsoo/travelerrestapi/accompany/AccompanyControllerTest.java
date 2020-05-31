@@ -316,8 +316,8 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 fieldWithPath("_embedded.accompanyList[].longitude").description("동행 장소의 경도"),
                                 fieldWithPath("_embedded.accompanyList[].regDate").description("동행 게시물 작성 시간"),
                                 fieldWithPath("_embedded.accompanyList[].viewCount").description("동행 게시물 조회수"),
-                                fieldWithPath("_embedded.accompanyList[]._links.self.href").description("동행 게시물 리소스 요청 url"),
-                                fieldWithPath("_embedded.accompanyList[]._links.get-accompany-comments.href").description("동행 게시물의 댓글 목록 요청 url"),
+                                fieldWithPath("_embedded.accompanyList[]._links.self.href").description("동행 게시물 리소스 조회 링크"),
+                                fieldWithPath("_embedded.accompanyList[]._links.get-accompany-comments.href").description("동행 게시물의 댓글 목록 조회 링크"),
                                 fieldWithPath("_links.create-accompany.href").description("동행 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         )
                 ))
@@ -390,12 +390,12 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(jsonPath("_links.profile").exists())
                 .andDo(document("get-accompany",
                         links(
-                                linkWithRel("self").description("조회한 동행 게시물의 리소스 url"),
-                                linkWithRel("get-accompany-comments").description("조회한 동행 게시물의 댓글 목록을 조회할 수 있는 url"),
-                                linkWithRel("get-accompanies").description("동행 게시물 목록을 조회할 수 있는 url"),
-                                linkWithRel("update-accompany").description("동행 게시물을 수정할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
-                                linkWithRel("delete-accompany").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
-                                linkWithRel("profile").description("api 문서 url")
+                                linkWithRel("self").description("조회한 동행 게시물의 리소스 링크"),
+                                linkWithRel("get-accompany-comments").description("조회한 동행 게시물의 댓글 목록을 조회할 수 있는 링크"),
+                                linkWithRel("get-accompanies").description("동행 게시물 목록을 조회할 수 있는 링크"),
+                                linkWithRel("update-accompany").description("동행 게시물을 수정할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                linkWithRel("delete-accompany").description("동행 게시물을 삭제할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                linkWithRel("profile").description("api 문서 링크")
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),

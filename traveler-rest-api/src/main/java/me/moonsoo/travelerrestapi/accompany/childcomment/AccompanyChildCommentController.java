@@ -93,7 +93,7 @@ public class AccompanyChildCommentController {
 
         Page<AccompanyChildComment> childComments = accompanyChildCommentService.findAllByAccompanyComment(comment, pageable);//대댓글 리스트 조회
         //Hateoas 적용
-        PagedModel<EntityModel<AccompanyChildComment>> childCommentModels = pagedResourcesAssembler.toModel(childComments, c -> new AccompanyChildCommentModel(c));//각 요소에 self링크 추가
+        PagedModel<AccompanyChildCommentModel> childCommentModels = pagedResourcesAssembler.toModel(childComments, c -> new AccompanyChildCommentModel(c));//각 요소에 self링크 추가
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccompanyChildCommentsAnchor()).withRel("profile");//프로필 링크
         if (account != null) {
             Link createAccompanyChildCommentLink = linkTo(AccompanyChildCommentController.class)

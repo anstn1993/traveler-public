@@ -51,4 +51,8 @@ public class ScheduleService {
             return scheduleWithoutLocationsRepository.findAllWithAuth(account, filter, search, pageable);
         }
     }
+
+    public Schedule update(Schedule schedule) {
+        return scheduleRepository.save(schedule);
+    }
 }

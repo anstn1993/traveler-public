@@ -57,4 +57,6 @@ public class AppProperties {
 
     private String getSchedulesAnchor;
 
+    private String getScheduleAnchor;
+
 }

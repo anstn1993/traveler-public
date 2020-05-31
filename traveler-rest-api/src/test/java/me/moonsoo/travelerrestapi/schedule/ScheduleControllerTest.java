@@ -2,29 +2,39 @@ package me.moonsoo.travelerrestapi.schedule;
 
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
+import me.moonsoo.travelerrestapi.follow.Follow;
+import me.moonsoo.travelerrestapi.follow.FollowRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,8 +51,12 @@ class ScheduleControllerTest extends BaseControllerTest {
     @Autowired
     private ScheduleDetailRepository scheduleDetailRepository;
 
+    @Autowired
+    private FollowRepository followRepository;
+
     @AfterEach
     public void setUp() {
+        followRepository.deleteAll();
         scheduleRepository.deleteAll();
         accountRepository.deleteAll();
     }
@@ -220,10 +234,9 @@ class ScheduleControllerTest extends BaseControllerTest {
         //자신의 일정 게시물 15개, 다른 사용자의 일정 게시물 15 생성
         IntStream.range(0, 15).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.NONE);
-            if(i % 2 == 0) {
+            if (i % 2 == 0) {
                 createSchedule(otherAccount, i + 15, 3, 3, Scope.ALL);
-            }
-            else {
+            } else {
                 createSchedule(otherAccount, i + 16, 3, 3, Scope.NONE);
             }
         });
@@ -246,43 +259,39 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("_links.next").exists())
                 .andExpect(jsonPath("_links.last").exists())
                 .andExpect(jsonPath("_links.create-schedule").exists())
+                .andDo(document("get-schedules",
+                        pagingLinks.and(
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("create-schedule").description("일정 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        requestParameters(
+                                parameterWithName("page").optional().description("페이지 번호"),
+                                parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
+                                parameterWithName("sort").optional().description("정렬 기준(id-게시물 id, regDate-등록 날짜, viewCount-조회수)"),
+                                parameterWithName("filter").optional().description("검색어 필터(writer-작성자, title-제목, location-장소명)"),
+                                parameterWithName("search").optional().description("검색어")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responsePageFields.and(
+                                fieldWithPath("_embedded.scheduleList[].id").description("일정 게시물 id"),
+                                fieldWithPath("_embedded.scheduleList[].account.id").description("일정 게시물 작성자 id"),
+                                fieldWithPath("_embedded.scheduleList[].title").description("일정 게시물 제목"),
+                                fieldWithPath("_embedded.scheduleList[].scope").description("일정 게시물 공개 범위(NONE인 게시물은 자신의 게시물이 아닌 경우에는 조회되지 않는다.)"),
+                                fieldWithPath("_embedded.scheduleList[].regDate").description("일정 게시물 작성 시간"),
+                                fieldWithPath("_embedded.scheduleList[].viewCount").description("일정 게시물 조회수"),
+                                fieldWithPath("_embedded.scheduleList[]._links.self.href").description("해당 일정 게시물 조회 링크"),
+                                fieldWithPath("_links.create-schedule.href").description("일정 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        )
+                ))
         ;
     }
 
-//    @Test
-//    @DisplayName("인증 상태에서 일정 게시물 목록 조회(자기 게시물 조회: Scope에 무관하게 모두 query)-검색어x, 30개의 게시물, 한 페이지에 10개, 2페이지 가져오기")
-//    public void getSchedules_With_Auth() throws Exception {
-//        //Given
-//        String email = "anstn1993@email.com";
-//        String password = "1111";
-//        String accessToken = getAuthToken(email, password, 0);
-//        Account otherAccount = createAccount(email, password, 1);
-//        //자신의 일정 게시물 15개, 다른 사용자의 일정 게시물 15 생성
-//        IntStream.range(0, 15).forEach(i -> {
-//            createSchedule(account, i, 3, 3, Scope.NONE);
-//            createSchedule(otherAccount, i + 15, 3, 3, Scope.ALL);
-//        });
-//
-//        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
-//                .header(HttpHeaders.AUTHORIZATION, "Bearer" + accessToken)
-//                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
-//                .param("page", "1")
-//                .param("size", "10")
-//                .param("sort", "id,DESC"))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("_embedded.scheduleList").exists())
-//                .andExpect(jsonPath("_embedded.scheduleList[0]._links.self").exists())
-//                .andExpect(jsonPath("page").exists())
-//                .andExpect(jsonPath("_links.self").exists())
-//                .andExpect(jsonPath("_links.profile").exists())
-//                .andExpect(jsonPath("_links.first").exists())
-//                .andExpect(jsonPath("_links.prev").exists())
-//                .andExpect(jsonPath("_links.next").exists())
-//                .andExpect(jsonPath("_links.last").exists())
-//                .andExpect(jsonPath("_links.create-schedule").exists())
-//        ;
-//    }
 
     @Test
     @DisplayName("인증 상태에서 일정 게시물 목록 조회(자기 게시물 조회: Scope에 무관하게 모두 query)-검색어 조건: 작성자, 30개의 게시물, 한 페이지에 10개, 2페이지 가져오기")
@@ -664,8 +673,197 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("_links.last").exists())
                 .andExpect(jsonPath("_links.create-schedule").doesNotHaveJsonPath())
         ;
-
     }
+
+    @DisplayName("인증 상태에서 자신의 일정 게시물 하나 조회(scope와 무관하게 모두 조회 가능)")
+    @ParameterizedTest
+    @MethodSource("scopeProvider")
+    public void getMySchedule_With_Auth_Scope(Scope scope) throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+        Schedule schedule = createSchedule(account, 0, 3, 3, scope);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("title").exists())
+                .andExpect(jsonPath("scope").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("viewCount").value(1))
+                .andExpect(jsonPath("scheduleLocations").exists())
+                .andExpect(jsonPath("scheduleLocations[0].scheduleDetails").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-schedules").exists())
+                .andExpect(jsonPath("_links.update-schedule").exists())
+                .andExpect(jsonPath("_links.delete-schedule").exists())
+                .andDo(document("get-schedule", links(
+                        linkWithRel("self").description("조회한 일정 게시물의 리소스 링크"),
+                        linkWithRel("profile").description("api 문서 링크"),
+                        linkWithRel("get-schedules").description("일정 게시물 목록 조회 링크"),
+                        linkWithRel("update-schedule").description("일정 게시물을 수정할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                        linkWithRel("delete-schedule").description("일정 게시물을 삭제할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        pathParameters(
+                                parameterWithName("scheduleId").description("일정 게시물의 id")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("일정 게시물의 id"),
+                                fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("title").description("일정 게시물의 제목"),
+                                fieldWithPath("scope").description("일정 게시물의 공개 범위(NONE, FOLLOWER, ALL)"),
+                                fieldWithPath("regDate").description("일정 게시물의 작성 시간"),
+                                fieldWithPath("viewCount").description("일정 게시물 조회수"),
+                                fieldWithPath("scheduleLocations[].id").description("여행지 리소스 id"),
+                                fieldWithPath("scheduleLocations[].schedule.id").description("일정 게시물 id"),
+                                fieldWithPath("scheduleLocations[].location").description("여행지명"),
+                                fieldWithPath("scheduleLocations[].latitude").description("여행지의 위도"),
+                                fieldWithPath("scheduleLocations[].longitude").description("여행지의 경도"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].id").description("여행지의 세부 장소 리소스 id"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].scheduleLocation.id").description("여행지 리소스 id"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].place").description("여행지의 세부 장소"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].plan").description("세부 장소에서 행할 세부적인 계획"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].startDate").description("세부 장소에서의 일정 시작 시간"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].endDate").description("세부 장소에서의 일정 종료 시간"),
+                                fieldWithPath("_links.self.href").description("업로드된 일정 게시물의 리소스 링크"),
+                                fieldWithPath("_links.get-schedules.href").description("일일정 게시물 목록 조회 링크"),
+                                fieldWithPath("_links.update-schedule.href").description("일정 게시물을 수정할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.delete-schedule.href").description("일정 게시물을 삭제할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
+                ))
+        ;
+    }
+
+    @DisplayName("인증 상태에서 타인의 일정 게시물 하나 조회(scope가 ALL)")
+    @ParameterizedTest
+    @MethodSource("scopeAndFollowingStatusProvider")
+    public void getOthersSchedule_With_Auth_Scope_ALL(Scope scope, boolean following) throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+        Schedule schedule = createSchedule(otherAccount, 0, 3, 3, scope);
+
+        if (scope.equals(Scope.FOLLOWER) && following) {
+            //argument로 following이 true로 넘어오면 요청을 보내는 사용자가 일정 게시물의 작성자를 following하도록 처리
+            createFollow(account, otherAccount);
+        }
+
+        ResultActions resultActions = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print());
+
+        if (scope.equals(Scope.FOLLOWER) && !following) {//scope가 FOLLOWER인데 팔로잉하고 있지 않은 경우 forbidden
+            resultActions.andExpect(status().isForbidden());
+            return;
+        } else if (scope.equals(Scope.NONE)) {//Scope.NONE인 경우 forbidden
+            resultActions.andExpect(status().isForbidden());
+            return;
+        }
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("title").exists())
+                .andExpect(jsonPath("scope").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("viewCount").value(1))
+                .andExpect(jsonPath("scheduleLocations").exists())
+                .andExpect(jsonPath("scheduleLocations[0].scheduleDetails").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-schedules").exists())
+                .andExpect(jsonPath("_links.update-schedule").doesNotHaveJsonPath())
+                .andExpect(jsonPath("_links.delete-schedule").doesNotHaveJsonPath())
+        ;
+    }
+
+    @DisplayName("인증하지 않은 상태에서 일정 게시물 하나 조회(scope가 ALL인 게시물만 조회 가능)")
+    @ParameterizedTest
+    @MethodSource("scopeProvider")
+    public void getSchedule_Without_Auth_Scope(Scope scope) throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        account = createAccount(email, password, 0);
+        Schedule schedule = createSchedule(account, 0, 3, 3, scope);
+
+        ResultActions resultActions = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print());
+        if (scope.equals(Scope.ALL)) {
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("id").exists())
+                    .andExpect(jsonPath("account.id").exists())
+                    .andExpect(jsonPath("title").exists())
+                    .andExpect(jsonPath("scope").exists())
+                    .andExpect(jsonPath("regDate").exists())
+                    .andExpect(jsonPath("viewCount").value(1))
+                    .andExpect(jsonPath("scheduleLocations").exists())
+                    .andExpect(jsonPath("scheduleLocations[0].scheduleDetails").exists())
+                    .andExpect(jsonPath("_links.self").exists())
+                    .andExpect(jsonPath("_links.profile").exists())
+                    .andExpect(jsonPath("_links.get-schedules").exists())
+                    .andExpect(jsonPath("_links.update-schedule").doesNotHaveJsonPath())
+                    .andExpect(jsonPath("_links.delete-schedule").doesNotHaveJsonPath())
+            ;
+        } else {
+            resultActions.andExpect(status().isForbidden());
+        }
+    }
+
+    //매개변수 테스트 시 매개변수의 값을 전달해줄 메소드
+    private static Stream<Arguments> scopeProvider() {
+        return Stream.of(
+                Arguments.of(Scope.ALL),
+                Arguments.of(Scope.FOLLOWER),
+                Arguments.of(Scope.NONE)
+        );
+    }
+
+    //매개변수 테스트 시 매개변수의 값을 전달해줄 메소드
+    private static Stream<Arguments> scopeAndFollowingStatusProvider() {
+        return Stream.of(
+                Arguments.of(Scope.ALL, false),
+                Arguments.of(Scope.FOLLOWER, true),
+                Arguments.of(Scope.FOLLOWER, false),
+                Arguments.of(Scope.NONE, false)
+        );
+    }
+
+    @Test
+    @DisplayName("일정 게시물 하나 조회 실패-존재하지 않는 게시물(404 Not found)")
+    public void getScheduleFail_Not_Found() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+        mockMvc.perform(get("/api/schedules/{scheduleId}", 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andExpect(status().isNotFound());
+    }
+
 
     //request 요청 본문으로 binding될 dto객체 생성 메소드
     private ScheduleDto createScheduleDto(int index, Scope scope) {
@@ -858,6 +1056,15 @@ class ScheduleControllerTest extends BaseControllerTest {
             }
             scheduleLocation.setScheduleDetails(scheduleDetails);
         });
+    }
+
+    private Follow createFollow(Account followingAccount, Account followedAccount) {
+        Follow follow = Follow.builder()
+                .followingAccount(followingAccount)
+                .followedAccount(followedAccount)
+                .build();
+
+        return followRepository.save(follow);
     }
 
 
