@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 public class ScheduleDetail {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(targetEntity = ScheduleLocation.class)

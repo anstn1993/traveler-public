@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 public class Schedule {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(targetEntity = Account.class)

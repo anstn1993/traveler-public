@@ -125,6 +125,7 @@ public class ScheduleController {
         return schedule;
     }
 
+    //일정 게시물 조회 핸들러
     @GetMapping("/{scheduleId}")
     public ResponseEntity getSchedules(@PathVariable("scheduleId") Schedule schedule,
                                        @CurrentAccount Account account) {
@@ -181,5 +182,25 @@ public class ScheduleController {
         }
 
         return ResponseEntity.ok(scheduleModel);
+    }
+
+
+    //일정 게시물 삭제 핸들러
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity deleteSchedule(@PathVariable("scheduleId") Schedule schedule,
+                                         @CurrentAccount Account account) {
+
+        if(schedule == null) {//존재하지 않는 게시물
+            return ResponseEntity.notFound().build();
+        }
+
+        if(!schedule.getAccount().equals(account)) {//자신의 게시물이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(account, "account");
+            errors.reject("forbidden", "You can not delete other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        scheduleService.delete(schedule);//리소스 삭제
+        return ResponseEntity.noContent().build();
     }
 }

@@ -18,7 +18,7 @@ import java.util.Set;
 @Entity
 public class ScheduleLocation {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(targetEntity = Schedule.class)

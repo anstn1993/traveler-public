@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Entity
 public class Accompany {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(targetEntity = Account.class)

@@ -54,8 +54,8 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
 //        clients.jdbc(dataSource)
 //                .withClient("traveler")
 //                .secret(passwordEncoder.encode("pass"))
-//                .refreshTokenValiditySeconds(30*60)
-//                .accessTokenValiditySeconds(10*60)
+//                .refreshTokenValiditySeconds(60*60)
+//                .accessTokenValiditySeconds(30*60)
 //                .scopes("read", "write")
 //                .authorizedGrantTypes("password", "refresh_token");
     }

@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 public class ScheduleWithoutLocations {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(targetEntity = Account.class)

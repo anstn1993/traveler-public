@@ -1,5 +1,6 @@
 package me.moonsoo.travelerrestapi.schedule;
 
+import lombok.SneakyThrows;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
 import me.moonsoo.travelerrestapi.follow.Follow;
@@ -34,8 +35,7 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -998,6 +998,108 @@ class ScheduleControllerTest extends BaseControllerTest {
         );
     }
 
+    @Test
+    @DisplayName("일정 게시물 수정")
+    public void updateSchedule() {
+
+    }
+
+    @Test
+    @DisplayName("일정 게시물 수정 실패-요청 본문이 없는 경우(400 Bad request)")
+    public void updateScheduleFail_Bad_Request_Empty_Value() {
+
+    }
+
+    @Test
+    @DisplayName("일정 게시물 수정 실패-요청 본문에 허용되지 않은 값이 존재(400 Bad request)")
+    public void updateScheduleFail_Bad_Request_Unknown_Property() {
+
+    }
+
+    @Test
+    @DisplayName("일정 게시물 수정 실패-요청 본문이 비즈니스 로직에 맞지 않는 경우(400 Bad request)")
+    public void updateScheduleFail_Bad_Request_Wrong_Value() {
+
+    }
+
+    @Test
+    @DisplayName("일정 게시물 수정 실패-oauth인증을 하지 않은 경우(401 Unauthorized)")
+    public void updateScheduleFail_Unauthorized() {
+
+    }
+
+    @Test
+    @DisplayName("일정 게시물 수정 실패-타인의 일정을 수정하려고 하는 경우(403 Forbidden)")
+    public void updateScheduleFail_Forbidden() {
+
+    }
+
+    @Test
+    @DisplayName("일정 게시물 수정 실패-존재하지 않는 일정을 수정하려고 하는 경우(404 Forbidden)")
+    public void updateScheduleFail_Not_Found() {
+
+    }
+
+    @Test
+    @DisplayName("일정 게시물 삭제")
+    public void deleteSchedule() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+
+        Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("일정 게시물 삭제 실패-oauth 인증을 하지 않은 경우(401 Unauthorized)")
+    public void deleteScheduleFail_Unauthorized() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        account = createAccount(email, password, 0);
+
+        Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);
+
+        mockMvc.perform(delete("/api/schedules/{scheduleId}", schedule.getId()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("일정 게시물 삭제 실패-타인의 일정을 삭제하려고 하는 경우(403 Forbidden)")
+    public void deleteScheduleFail_Forbidden() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+        Schedule schedule = createSchedule(otherAccount, 0, 3, 3, Scope.ALL);//다른 사용자가 만든 일정 게시물
+
+        mockMvc.perform(delete("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("일정 게시물 삭제 실패-존재하지 않는 일정을 삭제하려고 하는 경우(404 Not found)")
+    public void deleteScheduleFail_Not_Found() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+
+        mockMvc.perform(delete("/api/schedules/{scheduleId}", 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
 
     //일정 게시물 생성 메소드
     public Schedule createSchedule(Account account, int index, int locationCount, int detailCount, Scope scope) {
@@ -1011,7 +1113,6 @@ class ScheduleControllerTest extends BaseControllerTest {
         Schedule savedSchedule = scheduleRepository.save(schedule);
         List<ScheduleLocation> scheduleLocations = createScheduleLocations(savedSchedule, locationCount, detailCount);
         savedSchedule.setScheduleLocations(scheduleLocations);
-
         return savedSchedule;
     }
 

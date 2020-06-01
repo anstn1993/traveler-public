@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity(name = "accompany_comment")
 public class AccompanyComment {
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;//댓글 id
 
     @ManyToOne(targetEntity = Account.class)
