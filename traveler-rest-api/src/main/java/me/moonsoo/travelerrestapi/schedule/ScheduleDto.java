@@ -2,11 +2,13 @@ package me.moonsoo.travelerrestapi.schedule;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.hateoas.Link;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -26,5 +28,5 @@ public class ScheduleDto {
 
     @NotEmpty
     @JsonProperty("scheduleLocations")//json key 설정
-    private List<ScheduleLocationDto> scheduleLocationDtos;
+    private LinkedHashSet<ScheduleLocationDto> scheduleLocationDtos = new LinkedHashSet<>();
 }

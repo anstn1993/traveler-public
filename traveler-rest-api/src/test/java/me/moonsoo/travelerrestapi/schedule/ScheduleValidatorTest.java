@@ -11,7 +11,9 @@ import org.springframework.validation.Errors;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -73,16 +75,16 @@ public class ScheduleValidatorTest {
     //Schedule dto 객체를 생성해주는 메소드
     private static ScheduleDto createScheduleDtoHolder() {
 
-        List<ScheduleLocationDto> scheduleLocationDtos = new ArrayList<>();//일정 장소 dto set
+        LinkedHashSet<ScheduleLocationDto> scheduleLocationDtos = new LinkedHashSet<>();//일정 장소 dto set
         IntStream.range(0, 3).forEach(i -> {
 
-            List<ScheduleDetailDto> scheduleDetailDtos = new ArrayList<>();//상세 일정 dto set
+            LinkedHashSet<ScheduleDetailDto> scheduleDetailDtos = new LinkedHashSet<>();//상세 일정 dto set
             IntStream.range(0, 3).forEach(j -> {
-                ScheduleDetailDto scheduleDetailDto = ScheduleDetailDto.builder().build();
+                ScheduleDetailDto scheduleDetailDto = ScheduleDetailDto.builder().place("place" + j).build();
                 scheduleDetailDtos.add(scheduleDetailDto);
             });
 
-            ScheduleLocationDto scheduleLocationDto = ScheduleLocationDto.builder().scheduleDetailDtos(scheduleDetailDtos).build();
+            ScheduleLocationDto scheduleLocationDto = ScheduleLocationDto.builder().location("location" + i).scheduleDetailDtos(scheduleDetailDtos).build();
             scheduleLocationDtos.add(scheduleLocationDto);
         });
 

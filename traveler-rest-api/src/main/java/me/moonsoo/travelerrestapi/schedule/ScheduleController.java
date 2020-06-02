@@ -8,6 +8,7 @@ import me.moonsoo.travelerrestapi.follow.Follow;
 import me.moonsoo.travelerrestapi.follow.FollowService;
 import me.moonsoo.travelerrestapi.properties.AppProperties;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +24,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -109,21 +110,7 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleWithoutLocationsPagedModel);
     }
 
-    //DTO객체를 엔티티 객체로 변환해주는 메소드
-    private Schedule parseDtoToEntity(ScheduleDto scheduleDto) {
-        Schedule schedule = modelMapper.map(scheduleDto, Schedule.class);
-        scheduleDto.getScheduleLocationDtos().forEach(scheduleLocationDto -> {
-            ScheduleLocation scheduleLocation = modelMapper.map(scheduleLocationDto, ScheduleLocation.class);
-            scheduleLocationDto.getScheduleDetailDtos().forEach(scheduleDetailDto -> {
-                ScheduleDetail scheduleDetail = modelMapper.map(scheduleDetailDto, ScheduleDetail.class);
-                scheduleDetail.setScheduleLocation(scheduleLocation);
-                scheduleLocation.getScheduleDetails().add(scheduleDetail);
-            });
-            scheduleLocation.setSchedule(schedule);
-            schedule.getScheduleLocations().add(scheduleLocation);
-        });
-        return schedule;
-    }
+
 
     //일정 게시물 조회 핸들러
     @GetMapping("/{scheduleId}")
@@ -164,7 +151,7 @@ public class ScheduleController {
 
         //조회수 +1
         schedule.setViewCount(schedule.getViewCount() + 1);
-        Schedule updatedSchedule = scheduleService.update(schedule);
+        Schedule updatedSchedule = scheduleService.updateViewCount(schedule);
 
         //Hateoas적용
         ScheduleModel scheduleModel = new ScheduleModel(updatedSchedule);
@@ -184,17 +171,63 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleModel);
     }
 
+    //일정 게시물 수정 핸들러
+    @PutMapping("/{scheduleId}")
+    public ResponseEntity updateSchedule(@PathVariable("scheduleId") Schedule schedule,
+                                         @RequestBody @Valid ScheduleDto scheduleDto,
+                                         Errors errors,
+                                         @CurrentAccount Account account) {
+
+        //존재하지 않는 리소스인 경우
+        if(schedule == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //다른 사용자의 리소스를 수정하려고 하는 경우
+        if(!schedule.getAccount().equals(account)) {
+            errors.reject("forbidden", "You can not update other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        //요청 본문이 없거나 허용되지 않은 값이 넘어온 경우
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+        //요청 본문의 값이 비즈니스 로직에 맞지 않는 경우
+        scheduleValidator.validate(scheduleDto, errors);
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+        //기존의 schedule의 하위 scheduleLocation 제거
+        scheduleService.deleteScheduleLocations(schedule);
+
+        //기존 리소스 엔티티로 요청 본문의 값 전달
+        Schedule updatedSchedule = parseDtoToEntity(schedule, scheduleDto);
+        Schedule savedSchedule = scheduleService.update(updatedSchedule);//수정된 일정 save
+
+        //Hateoas적용
+        ScheduleModel scheduleModel = new ScheduleModel(savedSchedule);
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getUpdateScheduleAnchor()).withRel("profile");//profile 링크
+        WebMvcLinkBuilder linkBuilder = linkTo(ScheduleController.class);
+        Link getSchedulesLink = linkBuilder.withRel("get-schedules");//일정 게시물 목록 조회 링크
+        Link deleteLink = linkBuilder.withRel("delete-schedule");//일정 게시물 삭제 링크
+        scheduleModel.add(profileLink, getSchedulesLink, deleteLink);
+        return ResponseEntity.ok(scheduleModel);
+    }
+
 
     //일정 게시물 삭제 핸들러
     @DeleteMapping("/{scheduleId}")
     public ResponseEntity deleteSchedule(@PathVariable("scheduleId") Schedule schedule,
                                          @CurrentAccount Account account) {
 
-        if(schedule == null) {//존재하지 않는 게시물
+        if (schedule == null) {//존재하지 않는 게시물
             return ResponseEntity.notFound().build();
         }
 
-        if(!schedule.getAccount().equals(account)) {//자신의 게시물이 아닌 경우
+        if (!schedule.getAccount().equals(account)) {//자신의 게시물이 아닌 경우
             Errors errors = new DirectFieldBindingResult(account, "account");
             errors.reject("forbidden", "You can not delete other user's contents.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
@@ -202,5 +235,37 @@ public class ScheduleController {
 
         scheduleService.delete(schedule);//리소스 삭제
         return ResponseEntity.noContent().build();
+    }
+
+    //DTO객체를 엔티티 객체로 변환해주는 메소드
+    private Schedule parseDtoToEntity(ScheduleDto scheduleDto) {
+        Schedule schedule = modelMapper.map(scheduleDto, Schedule.class);
+        LinkedHashSet<ScheduleLocation> scheduleLocations = modelMapper.map(scheduleDto.getScheduleLocationDtos(), new TypeToken<LinkedHashSet<ScheduleLocation>>(){}.getType());
+        schedule.setScheduleLocations(scheduleLocations);
+        List<ScheduleLocation> scheduleLocationList = List.copyOf(scheduleLocations);
+        AtomicInteger index = new AtomicInteger();
+        for (ScheduleLocationDto scheduleLocationDto : scheduleDto.getScheduleLocationDtos()) {
+            LinkedHashSet<ScheduleDetail> scheduleDetails =
+                    modelMapper.map(scheduleLocationDto.getScheduleDetailDtos(), new TypeToken<LinkedHashSet<ScheduleDetail>>(){}.getType());
+            scheduleLocationList.get(index.get()).setScheduleDetails(scheduleDetails);
+            index.getAndIncrement();
+        }
+        return schedule;
+    }
+
+    //DTO객체를 persistence 엔티티 객체로 변환해주는 메소드
+    private Schedule parseDtoToEntity(Schedule schedule, ScheduleDto scheduleDto) {
+        modelMapper.map(scheduleDto, schedule);
+        LinkedHashSet<ScheduleLocation> scheduleLocations = modelMapper.map(scheduleDto.getScheduleLocationDtos(), new TypeToken<LinkedHashSet<ScheduleLocation>>(){}.getType());
+        schedule.setScheduleLocations(scheduleLocations);
+        List<ScheduleLocation> scheduleLocationList = List.copyOf(scheduleLocations);
+        AtomicInteger index = new AtomicInteger();
+        for (ScheduleLocationDto scheduleLocationDto : scheduleDto.getScheduleLocationDtos()) {
+            LinkedHashSet<ScheduleDetail> scheduleDetails =
+                    modelMapper.map(scheduleLocationDto.getScheduleDetailDtos(), new TypeToken<LinkedHashSet<ScheduleDetail>>(){}.getType());
+            scheduleLocationList.get(index.get()).setScheduleDetails(scheduleDetails);
+            index.getAndIncrement();
+        }
+        return schedule;
     }
 }

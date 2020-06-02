@@ -287,3 +287,17 @@ operation::get-schedules[snippets='curl-request,http-request,request-headers,req
 2. 인증하지 않은 상태: 공개 범위가 ALL인 게시물만 조회 가능하다.
 
 operation::get-schedule[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-schedule-update]]
+=== 일정 수정
+
+'PUT' 요청을 사용해서 일정 게시물을 수정할 수 있다.
+
+operation::update-schedule[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-schedule-delete]]
+=== 일정 삭제
+
+'DELETE' 요청을 사용해서 일정 게시물을 삭제할 수 있다.
+
+operation::delete-schedule[snippets='curl-request,http-request,request-headers,path-parameters,http-response']

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = {"id", "scheduleLocation", "place", "plan", "startDate", "endDate"})
 @Builder
 @Entity
 public class ScheduleDetail {

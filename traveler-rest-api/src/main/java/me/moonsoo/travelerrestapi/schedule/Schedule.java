@@ -8,11 +8,13 @@ import me.moonsoo.commonmodule.account.AccountSerializer;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = {"id", "account", "title", "scope", "regDate", "viewCount"})
 @Builder
 @Entity
 public class Schedule {
@@ -36,8 +38,8 @@ public class Schedule {
     @Column(columnDefinition = "integer default 0")
     private Integer viewCount;//조회수
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
-    private List<ScheduleLocation> scheduleLocations = new ArrayList<>();
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<ScheduleLocation> scheduleLocations = new LinkedHashSet<>();
 
     public void addScheduleLocation(ScheduleLocation scheduleLocation) {
         scheduleLocation.setSchedule(this);

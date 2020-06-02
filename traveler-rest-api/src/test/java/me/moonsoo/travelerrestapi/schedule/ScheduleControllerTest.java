@@ -1,6 +1,5 @@
 package me.moonsoo.travelerrestapi.schedule;
 
-import lombok.SneakyThrows;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
 import me.moonsoo.travelerrestapi.follow.Follow;
@@ -20,7 +19,9 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -865,117 +866,8 @@ class ScheduleControllerTest extends BaseControllerTest {
     }
 
 
-    //request 요청 본문으로 binding될 dto객체 생성 메소드
-    private ScheduleDto createScheduleDto(int index, Scope scope) {
-
-        AtomicInteger day = new AtomicInteger(1);//schedule detail의 시작 날짜와 종료 날짜의 day에 사용될 변수
-        List<ScheduleLocationDto> scheduleLocationDtos = new ArrayList<>();//일정 장소 dto set
-        IntStream.range(0, 3).forEach(i -> {
-            List<ScheduleDetailDto> scheduleDetailDtos = new ArrayList<>();//상세 일정 dto set
-            IntStream.range(0, 3).forEach(j -> {
-                ScheduleDetailDto scheduleDetailDto = ScheduleDetailDto.builder()
-                        .place("Place" + j + " in location")
-                        .plan("Do something in place" + j)
-                        .startDate(LocalDateTime.of(2020, 5, day.get() + 1, 12, 0, 0))
-                        .endDate(LocalDateTime.of(2020, 5, day.get() + 2, 12, 0, 0))
-                        .build();
-                scheduleDetailDtos.add(scheduleDetailDto);
-                day.getAndIncrement();
-            });
-
-            ScheduleLocationDto scheduleLocationDto = ScheduleLocationDto.builder()
-                    .location("location" + i)
-                    .latitude(33.00000 + i)
-                    .longitude(127.00000 + i)
-                    .scheduleDetailDtos(scheduleDetailDtos)
-                    .build();
-            scheduleLocationDtos.add(scheduleLocationDto);
-        });
-
-        ScheduleDto scheduleDto = ScheduleDto.builder()
-                .title("schedule" + index)
-                .scope(scope)
-                .scheduleLocationDtos(scheduleLocationDtos)
-                .build();
-
-        return scheduleDto;
-    }
-
-    //허용되지 않은 값이 포함된 요청 본문을 만드는 메소드
-    private Schedule createScheduleWithNotAllowedValue(int index, Scope scope) {
-
-        AtomicInteger day = new AtomicInteger(1);//schedule detail의 시작 날짜와 종료 날짜의 day에 사용될 변수
-        List<ScheduleLocation> scheduleLocations = new ArrayList<>();//일정 장소 dto set
-        IntStream.range(0, 3).forEach(i -> {
-            List<ScheduleDetail> scheduleDetails = new ArrayList<>();//상세 일정 dto set
-            IntStream.range(0, 3).forEach(j -> {
-                ScheduleDetail scheduleDetail = ScheduleDetail.builder()
-                        .id(10)//허용되지 않은 값
-                        .place("Place" + j + " in location")
-                        .plan("do something in place" + j)
-                        .startDate(LocalDateTime.of(2020, 5, day.get() + 1, 12, 0, 0))
-                        .endDate(LocalDateTime.of(2020, 5, day.get() + 2, 12, 0, 0))
-                        .build();
-                scheduleDetails.add(scheduleDetail);
-                day.getAndIncrement();
-            });
 
 
-            ScheduleLocation scheduleLocation = ScheduleLocation.builder()
-                    .id(10)//허용되지 않은 값
-                    .location("location" + i)
-                    .latitude(33.00000 + i)
-                    .longitude(127.00000 + i)
-                    .scheduleDetails(scheduleDetails)
-                    .build();
-            scheduleLocations.add(scheduleLocation);
-        });
-
-        Schedule schedule = Schedule.builder()
-                .id(10)//허용되지 않은 값
-                .title("schedule" + index)
-                .scope(scope)
-                .scheduleLocations(scheduleLocations)
-                .viewCount(100)//허용되지 않은 값
-                .regDate(LocalDateTime.now())//허용되지 않은 값
-                .build();
-
-        return schedule;
-    }
-
-    //비즈니스 로직에 부합하지 않는 요청 본문 dto 생성 메소드
-    private ScheduleDto createScheduleDtoWithWrongValue(int index, Scope scope) {
-
-        List<ScheduleDetailDto> scheduleDetailDtos = new ArrayList<>();//상세 일정 dto set
-        IntStream.range(0, 3).forEach(i -> {
-            ScheduleDetailDto scheduleDetailDto = ScheduleDetailDto.builder()
-                    .place("Place" + i + " in location")
-                    .plan("Do something in place" + i)
-                    .startDate(LocalDateTime.of(2020, 5, i + 2, 12, 0, 0))
-                    .endDate(LocalDateTime.of(2020, 5, i + 1, 12, 0, 0))
-                    .build();
-            scheduleDetailDtos.add(scheduleDetailDto);
-        });
-
-        List<ScheduleLocationDto> scheduleLocationDtos = new ArrayList<>();//일정 장소 dto set
-        IntStream.range(0, 3).forEach(i -> {
-            ScheduleLocationDto scheduleLocationDto = ScheduleLocationDto.builder()
-                    .location("location" + i)
-                    .latitude(33.00000 + i)
-                    .longitude(127.00000 + i)
-                    .scheduleDetailDtos(scheduleDetailDtos)
-                    .build();
-            scheduleLocationDtos.add(scheduleLocationDto);
-        });
-
-        ScheduleDto scheduleDto = ScheduleDto.builder()
-                .title("schedule" + index)
-                .scope(scope)
-                .scheduleLocationDtos(scheduleLocationDtos)
-                .build();
-
-        return scheduleDto;
-    }
 
     @Test
     @DisplayName("일정 게시물 추가 메소드 테스트")
@@ -1000,44 +892,225 @@ class ScheduleControllerTest extends BaseControllerTest {
 
     @Test
     @DisplayName("일정 게시물 수정")
-    public void updateSchedule() {
+    public void updateSchedule() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+        Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
+
+        ScheduleDto scheduleDto = createScheduleDto(0, Scope.FOLLOWER);//수정할 일정 게시물 DTO
+        String title = "updated title";//수정할 게시물 제목
+        scheduleDto.setTitle(title);
+        for (ScheduleLocationDto scheduleLocationDto : scheduleDto.getScheduleLocationDtos()) {
+            scheduleLocationDto.setLocation("updated location");
+        }
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(scheduleDto)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("title").value(title))
+                .andExpect(jsonPath("scope").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("viewCount").exists())
+                .andExpect(jsonPath("scheduleLocations").exists())
+                .andExpect(jsonPath("scheduleLocations[0].scheduleDetails").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-schedules").exists())
+                .andExpect(jsonPath("_links.delete-schedule").exists())
+                .andDo(document("update-schedule",
+                        links(
+                                linkWithRel("self").description("수정된 일정 게시물의 리소스 링크"),
+                                linkWithRel("get-schedules").description("일정 게시물 리스트를 조회할 수 있는 링크"),
+                                linkWithRel("delete-schedule").description("수정된 일정 게시물을 삭제할 수 있는 링크"),
+                                linkWithRel("profile").description("api 문서 링크")
+                        ),
+                        requestHeaders,
+                        pathParameters(
+                                parameterWithName("scheduleId").description("수정할 일정 게시물의 id")
+                        ),
+                        requestFields(
+                                fieldWithPath("title").description("일정 게시물의 제목"),
+                                fieldWithPath("scope").description("일정 게시물의 공개 범위(NONE, FOLLOWER, ALL)"),
+                                fieldWithPath("scheduleLocations[].location").description("여행지명"),
+                                fieldWithPath("scheduleLocations[].latitude").description("여행지의 위도"),
+                                fieldWithPath("scheduleLocations[].longitude").description("여행지의 경도"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].place").description("여행지의 세부 장소"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].plan").description("세부 장소에서 행할 세부적인 계획"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].startDate").description("세부 장소에서의 일정 시작 시간"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].endDate").description("세부 장소에서의 일정 종료 시간")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("일정 게시물의 id"),
+                                fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("title").description("일정 게시물의 제목"),
+                                fieldWithPath("scope").description("일정 게시물의 공개 범위(NONE, FOLLOWER, ALL)"),
+                                fieldWithPath("regDate").description("일정 게시물의 작성 시간"),
+                                fieldWithPath("viewCount").description("일정 게시물 조회수"),
+                                fieldWithPath("scheduleLocations[].id").description("여행지 리소스 id"),
+                                fieldWithPath("scheduleLocations[].schedule.id").description("일정 게시물 id"),
+                                fieldWithPath("scheduleLocations[].location").description("여행지명"),
+                                fieldWithPath("scheduleLocations[].latitude").description("여행지의 위도"),
+                                fieldWithPath("scheduleLocations[].longitude").description("여행지의 경도"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].id").description("여행지의 세부 장소 리소스 id"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].scheduleLocation.id").description("여행지 리소스 id"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].place").description("여행지의 세부 장소"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].plan").description("세부 장소에서 행할 세부적인 계획"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].startDate").description("세부 장소에서의 일정 시작 시간"),
+                                fieldWithPath("scheduleLocations[].scheduleDetails[].endDate").description("세부 장소에서의 일정 종료 시간"),
+                                fieldWithPath("_links.self.href").description("업로드된 일정 게시물의 리소스 링크"),
+                                fieldWithPath("_links.get-schedules.href").description("일정 게시물 리스트를 조회할 수 있는 링크"),
+                                fieldWithPath("_links.delete-schedule.href").description("업로드된 일정 게시물을 삭제할 수 있는 링크"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
+                ))
+
+        ;
 
     }
 
     @Test
     @DisplayName("일정 게시물 수정 실패-요청 본문이 없는 경우(400 Bad request)")
-    public void updateScheduleFail_Bad_Request_Empty_Value() {
+    public void updateScheduleFail_Bad_Request_Empty_Value() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
 
+        Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
+        ScheduleDto scheduleDto = ScheduleDto.builder().build();//빈 요청 본문
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(scheduleDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
     }
 
     @Test
     @DisplayName("일정 게시물 수정 실패-요청 본문에 허용되지 않은 값이 존재(400 Bad request)")
-    public void updateScheduleFail_Bad_Request_Unknown_Property() {
+    public void updateScheduleFail_Bad_Request_Unknown_Property() throws Exception {
+//Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
 
+        Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(schedule)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
     }
 
     @Test
     @DisplayName("일정 게시물 수정 실패-요청 본문이 비즈니스 로직에 맞지 않는 경우(400 Bad request)")
-    public void updateScheduleFail_Bad_Request_Wrong_Value() {
+    public void updateScheduleFail_Bad_Request_Wrong_Value() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
 
+        Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
+        ScheduleDto scheduleDtoWithWrongValue = createScheduleDtoWithWrongValue(0, Scope.FOLLOWER);//비즈니스 로직에 맞지 않는 일정 게시물 dto
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(scheduleDtoWithWrongValue)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
     }
 
     @Test
     @DisplayName("일정 게시물 수정 실패-oauth인증을 하지 않은 경우(401 Unauthorized)")
-    public void updateScheduleFail_Unauthorized() {
+    public void updateScheduleFail_Unauthorized() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        account = createAccount(email, password, 0);
 
+        Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
+
+        ScheduleDto scheduleDto = createScheduleDto(0, Scope.FOLLOWER);//수정할 일정 게시물 DTO
+        String title = "updated title";//수정할 게시물 제목
+        scheduleDto.setTitle(title);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(scheduleDto)))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
     }
 
     @Test
     @DisplayName("일정 게시물 수정 실패-타인의 일정을 수정하려고 하는 경우(403 Forbidden)")
-    public void updateScheduleFail_Forbidden() {
+    public void updateScheduleFail_Forbidden() throws Exception {
+//Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+        Schedule schedule = createSchedule(otherAccount, 0, 3, 3, Scope.ALL);//다른 사용자의 일정 게시물 생성
 
+        ScheduleDto scheduleDto = createScheduleDto(0, Scope.FOLLOWER);//수정할 일정 게시물 DTO
+        String title = "updated title";//수정할 게시물 제목
+        scheduleDto.setTitle(title);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/schedules/{scheduleId}", schedule.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(scheduleDto)))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
     }
 
     @Test
-    @DisplayName("일정 게시물 수정 실패-존재하지 않는 일정을 수정하려고 하는 경우(404 Forbidden)")
-    public void updateScheduleFail_Not_Found() {
+    @DisplayName("일정 게시물 수정 실패-존재하지 않는 일정을 수정하려고 하는 경우(404 Not found)")
+    public void updateScheduleFail_Not_Found() throws Exception {
+//Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
 
+        Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
+
+        ScheduleDto scheduleDto = createScheduleDto(0, Scope.FOLLOWER);//수정할 일정 게시물 DTO
+        String title = "updated title";//수정할 게시물 제목
+        scheduleDto.setTitle(title);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/schedules/{scheduleId}", 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(scheduleDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
     }
 
     @Test
@@ -1053,7 +1126,16 @@ class ScheduleControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/schedules/{scheduleId}", schedule.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-schedule",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                        ),
+                        pathParameters(
+                                parameterWithName("scheduleId").description("삭제할 일정 게시물 id")
+                        )
+                ))
+        ;
     }
 
     @Test
@@ -1111,14 +1193,14 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .viewCount(0)
                 .build();
         Schedule savedSchedule = scheduleRepository.save(schedule);
-        List<ScheduleLocation> scheduleLocations = createScheduleLocations(savedSchedule, locationCount, detailCount);
+        Set<ScheduleLocation> scheduleLocations = createScheduleLocations(savedSchedule, locationCount, detailCount);
         savedSchedule.setScheduleLocations(scheduleLocations);
         return savedSchedule;
     }
 
     //일정의 세부 장소 아이템 생성 메소드
-    private List<ScheduleLocation> createScheduleLocations(Schedule schedule, int locationCount, int detailCount) {
-        List<ScheduleLocation> scheduleLocations = new ArrayList<>();
+    private Set<ScheduleLocation> createScheduleLocations(Schedule schedule, int locationCount, int detailCount) {
+        Set<ScheduleLocation> scheduleLocations = new LinkedHashSet<>();
         for (int i = 0; i < locationCount; i++) {
             ScheduleLocation scheduleLocation = ScheduleLocation.builder()
                     .schedule(schedule)
@@ -1136,9 +1218,9 @@ class ScheduleControllerTest extends BaseControllerTest {
     }
 
     //세부 장소의 세부 일정 아이템 생성 메소드
-    private void createScheduleDetails(List<ScheduleLocation> scheduleLocations, AtomicInteger numForDateValid, int detailCount) {
+    private void createScheduleDetails(Set<ScheduleLocation> scheduleLocations, AtomicInteger numForDateValid, int detailCount) {
         scheduleLocations.forEach(scheduleLocation -> {
-            List<ScheduleDetail> scheduleDetails = new ArrayList<>();
+            Set<ScheduleDetail> scheduleDetails = new LinkedHashSet<>();
             for (int i = numForDateValid.get() - detailCount; i < numForDateValid.get(); i++) {
                 ScheduleDetail scheduleDetail = ScheduleDetail.builder()
                         .place("Place" + i + " in location")
@@ -1157,6 +1239,119 @@ class ScheduleControllerTest extends BaseControllerTest {
             }
             scheduleLocation.setScheduleDetails(scheduleDetails);
         });
+    }
+
+    //request 요청 본문으로 binding될 dto객체 생성 메소드
+    private ScheduleDto createScheduleDto(int index, Scope scope) {
+
+        AtomicInteger day = new AtomicInteger(1);//schedule detail의 시작 날짜와 종료 날짜의 day에 사용될 변수
+        LinkedHashSet<ScheduleLocationDto> scheduleLocationDtos = new LinkedHashSet<>();//일정 장소 dto set
+        IntStream.range(0, 3).forEach(i -> {
+            LinkedHashSet<ScheduleDetailDto> scheduleDetailDtos = new LinkedHashSet<>();//상세 일정 dto set
+            IntStream.range(0, 3).forEach(j -> {
+                ScheduleDetailDto scheduleDetailDto = ScheduleDetailDto.builder()
+                        .place("Place" + j + " in location")
+                        .plan("Do something in place" + j)
+                        .startDate(LocalDateTime.of(2020, 5, day.get() + 1, 12, 0, 0))
+                        .endDate(LocalDateTime.of(2020, 5, day.get() + 2, 12, 0, 0))
+                        .build();
+                scheduleDetailDtos.add(scheduleDetailDto);
+                day.getAndIncrement();
+            });
+
+            ScheduleLocationDto scheduleLocationDto = ScheduleLocationDto.builder()
+                    .location("location" + i)
+                    .latitude(33.00000 + i)
+                    .longitude(127.00000 + i)
+                    .scheduleDetailDtos(scheduleDetailDtos)
+                    .build();
+            scheduleLocationDtos.add(scheduleLocationDto);
+        });
+
+        ScheduleDto scheduleDto = ScheduleDto.builder()
+                .title("schedule" + index)
+                .scope(scope)
+                .scheduleLocationDtos(scheduleLocationDtos)
+                .build();
+
+        return scheduleDto;
+    }
+
+    //허용되지 않은 값이 포함된 요청 본문을 만드는 메소드
+    private Schedule createScheduleWithNotAllowedValue(int index, Scope scope) {
+
+        AtomicInteger day = new AtomicInteger(1);//schedule detail의 시작 날짜와 종료 날짜의 day에 사용될 변수
+        Set<ScheduleLocation> scheduleLocations = new LinkedHashSet<>();//일정 장소 dto set
+        IntStream.range(0, 3).forEach(i -> {
+            Set<ScheduleDetail> scheduleDetails = new LinkedHashSet<>();//상세 일정 dto set
+            IntStream.range(0, 3).forEach(j -> {
+                ScheduleDetail scheduleDetail = ScheduleDetail.builder()
+                        .id(10)//허용되지 않은 값
+                        .place("Place" + j + " in location")
+                        .plan("do something in place" + j)
+                        .startDate(LocalDateTime.of(2020, 5, day.get() + 1, 12, 0, 0))
+                        .endDate(LocalDateTime.of(2020, 5, day.get() + 2, 12, 0, 0))
+                        .build();
+                scheduleDetails.add(scheduleDetail);
+                day.getAndIncrement();
+            });
+
+
+            ScheduleLocation scheduleLocation = ScheduleLocation.builder()
+                    .id(10)//허용되지 않은 값
+                    .location("location" + i)
+                    .latitude(33.00000 + i)
+                    .longitude(127.00000 + i)
+                    .scheduleDetails(scheduleDetails)
+                    .build();
+            scheduleLocations.add(scheduleLocation);
+        });
+
+        Schedule schedule = Schedule.builder()
+                .id(10)//허용되지 않은 값
+                .title("schedule" + index)
+                .scope(scope)
+                .scheduleLocations(scheduleLocations)
+                .viewCount(100)//허용되지 않은 값
+                .regDate(LocalDateTime.now())//허용되지 않은 값
+                .build();
+
+        return schedule;
+    }
+
+
+    //비즈니스 로직에 부합하지 않는 요청 본문 dto 생성 메소드
+    private ScheduleDto createScheduleDtoWithWrongValue(int index, Scope scope) {
+
+        LinkedHashSet<ScheduleDetailDto> scheduleDetailDtos = new LinkedHashSet<>();//상세 일정 dto set
+        IntStream.range(0, 3).forEach(i -> {
+            ScheduleDetailDto scheduleDetailDto = ScheduleDetailDto.builder()
+                    .place("Place" + i + " in location")
+                    .plan("Do something in place" + i)
+                    .startDate(LocalDateTime.of(2020, 5, i + 2, 12, 0, 0))
+                    .endDate(LocalDateTime.of(2020, 5, i + 1, 12, 0, 0))
+                    .build();
+            scheduleDetailDtos.add(scheduleDetailDto);
+        });
+
+        LinkedHashSet<ScheduleLocationDto> scheduleLocationDtos = new LinkedHashSet<>();//일정 장소 dto set
+        IntStream.range(0, 3).forEach(i -> {
+            ScheduleLocationDto scheduleLocationDto = ScheduleLocationDto.builder()
+                    .location("location" + i)
+                    .latitude(33.00000 + i)
+                    .longitude(127.00000 + i)
+                    .scheduleDetailDtos(scheduleDetailDtos)
+                    .build();
+            scheduleLocationDtos.add(scheduleLocationDto);
+        });
+
+        ScheduleDto scheduleDto = ScheduleDto.builder()
+                .title("schedule" + index)
+                .scope(scope)
+                .scheduleLocationDtos(scheduleLocationDtos)
+                .build();
+
+        return scheduleDto;
     }
 
     private Follow createFollow(Account followingAccount, Account followedAccount) {

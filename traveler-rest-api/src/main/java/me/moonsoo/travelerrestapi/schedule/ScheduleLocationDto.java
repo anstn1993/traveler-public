@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +30,6 @@ public class ScheduleLocationDto {
 
     @NotEmpty
     @JsonProperty("scheduleDetails")//json key 설정
-    private List<ScheduleDetailDto> scheduleDetailDtos;
+    private LinkedHashSet<ScheduleDetailDto> scheduleDetailDtos = new LinkedHashSet<>();
 
 }

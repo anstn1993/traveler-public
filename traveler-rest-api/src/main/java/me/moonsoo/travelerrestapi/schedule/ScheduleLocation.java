@@ -4,16 +4,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = {"id", "schedule", "location", "latitude", "longitude"})
 @Builder
 @Entity
 public class ScheduleLocation {
@@ -34,8 +31,8 @@ public class ScheduleLocation {
     @Column(nullable = false, columnDefinition = "decimal(13, 10)")
     private Double longitude;//장소 경도
 
-    @OneToMany(mappedBy = "scheduleLocation", cascade = CascadeType.ALL)
-    private List<ScheduleDetail> scheduleDetails = new ArrayList<>();//세부 일정
+    @OneToMany(mappedBy = "scheduleLocation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<ScheduleDetail> scheduleDetails = new LinkedHashSet<>();//세부 일정
 
     private void addScheduleDetails(ScheduleDetail scheduleDetail) {
         scheduleDetail.setScheduleLocation(this);
