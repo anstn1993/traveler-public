@@ -4,10 +4,7 @@ import ch.qos.logback.classic.spi.EventArgUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import me.moonsoo.commonmodule.account.*;
-import me.moonsoo.travelerrestapi.config.AuthServerConfig;
-import me.moonsoo.travelerrestapi.config.ResourceServerConfig;
-import me.moonsoo.travelerrestapi.config.RestDocsConfig;
-import me.moonsoo.travelerrestapi.config.SecurityConfig;
+import me.moonsoo.travelerrestapi.config.*;
 import org.junit.jupiter.api.Disabled;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Slf4j
-@Import({AuthServerConfig.class, ResourceServerConfig.class, SecurityConfig.class, RestDocsConfig.class})
+@Import({AuthServerConfig.class, ResourceServerConfig.class, SecurityConfig.class, RestDocsConfig.class, MockS3Config.class})
 @Disabled
 public class BaseControllerTest {
 

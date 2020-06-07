@@ -69,6 +69,20 @@
             <version>${querydsl.version}</version>
         </dependency>
 
+        <!--aws s3-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-aws</artifactId>
+            <version>2.2.2.RELEASE</version>
+        </dependency>
+
+        <!--mock s3-->
+        <dependency>
+            <groupId>io.findify</groupId>
+            <artifactId>s3mock_2.13</artifactId>
+            <version>0.2.6</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 

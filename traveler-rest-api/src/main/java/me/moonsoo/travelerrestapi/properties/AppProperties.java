@@ -61,4 +61,6 @@ public class AppProperties {
 
     private String updateScheduleAnchor;
 
+    private String createPostAnchor;
+
 }
