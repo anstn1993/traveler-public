@@ -48,9 +48,9 @@ public class FileUploader {
     private List<String> uploadToS3(List<File> tempFiles) {
         List<String> uploadedImageUrlList = new ArrayList<>();
         for (File file : tempFiles) {
-            String targetDirectory = "post-image";//파일을 저장할 s3서버의 디렉토리
+            String targetDirectory = s3Properties.getPostImageDirectory();//파일을 저장할 s3서버의 디렉토리
             amazonS3.putObject(new PutObjectRequest(s3Properties.getBUCKET(), targetDirectory + "/" + file.getName(), file).withCannedAcl(CannedAccessControlList.PublicRead));//s3로 업로드
-            uploadedImageUrlList.add(amazonS3.getUrl(s3Properties.getBUCKET(), file.getName()).toString());
+            uploadedImageUrlList.add(amazonS3.getUrl(s3Properties.getBUCKET(), targetDirectory + "/" + file.getName()).toString());
         }
         return uploadedImageUrlList;
     }

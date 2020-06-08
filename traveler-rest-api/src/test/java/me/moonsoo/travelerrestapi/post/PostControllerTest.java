@@ -1,13 +1,19 @@
 package me.moonsoo.travelerrestapi.post;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import io.findify.s3mock.S3Mock;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
+import me.moonsoo.travelerrestapi.config.MockS3Config;
+import me.moonsoo.travelerrestapi.properties.S3Properties;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
@@ -15,20 +21,26 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.util.FileCopyUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.IntStream;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @TestPropertySource({"classpath:/aws.properties", "classpath:/application-test.properties"})
+@Import(MockS3Config.class)
 class PostControllerTest extends BaseControllerTest {
 
     @Autowired
@@ -49,6 +62,12 @@ class PostControllerTest extends BaseControllerTest {
 
     @Autowired
     PostTagRepository postTagRepository;
+
+    @Autowired
+    AmazonS3 amazonS3;
+
+    @Autowired
+    S3Properties s3Properties;
 
     @AfterAll
     public static void closeMockS3Server(@Autowired S3Mock s3Mock) {
@@ -325,32 +344,181 @@ class PostControllerTest extends BaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("인증 상태에서 post게시물 목록 조회-30개의 게시물, 한 페이지에 10개씩 조회하고 2페이지 조회")
+    public void getPosts_WithAuth() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+        //게시물 30개 생성
+        IntStream.range(0, 30).forEach(i -> {
+            createPost(account, i, 2, 2);
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,DESC")
+                .param("filter", "tag")
+                .param("search", "0"))
+                .andDo(print())
+                .andExpect(jsonPath("_embedded.postList").exists())
+                .andExpect(jsonPath("_embedded.postList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.postList[0]._links.get-post-comments").exists())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+                .andExpect(jsonPath("_links.create-post").exists())
+        .andDo(document("get-posts",
+                pagingLinks.and(
+                        linkWithRel("profile").description("api 문서 링크"),
+                        linkWithRel("create-post").description("post 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                ),
+                requestHeaders(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                        headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                ),
+                requestParameters(
+                        parameterWithName("page").optional().description("페이지 번호"),
+                        parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
+                        parameterWithName("sort").optional().description("정렬 기준(id-게시물 id, regDate-등록 날짜, viewCount-조회수)"),
+                        parameterWithName("filter").optional().description("검색어 필터(writer-작성자, article-본문, location-장소명, tag-태그)"),
+                        parameterWithName("search").optional().description("검색어")
+                ),
+                responseHeaders.and(
+                        headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                ),
+                responsePageFields.and(
+                        fieldWithPath("_embedded.postList[].id").description("post 게시물의 id"),
+                        fieldWithPath("_embedded.postList[].account.id").description("post 게시물 작성자의 id"),
+                        fieldWithPath("_embedded.postList[].article").description("post 게시물의 본문"),
+                        fieldWithPath("_embedded.postList[].postTagList[].id").description("post 게시물의 tag id"),
+                        fieldWithPath("_embedded.postList[].postTagList[].post.id").description("해당 tag가 달린 post게시물 id"),
+                        fieldWithPath("_embedded.postList[].postTagList[].tag").description("tag"),
+                        fieldWithPath("_embedded.postList[].postImageList[].id").description("post 게시물의 이미지 id"),
+                        fieldWithPath("_embedded.postList[].postImageList[].post.id").description("해당 이미지가 게시된 post id"),
+                        fieldWithPath("_embedded.postList[].postImageList[].uri").description("이미지 uri"),
+                        fieldWithPath("_embedded.postList[].location").description("post 게시물에 달린 장소명"),
+                        fieldWithPath("_embedded.postList[].latitude").description("장소의 위도"),
+                        fieldWithPath("_embedded.postList[].longitude").description("장소의 경도"),
+                        fieldWithPath("_embedded.postList[].regDate").description("post 게시물 작성 시간"),
+                        fieldWithPath("_embedded.postList[].viewCount").description("post 게시물 조회수"),
+                        fieldWithPath("_embedded.postList[]._links.self.href").description("post 게시물 리소스 조회 링크"),
+                        fieldWithPath("_embedded.postList[]._links.get-post-comments.href").description("post 게시물의 댓글 목록 조회 링크"),
+                        fieldWithPath("_links.create-post.href").description("post 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                )
+
+        ))
+        ;
+    }
+
+    @Test
+    @DisplayName("인증하지 않은 상태에서 post게시물 목록 조회-30개의 게시물, 한 페이지에 10개씩 조회하고 2페이지 조회")
+    public void getPosts_WithoutAuth() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        account = createAccount(email, password, 0);
+        //게시물 30개 생성
+        IntStream.range(0, 30).forEach(i -> {
+            createPost(account, i, 2, 2);
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts")
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,DESC")
+                .param("filter", "location")
+                .param("search", "somewhere"))
+                .andDo(print())
+                .andExpect(jsonPath("_embedded.postList").exists())
+                .andExpect(jsonPath("_embedded.postList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.postList[0]._links.get-post-comments").exists())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+                .andExpect(jsonPath("_links.create-post").doesNotExist())
+        ;
+    }
 
 
-    private Post createPost(Account account, int index, int tagCount) {
+    private Post createPost(Account account, int index, int tagCount, int imageCount) {
         Post post = Post.builder()
                 .account(account)
                 .article("This is article" + index)
                 .location("somewhere" + index)
                 .latitude(33.0000)
                 .longitude(127.0000)
+                .regDate(LocalDateTime.now())
+                .viewCount(0)
                 .build();
-
-        Set<PostTag> postTags = new LinkedHashSet<>();
+        Post savedPost = postRepository.save(post);
+        //post tag set
+        Set<PostTag> postTagList = new LinkedHashSet<>();
         IntStream.range(0, tagCount).forEach(i -> {
             PostTag postTag = createPostTag(i, post);
-            postTags.add(postTag);
+            postTagList.add(postTag);
         });
+        savedPost.setPostTagList(postTagList);
 
-        return post;
+        //post image set
+        Set<PostImage> postImageList = new LinkedHashSet<>();
+        IntStream.range(0, imageCount).forEach(i -> {
+            PostImage postImage = null;
+            try {
+                postImage = createPostImage(i, savedPost);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            postImageList.add(postImage);
+        });
+        savedPost.setPostImageList(postImageList);
+        return savedPost;
+    }
+
+    private PostImage createPostImage(int index, Post post) throws IOException {
+        String uri = uploadImage(index, post.getAccount());//이미지를 mock s3서버에 업로드
+        PostImage postImage = PostImage.builder()
+                .uri(uri)
+                .post(post)
+                .build();
+        return postImageRepository.save(postImage);
+    }
+
+    private String uploadImage(int index, Account account) throws IOException {
+        String targetDirectory = s3Properties.getPostImageDirectory();//이미지를 저장할 디렉토리
+        //이미지 파일
+        String originalFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        File originalFile = resourceLoader.getResource("classpath:image/" + originalFileName).getFile();
+        String imageFileName = account.getEmail() + new SimpleDateFormat("HHmmss").format(new Date()) + (index + 1) + ".jpg";
+        //로컬에 임시 이미지 파일 생성
+        File tempFile = new File(imageFileName);
+        if (tempFile.createNewFile()) {
+            FileCopyUtils.copy(originalFile, tempFile);
+        }
+        amazonS3.putObject(new PutObjectRequest(s3Properties.getBUCKET(), targetDirectory + File.separator + tempFile.getName(), tempFile).withCannedAcl(CannedAccessControlList.PublicRead));//mock s3 bucket에 파일 저장
+        tempFile.delete();//로컬에 임시 파일 삭제
+        return amazonS3.getUrl(s3Properties.getBUCKET(), targetDirectory + File.separator + tempFile.getName()).toString();
     }
 
     private PostTag createPostTag(int index, Post post) {
-        return PostTag.builder()
+        PostTag postTag = PostTag.builder()
                 .post(post)
                 .tag("tag" + index)
-                .id(index)
                 .build();
+        return postTagRepository.save(postTag);
     }
 
     private PostDto createPostDto(int index, int tagCount) {
@@ -385,6 +553,7 @@ class PostControllerTest extends BaseControllerTest {
                 .longitude(127.0000)
                 .build();
     }
+
     private PostDto createPostWithWrongValue() {
         return PostDto.builder()
                 .article("This is article")

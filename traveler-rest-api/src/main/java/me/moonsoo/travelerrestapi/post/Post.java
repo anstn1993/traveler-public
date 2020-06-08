@@ -29,10 +29,10 @@ public class Post {
 
     private String article;//본문의 제목
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post")
     private Set<PostTag> postTagList = new LinkedHashSet<>();//게시물 태그 set
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post")
     private Set<PostImage> postImageList = new LinkedHashSet<>();//게시물 이미지 set
 
     private String location;//장소

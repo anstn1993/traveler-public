@@ -300,11 +300,11 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 parameterWithName("sort").optional().description("정렬 기준(id-게시물 id, regDate-등록 날짜, viewCount-조회수)"),
                                 parameterWithName("filter").optional().description("검색어 필터(writer-작성자, article-본문, title-제목, location-장소명)"),
                                 parameterWithName("search").optional().description("검색어")
-                        )
-                        , responseHeaders.and(
+                        ),
+                        responseHeaders.and(
                                 headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
-                        )
-                        , responsePageFields.and(
+                        ),
+                        responsePageFields.and(
                                 fieldWithPath("_embedded.accompanyList[].id").description("동행 게시물의 id"),
                                 fieldWithPath("_embedded.accompanyList[].account.id").description("게시물 작성자의 id"),
                                 fieldWithPath("_embedded.accompanyList[].title").description("동행 게시물의 제목"),
@@ -744,8 +744,6 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isForbidden())
         ;
     }
-
-
 
 
     private class ConstrainedFields {

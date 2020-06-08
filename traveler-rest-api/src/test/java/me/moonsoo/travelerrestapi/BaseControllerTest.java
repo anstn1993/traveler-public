@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Slf4j
-@Import({AuthServerConfig.class, ResourceServerConfig.class, SecurityConfig.class, RestDocsConfig.class, MockS3Config.class})
+@Import({AuthServerConfig.class, ResourceServerConfig.class, SecurityConfig.class, RestDocsConfig.class})
 @Disabled
 public class BaseControllerTest {
 
