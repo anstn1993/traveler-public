@@ -76,4 +76,9 @@ public class PostService {
             return postRepository.findAllByLocationContains(search, pageable);
         }
     }
+
+    public Post updateViewCount(Post post) {
+        post.setViewCount(post.getViewCount() + 1);
+        return postRepository.save(post);
+    }
 }

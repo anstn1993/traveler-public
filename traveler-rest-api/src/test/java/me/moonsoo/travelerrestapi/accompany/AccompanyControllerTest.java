@@ -419,12 +419,12 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 fieldWithPath("longitude").description("동행 장소의 경도"),
                                 fieldWithPath("regDate").description("동행 게시물 작성 시간"),
                                 fieldWithPath("viewCount").description("동행 게시물 조회수"),
-                                fieldWithPath("_links.self.href").description("조회한 동행 게시물의 리소스 url"),
-                                fieldWithPath("_links.get-accompany-comments.href").description("조회한 동행 게시물의 댓글 목록을 조회할 수 있는 url"),
-                                fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 url"),
-                                fieldWithPath("_links.update-accompany.href").description("동행 게시물을 수정할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
-                                fieldWithPath("_links.delete-accompany.href").description("동행 게시물을 삭제할 수 있는 url(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
-                                fieldWithPath("_links.profile.href").description("api 문서 url")
+                                fieldWithPath("_links.self.href").description("조회한 동행 게시물의 리소스 링크"),
+                                fieldWithPath("_links.get-accompany-comments.href").description("조회한 동행 게시물의 댓글 목록을 조회할 수 있는 링크"),
+                                fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 링크"),
+                                fieldWithPath("_links.update-accompany.href").description("동행 게시물을 수정할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.delete-accompany.href").description("동행 게시물을 삭제할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
                         )
                 ))
         ;

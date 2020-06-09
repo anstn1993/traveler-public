@@ -324,10 +324,8 @@ class PostControllerTest extends BaseControllerTest {
         String password = "user";
         String accessToken = getAuthToken(email, password, 0);
 
-
         //이미지 파일 part
         MockMultipartFile mockFile = new MockMultipartFile("imageFiles", "test.txt", "text/plain", "This is not a image file.".getBytes());
-
 
         //post part
         PostDto postDto = createPostDto(0, 3);
@@ -365,6 +363,7 @@ class PostControllerTest extends BaseControllerTest {
                 .param("filter", "tag")
                 .param("search", "0"))
                 .andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.postList").exists())
                 .andExpect(jsonPath("_embedded.postList[0]._links.self").exists())
                 .andExpect(jsonPath("_embedded.postList[0]._links.get-post-comments").exists())
@@ -376,46 +375,46 @@ class PostControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("_links.next").exists())
                 .andExpect(jsonPath("_links.last").exists())
                 .andExpect(jsonPath("_links.create-post").exists())
-        .andDo(document("get-posts",
-                pagingLinks.and(
-                        linkWithRel("profile").description("api 문서 링크"),
-                        linkWithRel("create-post").description("post 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
-                ),
-                requestHeaders(
-                        headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                        headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
-                ),
-                requestParameters(
-                        parameterWithName("page").optional().description("페이지 번호"),
-                        parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
-                        parameterWithName("sort").optional().description("정렬 기준(id-게시물 id, regDate-등록 날짜, viewCount-조회수)"),
-                        parameterWithName("filter").optional().description("검색어 필터(writer-작성자, article-본문, location-장소명, tag-태그)"),
-                        parameterWithName("search").optional().description("검색어")
-                ),
-                responseHeaders.and(
-                        headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
-                ),
-                responsePageFields.and(
-                        fieldWithPath("_embedded.postList[].id").description("post 게시물의 id"),
-                        fieldWithPath("_embedded.postList[].account.id").description("post 게시물 작성자의 id"),
-                        fieldWithPath("_embedded.postList[].article").description("post 게시물의 본문"),
-                        fieldWithPath("_embedded.postList[].postTagList[].id").description("post 게시물의 tag id"),
-                        fieldWithPath("_embedded.postList[].postTagList[].post.id").description("해당 tag가 달린 post게시물 id"),
-                        fieldWithPath("_embedded.postList[].postTagList[].tag").description("tag"),
-                        fieldWithPath("_embedded.postList[].postImageList[].id").description("post 게시물의 이미지 id"),
-                        fieldWithPath("_embedded.postList[].postImageList[].post.id").description("해당 이미지가 게시된 post id"),
-                        fieldWithPath("_embedded.postList[].postImageList[].uri").description("이미지 uri"),
-                        fieldWithPath("_embedded.postList[].location").description("post 게시물에 달린 장소명"),
-                        fieldWithPath("_embedded.postList[].latitude").description("장소의 위도"),
-                        fieldWithPath("_embedded.postList[].longitude").description("장소의 경도"),
-                        fieldWithPath("_embedded.postList[].regDate").description("post 게시물 작성 시간"),
-                        fieldWithPath("_embedded.postList[].viewCount").description("post 게시물 조회수"),
-                        fieldWithPath("_embedded.postList[]._links.self.href").description("post 게시물 리소스 조회 링크"),
-                        fieldWithPath("_embedded.postList[]._links.get-post-comments.href").description("post 게시물의 댓글 목록 조회 링크"),
-                        fieldWithPath("_links.create-post.href").description("post 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
-                )
+                .andDo(document("get-posts",
+                        pagingLinks.and(
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("create-post").description("post 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        requestParameters(
+                                parameterWithName("page").optional().description("페이지 번호"),
+                                parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
+                                parameterWithName("sort").optional().description("정렬 기준(id-게시물 id, regDate-등록 날짜, viewCount-조회수)"),
+                                parameterWithName("filter").optional().description("검색어 필터(writer-작성자, article-본문, location-장소명, tag-태그)"),
+                                parameterWithName("search").optional().description("검색어")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responsePageFields.and(
+                                fieldWithPath("_embedded.postList[].id").description("post 게시물의 id"),
+                                fieldWithPath("_embedded.postList[].account.id").description("post 게시물 작성자의 id"),
+                                fieldWithPath("_embedded.postList[].article").description("post 게시물의 본문"),
+                                fieldWithPath("_embedded.postList[].postTagList[].id").description("post 게시물의 tag id"),
+                                fieldWithPath("_embedded.postList[].postTagList[].post.id").description("해당 tag가 달린 post게시물 id"),
+                                fieldWithPath("_embedded.postList[].postTagList[].tag").description("tag"),
+                                fieldWithPath("_embedded.postList[].postImageList[].id").description("post 게시물의 이미지 id"),
+                                fieldWithPath("_embedded.postList[].postImageList[].post.id").description("해당 이미지가 게시된 post id"),
+                                fieldWithPath("_embedded.postList[].postImageList[].uri").description("이미지 uri"),
+                                fieldWithPath("_embedded.postList[].location").description("post 게시물에 달린 장소명"),
+                                fieldWithPath("_embedded.postList[].latitude").description("장소의 위도"),
+                                fieldWithPath("_embedded.postList[].longitude").description("장소의 경도"),
+                                fieldWithPath("_embedded.postList[].regDate").description("post 게시물 작성 시간"),
+                                fieldWithPath("_embedded.postList[].viewCount").description("post 게시물 조회수"),
+                                fieldWithPath("_embedded.postList[]._links.self.href").description("post 게시물 리소스 조회 링크"),
+                                fieldWithPath("_embedded.postList[]._links.get-post-comments.href").description("post 게시물의 댓글 목록 조회 링크"),
+                                fieldWithPath("_links.create-post.href").description("post 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        )
 
-        ))
+                ))
         ;
     }
 
@@ -439,6 +438,7 @@ class PostControllerTest extends BaseControllerTest {
                 .param("filter", "location")
                 .param("search", "somewhere"))
                 .andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.postList").exists())
                 .andExpect(jsonPath("_embedded.postList[0]._links.self").exists())
                 .andExpect(jsonPath("_embedded.postList[0]._links.get-post-comments").exists())
@@ -450,6 +450,179 @@ class PostControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("_links.next").exists())
                 .andExpect(jsonPath("_links.last").exists())
                 .andExpect(jsonPath("_links.create-post").doesNotExist())
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 자신의 post 게시물 하나 조회")
+    public void getMyPost_WithAuth() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+
+        Post post = createPost(account, 0, 2, 2);//자신의 게시물 하나 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}", post.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("article").exists())
+                .andExpect(jsonPath("postImageList[0].id").exists())
+                .andExpect(jsonPath("postImageList[0].post.id").exists())
+                .andExpect(jsonPath("postImageList[0].uri").exists())
+                .andExpect(jsonPath("postTagList[0].id").exists())
+                .andExpect(jsonPath("postTagList[0].post.id").exists())
+                .andExpect(jsonPath("postTagList[0].tag").exists())
+                .andExpect(jsonPath("location").exists())
+                .andExpect(jsonPath("latitude").exists())
+                .andExpect(jsonPath("longitude").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("viewCount").value(post.getViewCount() + 1))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-post-comments").exists())
+                .andExpect(jsonPath("_links.get-posts").exists())
+                .andExpect(jsonPath("_links.update-post").exists())
+                .andExpect(jsonPath("_links.delete-post").exists())
+                .andDo(document("get-post",
+                        links(
+                                linkWithRel("self").description("조회한 post 게시물 리소스 링크"),
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("get-post-comments").description("조회한 post 게시물의 댓글 목록을 조회할 수 있는 링크"),
+                                linkWithRel("get-posts").description("post 게시물 목록을 조회할 수 있는 링크"),
+                                linkWithRel("update-post").description("post 게시물을 수정할 수 있는 링크"),
+                                linkWithRel("delete-post").description("post 게시물을 삭제할 수 있는 링크")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        pathParameters(
+                                parameterWithName("postId").description("post 게시물의 id")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("post 게시물의 id"),
+                                fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("article").description("post 게시물의 본문"),
+                                fieldWithPath("postImageList[].id").description("post 게시물에 등록된 이미지 id"),
+                                fieldWithPath("postImageList[].post.id").description("이미지가 등록된 게시물 id"),
+                                fieldWithPath("postImageList[].uri").description("post 게시물에 등록된 이미지 uri"),
+                                fieldWithPath("postTagList[].id").description("post 게시물에 달린 태그 id"),
+                                fieldWithPath("postTagList[].post.id").description("tag가 달린 게시물 id"),
+                                fieldWithPath("postTagList[].tag").description("tag"),
+                                fieldWithPath("location").description("post 게시물에 등록한 장소의 경도"),
+                                fieldWithPath("latitude").description("장소의 위도"),
+                                fieldWithPath("longitude").description("장소의 경도"),
+                                fieldWithPath("regDate").description("post 게시물 작성 시간"),
+                                fieldWithPath("viewCount").description("post 게시물 조회수"),
+                                fieldWithPath("_links.self.href").description("조회한 post 게시물의 리소스 링크"),
+                                fieldWithPath("_links.get-post-comments.href").description("조회한 post 게시물의 댓글 목록을 조회할 수 있는 링크"),
+                                fieldWithPath("_links.get-posts.href").description("post 게시물 리스트를 조회할 수 있는 링크"),
+                                fieldWithPath("_links.update-post.href").description("post 게시물을 수정할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.delete-post.href").description("post 게시물을 삭제할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 타인의 post 게시물 하나 조회")
+    public void getOthersPost_WithAuth() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+        Post post = createPost(otherAccount, 0, 2, 2);//타인의 게시물 하나 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}", post.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("article").exists())
+                .andExpect(jsonPath("postImageList[0].id").exists())
+                .andExpect(jsonPath("postImageList[0].post.id").exists())
+                .andExpect(jsonPath("postImageList[0].uri").exists())
+                .andExpect(jsonPath("postTagList[0].id").exists())
+                .andExpect(jsonPath("postTagList[0].post.id").exists())
+                .andExpect(jsonPath("postTagList[0].tag").exists())
+                .andExpect(jsonPath("location").exists())
+                .andExpect(jsonPath("latitude").exists())
+                .andExpect(jsonPath("longitude").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("viewCount").value(post.getViewCount() + 1))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-post-comments").exists())
+                .andExpect(jsonPath("_links.get-posts").exists())
+                //타인의 게시물 조회시에는 수정, 삭제 링크 제공 x
+                .andExpect(jsonPath("_links.update-post").doesNotHaveJsonPath())
+                .andExpect(jsonPath("_links.delete-post").doesNotHaveJsonPath())
+        ;
+    }
+
+    @Test
+    @DisplayName("미인증 상태에서 post 게시물 하나 조회")
+    public void getPost_WithoutAuth() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        account = createAccount(email, password, 1);
+        Post post = createPost(account, 0, 2, 2);//타인의 게시물 하나 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}", post.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("article").exists())
+                .andExpect(jsonPath("postImageList[0].id").exists())
+                .andExpect(jsonPath("postImageList[0].post.id").exists())
+                .andExpect(jsonPath("postImageList[0].uri").exists())
+                .andExpect(jsonPath("postTagList[0].id").exists())
+                .andExpect(jsonPath("postTagList[0].post.id").exists())
+                .andExpect(jsonPath("postTagList[0].tag").exists())
+                .andExpect(jsonPath("location").exists())
+                .andExpect(jsonPath("latitude").exists())
+                .andExpect(jsonPath("longitude").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("viewCount").value(post.getViewCount() + 1))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-post-comments").exists())
+                .andExpect(jsonPath("_links.get-posts").exists())
+                //타인의 게시물 조회시에는 수정, 삭제 링크 제공 x
+                .andExpect(jsonPath("_links.update-post").doesNotHaveJsonPath())
+                .andExpect(jsonPath("_links.delete-post").doesNotHaveJsonPath())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 하나 조회 실패-존재하지 않는 리소스 조회(404 Not found))")
+    public void getPostFail_Not_Found() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 1);
+        Post post = createPost(account, 0, 2, 2);//게시물 하나 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}", 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
         ;
     }
 

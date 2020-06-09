@@ -65,4 +65,6 @@ public class AppProperties {
 
     private String getPostsAnchor;
 
+    private String getPostAnchor;
+
 }

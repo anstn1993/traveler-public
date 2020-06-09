@@ -125,4 +125,27 @@ public class PostController {
         postModels.add(profileLink);
         return ResponseEntity.ok(postModels);
     }
+
+    //post 게시물 하나 조회 핸들러
+    @GetMapping("/{postId}")
+    public ResponseEntity getPost(@PathVariable("postId") Post post,
+                                  @CurrentAccount Account account) {
+        if(post == null) {//존재하지 않는 리소스인 경우
+            return ResponseEntity.notFound().build();
+        }
+        Post updatedPost = postService.updateViewCount(post);//조회수 1 증가 처리
+//Hateoas적용
+        PostModel postModel = new PostModel(updatedPost);
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetPostAnchor()).withRel("profile");//profile 링크
+        WebMvcLinkBuilder linkBuilder = linkTo(PostController.class);
+        Link getPostsLink = linkBuilder.withRel("get-posts");
+        Link getPostCommentsLink = linkBuilder.slash(updatedPost.getId()).slash("comments").withRel("get-post-comments");
+        postModel.add(profileLink, getPostsLink, getPostCommentsLink);
+        if(account != null && account.equals(updatedPost.getAccount())) {//인증 && 자신의 게시물
+            Link updatePostLink = linkBuilder.slash(updatedPost.getId()).withRel("update-post");
+            Link deletePostLink = linkBuilder.slash(updatedPost.getId()).withRel("delete-post");
+            postModel.add(updatePostLink, deletePostLink);
+        }
+        return ResponseEntity.ok(postModel);
+    }
 }

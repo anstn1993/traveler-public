@@ -322,3 +322,10 @@ operation::create-post[snippets='curl-request,http-request,request-headers,reque
 'GET' 요청을 사용해서 post 게시물 목록을 조회할 수 있다.
 
 operation::get-posts[snippets='curl-request,http-request,request-headers,request-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-post-get]]
+=== post 조회
+
+'GET' 요청을 사용해서 post 게시물을 조회할 수 있다.
+
+operation::get-post[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
