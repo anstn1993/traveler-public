@@ -338,3 +338,10 @@ operation::get-post[snippets='curl-request,http-request,request-headers,path-par
 Content-Type이 multipart/form-data인 경우 POST method로만 요청이 가능하기 때문에 이 리소스의 경우 'POST' method로 수정한다.
 
 operation::update-post[snippets='curl-request,http-request,request-headers,request-parts,request-part-post-fields,http-response,response-headers,response-fields,links']
+
+[[resources-post-delete]]
+=== post 삭제
+
+'DELETE' 요청을 사용해서 post 게시물을 삭제할 수 있다.
+
+operation::delete-post[snippets='curl-request,http-request,request-headers,path-parameters,http-response']

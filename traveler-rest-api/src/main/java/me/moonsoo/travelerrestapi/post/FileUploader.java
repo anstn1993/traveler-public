@@ -1,5 +1,7 @@
 package me.moonsoo.travelerrestapi.post;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -88,7 +90,7 @@ public class FileUploader {
     }
 
     //s3서버에 저장된 이미지 삭제
-    public void delete(Set<PostImage> postImageList) {
+    public void delete(Set<PostImage> postImageList) throws AmazonServiceException {
         for (PostImage postImage : postImageList) {
             String[] uriSplit = postImage.getUri().split("/");
             String target = s3Properties.getPostImageDirectory() + "/" + uriSplit[uriSplit.length - 1];

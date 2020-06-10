@@ -2,7 +2,11 @@ package me.moonsoo.travelerrestapi.post;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.findify.s3mock.S3Mock;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
@@ -23,10 +27,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -34,6 +40,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
@@ -101,7 +109,7 @@ class PostControllerTest extends BaseControllerTest {
         part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
 
-        mockMvc.perform(multipart("/api/posts")
+        MvcResult mvcResult = mockMvc.perform(multipart("/api/posts")
                 .part(part)
                 .file(mockFile1)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -173,8 +181,7 @@ class PostControllerTest extends BaseControllerTest {
                                 fieldWithPath("_links.delete-post.href").description("업로드된 post 게시물을 삭제할 수 있는 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크")
                         )
-                ))
-        ;
+                )).andReturn();
     }
 
 
@@ -1018,7 +1025,79 @@ class PostControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
+    }
 
+    @Test
+    @DisplayName("post 게시물 삭제")
+    public void deletePost() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+
+        Post post = createPost(account, 0, 2, 2);//post게시물 하나 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}", post.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-post",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                        ),
+                        pathParameters(
+                                parameterWithName("postId").description("삭제할 post 게시물 id")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 삭제 실패-인증하지 않은 상태에서 삭제(401 Unauthorized)")
+    public void deletePostFail_Unauthorized() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        account = createAccount(email, password, 0);
+
+        Post post = createPost(account, 0, 2, 2);//post게시물 하나 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}", post.getId()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 삭제-다른 사용자의 게시물을 삭제하려고 하는 경우(403 Forbidden)")
+    public void deletePostFail_Forbidden() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+        Post post = createPost(otherAccount, 0, 2, 2);//다른 사용자의 post게시물 하나 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}", post.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 삭제-존재하지 않는 게시물을 삭제하려고 하는 경우(404 Not found)")
+    public void deletePostFail_Not_Found() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}", 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
     }
 
 

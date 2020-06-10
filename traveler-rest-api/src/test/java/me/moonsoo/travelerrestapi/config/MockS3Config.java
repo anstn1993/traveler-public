@@ -23,7 +23,10 @@ public class MockS3Config {
 
     @Bean
     public S3Mock s3Mock() {
-        return new S3Mock.Builder().withInMemoryBackend().withPort(8001).build();
+        return new S3Mock.Builder()
+                .withInMemoryBackend()
+                .withPort(8001)
+                .build();
     }
 
     @Bean

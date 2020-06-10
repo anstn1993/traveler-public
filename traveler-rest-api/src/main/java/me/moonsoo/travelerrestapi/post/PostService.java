@@ -1,6 +1,7 @@
 package me.moonsoo.travelerrestapi.post;
 
 
+import com.amazonaws.AmazonServiceException;
 import me.moonsoo.commonmodule.account.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,30 +31,36 @@ public class PostService {
     @Autowired
     private PostImageRepository postImageRepository;
 
-
+    //post게시물 생성 메소드(이미지 파일을 s3서버에 저장하고 저장에 성공하면 db에 post엔티티 정보들을 저장한다)
     public Post save(List<MultipartFile> multipartFileList, Post post, Account account) throws IOException, IllegalArgumentException {
-
-        List<String> uploadedImageUriList = fileUploader.upload(multipartFileList, account);//s3서버로 파일 전송
-        post.setAccount(account);
-        post.setRegDate(LocalDateTime.now());
-        post.setViewCount(0);
-        Post savedPost = postRepository.save(post);
-        //post image save
-        for (String uri : uploadedImageUriList) {
-            PostImage postImage = PostImage.builder()
-                    .post(savedPost)
-                    .uri(uri)
-                    .build();
-            savedPost.getPostImageList().add(postImage);
-            postImageRepository.save(postImage);
+        try {
+            List<String> uploadedImageUriList = fileUploader.upload(multipartFileList, account);
+            post.setAccount(account);
+            post.setRegDate(LocalDateTime.now());
+            post.setViewCount(0);
+            Post savedPost = postRepository.save(post);
+            //post image save
+            for (String uri : uploadedImageUriList) {
+                PostImage postImage = PostImage.builder()
+                        .post(savedPost)
+                        .uri(uri)
+                        .build();
+                savedPost.getPostImageList().add(postImage);
+                postImageRepository.save(postImage);
+            }
+            //post tag save
+            for (PostTag postTag : savedPost.getPostTagList()) {
+                postTag.setPost(savedPost);
+                postTagRepository.save(postTag);
+            }
+            return savedPost;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(e.getMessage());
         }
-        //post tag save
-        for (PostTag postTag : savedPost.getPostTagList()) {
-            postTag.setPost(savedPost);
-            postTagRepository.save(postTag);
-        }
-
-        return savedPost;
     }
 
     //페이징, 검색어 조건에 따른 post 게시물 return
@@ -86,34 +93,59 @@ public class PostService {
     }
 
     @Transactional
-    public void deleteTagAndImage(Post post) {
+    protected void deleteTagAndImage(Post post) {
         List<PostTag> postTagList = postTagRepository.findAllByPost(post);
         List<PostImage> postImageList = postImageRepository.findAllByPost(post);
         postTagRepository.deleteAll(postTagList);//tag db에서 제거
         postImageRepository.deleteAll(postImageList);//이미지 db에서 제거
     }
 
+    //post게시물 update 메소드(s3서버에 저장된 기존의 이미지들을 제거하고 제거에 성공하는 경우 새로운 이미지 파일 업로드 및 엔티티 업데이트 작업 수행)
     public Post updatePost(Post post, Set<PostTag> postTagList, List<MultipartFile> imageFiles) throws IOException, IllegalArgumentException {
+        try {
+            fileUploader.delete(post.getPostImageList());//기존 이미지 파일 s3서버에서 제거
 
-        post.setPostTagList(postTagList);//post tag set
-        for (PostTag postTag : postTagList) {
-            postTag.setPost(post);
-            postTagRepository.save(postTag);//tag db에 저장
-        }
+            deleteTagAndImage(post);//기존 tag, image를 제거
+            post.setPostTagList(postTagList);//새로운 post tag set
+            for (PostTag postTag : postTagList) {
+                postTag.setPost(post);
+                postTagRepository.save(postTag);//tag db에 저장
+            }
 
-        fileUploader.delete(post.getPostImageList());//기존 이미지 파일 s3서버에서 제거
-        List<String> uploadedImageUriList = fileUploader.upload(imageFiles, post.getAccount());//multipart로 넘어온 이미지 파일 s3서버로 업로드
-        Set<PostImage> postImageList = new LinkedHashSet<>();
-        //post image set
-        for (String uri : uploadedImageUriList) {
-            PostImage postImage = PostImage.builder()
-                    .post(post)
-                    .uri(uri)
-                    .build();
-            postImageList.add(postImage);
-            postImageRepository.save(postImage);
+            List<String> uploadedImageUriList = fileUploader.upload(imageFiles, post.getAccount());//multipart로 넘어온 이미지 파일 s3서버로 업로드
+            Set<PostImage> postImageList = new LinkedHashSet<>();
+            //post image set
+            for (String uri : uploadedImageUriList) {
+                PostImage postImage = PostImage.builder()
+                        .post(post)
+                        .uri(uri)
+                        .build();
+                postImageList.add(postImage);
+                postImageRepository.save(postImage);
+            }
+            post.setPostImageList(postImageList);
+            return postRepository.save(post);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(e.getMessage());
+        } catch (AmazonServiceException e) {
+            e.printStackTrace();
+            throw new AmazonServiceException(e.getMessage());
         }
-        post.setPostImageList(postImageList);
-        return postRepository.save(post);
+    }
+
+    public void delete(Post post) throws AmazonServiceException{
+
+        try {
+            fileUploader.delete(post.getPostImageList());//s3서버에서 이미지 파일 삭제
+            postRepository.delete(post);//삭제에 성공하면 post 엔티티 delete
+        }
+        catch (AmazonServiceException e) {
+            e.printStackTrace();
+            throw new AmazonServiceException(e.getMessage());
+        }
     }
 }

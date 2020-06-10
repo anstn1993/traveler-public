@@ -1,6 +1,7 @@
 package me.moonsoo.travelerrestapi.post;
 
 
+import com.amazonaws.AmazonServiceException;
 import lombok.extern.slf4j.Slf4j;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.CurrentAccount;
@@ -18,6 +19,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.DirectFieldBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -116,8 +118,8 @@ public class PostController {
                         p -> new PostModel(p, linkTo(PostController.class).slash(p.getId()).slash("comments").withRel("get-post-comments")),
                         //page링크에 filter, search 같은 request param을 함께 붙이기 위해서 필요한 링크
                         linkTo(methodOn(PostController.class).getPosts(pageable, assembler, params, account)).withSelfRel()
-                        );
-        if(account != null) {//인증 상태에서의 요청인 경우
+                );
+        if (account != null) {//인증 상태에서의 요청인 경우
             Link createPostLink = linkTo(PostController.class).withRel("create-post");
             postModels.add(createPostLink);
         }
@@ -130,7 +132,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity getPost(@PathVariable("postId") Post post,
                                   @CurrentAccount Account account) {
-        if(post == null) {//존재하지 않는 리소스인 경우
+        if (post == null) {//존재하지 않는 리소스인 경우
             return ResponseEntity.notFound().build();
         }
         Post updatedPost = postService.updateViewCount(post);//조회수 1 증가 처리
@@ -141,7 +143,7 @@ public class PostController {
         Link getPostsLink = linkBuilder.withRel("get-posts");
         Link getPostCommentsLink = linkBuilder.slash(updatedPost.getId()).slash("comments").withRel("get-post-comments");
         postModel.add(profileLink, getPostsLink, getPostCommentsLink);
-        if(account != null && account.equals(updatedPost.getAccount())) {//인증 && 자신의 게시물
+        if (account != null && account.equals(updatedPost.getAccount())) {//인증 && 자신의 게시물
             Link updatePostLink = linkBuilder.slash(updatedPost.getId()).withRel("update-post");
             Link deletePostLink = linkBuilder.slash(updatedPost.getId()).withRel("delete-post");
             postModel.add(updatePostLink, deletePostLink);
@@ -157,16 +159,16 @@ public class PostController {
                                      Errors errors,
                                      @CurrentAccount Account account) {
 
-        if(post == null) {//존재하지 않는 리소스인 경우
+        if (post == null) {//존재하지 않는 리소스인 경우
             return ResponseEntity.notFound().build();
         }
 
-        if(!account.equals(post.getAccount())) {//자신의 게시물이 아닌 경우
+        if (!account.equals(post.getAccount())) {//자신의 게시물이 아닌 경우
             errors.reject("forbidden", "You can not update other user's contents.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
         }
 
-        if(imageFiles.isEmpty()) {//이미지가 파일이 multipart에 포함되지 않은 경우
+        if (imageFiles.isEmpty()) {//이미지가 파일이 multipart에 포함되지 않은 경우
             errors.reject("imageFiles", "You have to include at least one image in the multipart");
             return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
@@ -183,8 +185,9 @@ public class PostController {
         if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
-        postService.deleteTagAndImage(post);//기존 tag, image를 제거
-        Set<PostTag> postTagList = modelMapper.map(postDto.getPostTags(), new TypeToken<Set<PostTag>>(){}.getType());
+
+        Set<PostTag> postTagList = modelMapper.map(postDto.getPostTags(), new TypeToken<Set<PostTag>>() {
+        }.getType());
         try {
             Post updatedPost = postService.updatePost(post, postTagList, imageFiles);//post 게시물 update 처리
             PostModel postModel = new PostModel(updatedPost);
@@ -201,6 +204,37 @@ public class PostController {
             e.printStackTrace();
             errors.reject("imageFiles", "You have to send only image files.");
             return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        } catch (AmazonServiceException e) {
+            e.printStackTrace();
+            errors.reject("500 error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorsModel(errors));
+        }
+    }
+
+    //post게시물 삭제 핸들러
+    @DeleteMapping("/{postId}")
+    public ResponseEntity deletePost(@PathVariable("postId") Post post,
+                                     @CurrentAccount Account account) {
+
+        if (post == null) {//존재하지 않는 리소스인 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!post.getAccount().equals(account)) {//다른 사용자의 게시물인 경우
+            Errors errors = new DirectFieldBindingResult(account, "account");
+            errors.reject("forbidden", "You can not delete other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        //post게시물 삭제 처리
+        try {
+            postService.delete(post);
+            return ResponseEntity.noContent().build();
+        } catch (AmazonServiceException e) {
+            e.printStackTrace();
+            Errors errors = new DirectFieldBindingResult(post, "post");
+            errors.reject("500 error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorsModel(errors));
         }
     }
 }
