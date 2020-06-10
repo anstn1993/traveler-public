@@ -482,10 +482,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(jsonPath("_links.profile").exists())
                 .andDo(document("update-accompany",
                         links(
-                                linkWithRel("self").description("조회한 동행 게시물의 리소스 url"),
-                                linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 url"),
-                                linkWithRel("delete-accompany").description("동행 게시물을 삭제할 수 있는 url"),
-                                linkWithRel("profile").description("api 문서 url")
+                                linkWithRel("self").description("수정한 동행 게시물의 리소스 링크"),
+                                linkWithRel("get-accompanies").description("동행 게시물 리스트를 조회할 수 있는 링크"),
+                                linkWithRel("delete-accompany").description("동행 게시물을 삭제할 수 있는 링크"),
+                                linkWithRel("profile").description("api 문서 링크")
                         ),
                         requestHeaders,
                         pathParameters(
@@ -515,9 +515,9 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                                 fieldWithPath("longitude").description("동행 장소의 경도"),
                                 fieldWithPath("regDate").description("동행 게시물 작성 시간"),
                                 fieldWithPath("viewCount").description("동행 게시물 조회수"),
-                                fieldWithPath("_links.self.href").description("업로드된 동행 게시물의 리소스 url"),
-                                fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 url"),
-                                fieldWithPath("_links.delete-accompany.href").description("업로드된 동행 게시물을 삭제할 수 있는 url"),
+                                fieldWithPath("_links.self.href").description("업로드된 동행 게시물의 리소스 링크"),
+                                fieldWithPath("_links.get-accompanies.href").description("동행 게시물 리스트를 조회할 수 있는 링크"),
+                                fieldWithPath("_links.delete-accompany.href").description("업로드된 동행 게시물을 삭제할 수 있는 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크")
                         )))
         ;

@@ -49,10 +49,9 @@ public class ScheduleService {
         String filter = params.get("filter");
         String search = params.get("search");
 
-        if(account == null) {
+        if (account == null) {
             return scheduleWithoutLocationsRepository.findAllWithoutAuth(filter, search, pageable);
-        }
-        else {
+        } else {
             return scheduleWithoutLocationsRepository.findAllWithAuth(account, filter, search, pageable);
         }
     }
@@ -81,9 +80,6 @@ public class ScheduleService {
     @Transactional
     public void deleteScheduleLocations(Schedule schedule) {
         List<ScheduleLocation> scheduleLocations = scheduleLocationRepository.findAllBySchedule(schedule);
-        for (ScheduleLocation scheduleLocation : scheduleLocations) {
-            scheduleLocationRepository.delete(scheduleLocation);
-        }
-
+        scheduleLocationRepository.deleteAll(scheduleLocations);
     }
 }

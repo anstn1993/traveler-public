@@ -54,7 +54,7 @@ public class PostController {
                                      @CurrentAccount Account account) {
 
         //이미지 파일이 함께 넘어왔는지 검사
-        if (imageFiles.size() == 0) {
+        if (imageFiles.isEmpty()) {
             errors.reject("imageFiles", "You have to include at least one image in the multipart");
             return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
@@ -65,7 +65,7 @@ public class PostController {
             return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
 
-        //비즈니스 로직 유효성 검사
+        //post part의 비즈니스 로직 유효성 검사
         PostValidator postValidator = new PostValidator();
         postValidator.validate(postDto, errors);
         if (errors.hasErrors()) {
@@ -134,7 +134,7 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
         Post updatedPost = postService.updateViewCount(post);//조회수 1 증가 처리
-//Hateoas적용
+        //Hateoas적용
         PostModel postModel = new PostModel(updatedPost);
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetPostAnchor()).withRel("profile");//profile 링크
         WebMvcLinkBuilder linkBuilder = linkTo(PostController.class);
@@ -147,5 +147,60 @@ public class PostController {
             postModel.add(updatePostLink, deletePostLink);
         }
         return ResponseEntity.ok(postModel);
+    }
+
+    //post 게시물 수정 핸들러
+    @PostMapping("/{postId}")
+    public ResponseEntity updatePost(@PathVariable("postId") Post post,
+                                     @RequestPart List<MultipartFile> imageFiles,
+                                     @RequestPart("post") PostDto postDto,
+                                     Errors errors,
+                                     @CurrentAccount Account account) {
+
+        if(post == null) {//존재하지 않는 리소스인 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if(!account.equals(post.getAccount())) {//자신의 게시물이 아닌 경우
+            errors.reject("forbidden", "You can not update other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        if(imageFiles.isEmpty()) {//이미지가 파일이 multipart에 포함되지 않은 경우
+            errors.reject("imageFiles", "You have to include at least one image in the multipart");
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+        //이미지 파일이 10개 이상인 경우
+        if (imageFiles.size() > 10) {
+            errors.reject("imageFiles", "Max Image count is 10.");
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+        //post part의 비즈니스 로직 유효성 검사
+        PostValidator postValidator = new PostValidator();
+        postValidator.validate(postDto, errors);
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+        postService.deleteTagAndImage(post);//기존 tag, image를 제거
+        Set<PostTag> postTagList = modelMapper.map(postDto.getPostTags(), new TypeToken<Set<PostTag>>(){}.getType());
+        try {
+            Post updatedPost = postService.updatePost(post, postTagList, imageFiles);//post 게시물 update 처리
+            PostModel postModel = new PostModel(updatedPost);
+            Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getUpdatePostAnchor()).withRel("profile");//profile 링크
+            Link getPostsLink = linkTo(PostController.class).withRel("get-posts");
+            Link deletePostLink = linkTo(PostController.class).slash(updatedPost.getId()).withRel("delete-post");
+            postModel.add(profileLink, getPostsLink, deletePostLink);
+            return ResponseEntity.ok(postModel);
+        } catch (IOException e) {//파일 생성 실패
+            e.printStackTrace();
+            errors.reject("imageFiles", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorsModel(errors));
+        } catch (IllegalArgumentException e) {//multipart content type이 image가 아닌 경우
+            e.printStackTrace();
+            errors.reject("imageFiles", "You have to send only image files.");
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
     }
 }

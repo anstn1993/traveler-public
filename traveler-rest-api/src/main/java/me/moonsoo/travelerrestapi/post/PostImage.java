@@ -24,5 +24,4 @@ public class PostImage {
 
     @Column(nullable = false)
     String uri;//이미지 uri
-
 }

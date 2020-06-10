@@ -105,6 +105,7 @@ class PostControllerTest extends BaseControllerTest {
                 .part(part)
                 .file(mockFile1)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isCreated())
@@ -193,6 +194,7 @@ class PostControllerTest extends BaseControllerTest {
         mockMvc.perform(multipart("/api/posts")
                 .file(mockFile1)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -221,6 +223,7 @@ class PostControllerTest extends BaseControllerTest {
                 .file(mockFile1)
                 .part(part)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -238,7 +241,7 @@ class PostControllerTest extends BaseControllerTest {
         //이미지 파일 part
         String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
         Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile1 = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
 
         //post part
         PostDto postDto = createPostWithWrongValue();
@@ -246,9 +249,10 @@ class PostControllerTest extends BaseControllerTest {
         part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(multipart("/api/posts")
-                .file(mockFile1)
+                .file(mockFile)
                 .part(part)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -271,6 +275,7 @@ class PostControllerTest extends BaseControllerTest {
         mockMvc.perform(multipart("/api/posts")
                 .part(part)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -310,6 +315,7 @@ class PostControllerTest extends BaseControllerTest {
                 .file(mockFile)
                 .part(part)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -324,7 +330,7 @@ class PostControllerTest extends BaseControllerTest {
         String password = "user";
         String accessToken = getAuthToken(email, password, 0);
 
-        //이미지 파일 part
+        //파일 part
         MockMultipartFile mockFile = new MockMultipartFile("imageFiles", "test.txt", "text/plain", "This is not a image file.".getBytes());
 
         //post part
@@ -336,9 +342,31 @@ class PostControllerTest extends BaseControllerTest {
                 .file(mockFile)
                 .part(part)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 추가 실패-oauth 인증을 하지 않은 경우(401 Unauthorized)")
+    public void createPostFail_Unauthorized() throws Exception {
+        //파일 part
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", "test.txt", "text/plain", "This is not a image file.".getBytes());
+
+        //post part
+        PostDto postDto = createPostDto(0, 3);
+        MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
+        part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(multipart("/api/posts")
+                .file(mockFile)
+                .part(part)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
         ;
     }
 
@@ -616,7 +644,7 @@ class PostControllerTest extends BaseControllerTest {
         String email = "user@email.com";
         String password = "user";
         String accessToken = getAuthToken(email, password, 1);
-        Post post = createPost(account, 0, 2, 2);//게시물 하나 생성
+        createPost(account, 0, 2, 2);//게시물 하나 생성
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -624,6 +652,373 @@ class PostControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 수정")
+    public void updatePost() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 1);
+
+        Post post = createPost(account, 0, 2, 2);//게시물 생성
+
+        //mock image part
+        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+
+        //post part
+        PostDto postDto = createPostDto(0, 5);
+        MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
+        part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(multipart("/api/posts/" + post.getId())
+                .part(part)
+                .file(mockFile)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("article").exists())
+                .andExpect(jsonPath("postTagList[0].id").exists())
+                .andExpect(jsonPath("postTagList[0].post.id").exists())
+                .andExpect(jsonPath("postTagList[0].tag").exists())
+                .andExpect(jsonPath("postImageList[0].id").exists())
+                .andExpect(jsonPath("postImageList[0].post.id").exists())
+                .andExpect(jsonPath("postImageList[0].uri").exists())
+                .andExpect(jsonPath("location").exists())
+                .andExpect(jsonPath("latitude").exists())
+                .andExpect(jsonPath("longitude").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("viewCount").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-posts").exists())
+                .andExpect(jsonPath("_links.delete-post").exists())
+                .andDo(document("update-post",
+                        links(
+                                linkWithRel("self").description("수정된 post 게시물의 리소스 링크"),
+                                linkWithRel("get-posts").description("post 게시물 리스트를 조회할 수 있는 링크"),
+                                linkWithRel("delete-post").description("수정된 post 게시물을 삭제할 수 있는 링크"),
+                                linkWithRel("profile").description("api 문서 링크")
+                        ),
+                        requestParts(
+                                partWithName("imageFiles").description("수정할 이미지 파일 리스트"),
+                                partWithName("post").description("post게시물의 dto json")
+                        ),
+                        requestPartFields(
+                                "post",
+                                fieldWithPath("article").description("게시물 본문"),
+                                fieldWithPath("location").description("등록된 장소"),
+                                fieldWithPath("latitude").description("장소의 위도"),
+                                fieldWithPath("longitude").description("장소의 경도"),
+                                fieldWithPath("tagList[].tag").description("게시물에 달 태그")
+                        ),
+                        requestHeaders,
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("post 게시물의 id"),
+                                fieldWithPath("account.id").description("게시물 작성자 id"),
+                                fieldWithPath("article").description("게시물의 본문"),
+                                fieldWithPath("postTagList[].id").description("게시물에 붙은 태그의 id"),
+                                fieldWithPath("postTagList[].post.id").description("태그가 붙은 게시물의 id"),
+                                fieldWithPath("postTagList[].tag").description("태그"),
+                                fieldWithPath("postImageList[].id").description("게시물의 이미지 id"),
+                                fieldWithPath("postImageList[].post.id").description("게시물의 id"),
+                                fieldWithPath("postImageList[].uri").description("이미지의 uri"),
+                                fieldWithPath("location").description("게시물에 등록한 장소명"),
+                                fieldWithPath("latitude").description("장소의 위도"),
+                                fieldWithPath("longitude").description("장소의 경도"),
+                                fieldWithPath("regDate").description("게시물 작성 시간"),
+                                fieldWithPath("viewCount").description("조회수"),
+                                fieldWithPath("_links.self.href").description("수정된 post 게시물 리소스 링크"),
+                                fieldWithPath("_links.get-posts.href").description("post 게시물 리스트를 조회할 수 있는 링크"),
+                                fieldWithPath("_links.delete-post.href").description("수정된 post 게시물을 삭제할 수 있는 링크"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 수정 실패-post part가 없는 경우(400 Bad request)")
+    public void updatePostFail_Empty_Post_Part() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 1);
+
+        Post post = createPost(account, 0, 2, 2);//게시물 생성
+
+        //mock file
+        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+
+        mockMvc.perform(multipart("/api/posts/{postId}", post.getId())
+                .file(mockFile)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 수정 실패-post part에 허용되지 않은 값이 포함된 경우(400 Bad request)")
+    public void updatePostFail_Wrong_Value() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 1);
+
+        Post post = createPost(account, 0, 2, 2);//게시물 생성
+
+        //이미지 파일 part
+        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+
+        //post part
+        Post postDto = createPostWithUnknowValue();//허용되지 않는 값이 포함된 dto
+        MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
+        part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(multipart("/api/posts/{postId}", post.getId())
+                .file(mockFile)
+                .part(part)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 수정 실패-post part의 값이 비즈니스 로직에 맞지 않는 경우(400 Bad request)")
+    public void updatePostFail_Unknown_property() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 1);
+
+        Post post = createPost(account, 0, 2, 2);//게시물 생성
+
+        //이미지 파일 part
+        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+
+        //post part
+        PostDto postDto = createPostWithWrongValue();
+        MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
+        part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(multipart("/api/posts/{postId}", post.getId())
+                .file(mockFile)
+                .part(part)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 수정 실패-이미지 파일이 하나도 안 넘어온 경우(400 Bad request)")
+    public void updatePostFail_No_Image_File() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 1);
+
+        Post post = createPost(account, 0, 2, 2);//게시물 생성
+
+        //post part
+        PostDto postDto = createPostWithWrongValue();
+        MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
+        part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(multipart("/api/posts/{postId}", post.getId())
+                .part(part)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 수정 실패-이미지 파일이 10개를 초과한 경우(400 Bad request)")
+    public void updatePostFail_Exceed_Max_Image_Count() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 1);
+
+        Post post = createPost(account, 0, 2, 2);//게시물 생성
+
+        //이미지 파일 part
+        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+
+        //post part
+        PostDto postDto = createPostWithWrongValue();
+        MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
+        part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(multipart("/api/posts/{postId}", post.getId())
+                .file(mockFile)
+                .file(mockFile)
+                .file(mockFile)
+                .file(mockFile)
+                .file(mockFile)
+                .file(mockFile)
+                .file(mockFile)
+                .file(mockFile)
+                .file(mockFile)
+                .file(mockFile)
+                .file(mockFile)
+                .part(part)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 수정 실패-이미지 파일이 아닌 경우(400 Bad request)")
+    public void updatePostFail_Not_Image_File() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 1);
+
+        Post post = createPost(account, 0, 2, 2);//게시물 생성
+
+        //파일 part
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", "test.txt", "text/plain", "This is not a image file.".getBytes());
+
+        //post part
+        PostDto postDto = createPostWithWrongValue();
+        MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
+        part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(multipart("/api/posts/{postId}", post.getId())
+                .file(mockFile)
+                .part(part)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 수정 실패-oauth 인증을 하지 않은 경우(401 Unauthorized)")
+    public void updatePostFail_Unauthorized() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        account = createAccount(email, password, 1);
+
+        Post post = createPost(account, 0, 2, 2);//게시물 생성
+
+        //이미지 파일 part
+        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+
+        //post part
+        PostDto postDto = createPostWithWrongValue();
+        MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
+        part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(multipart("/api/posts/{postId}", post.getId())
+                .file(mockFile)
+                .part(part)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 수정 실패-타인의 게시물을 수정하려고 하는 경우(403 Forbidden)")
+    public void updatePost_Forbidden() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+        Post post = createPost(otherAccount, 0, 2, 2);//게시물 생성
+
+        //mock image part
+        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+
+        //post part
+        PostDto postDto = createPostDto(0, 5);
+        MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
+        part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(multipart("/api/posts/{postId}", post.getId())
+                .file(mockFile)
+                .part(part)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+
+    }
+
+    @Test
+    @DisplayName("post 게시물 수정 실패-존재하지 않는 게시물을 수정하려고 하는 경우(404 Not found)")
+    public void updatePost_Not_Found() throws Exception {
+        //Given
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+
+        //mock image part
+        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
+        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+
+        //post part
+        PostDto postDto = createPostDto(0, 5);
+        MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
+        part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(multipart("/api/posts/{postId}", 404)
+                .file(mockFile)
+                .part(part)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+
     }
 
 
@@ -675,15 +1070,15 @@ class PostControllerTest extends BaseControllerTest {
         //이미지 파일
         String originalFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
         File originalFile = resourceLoader.getResource("classpath:image/" + originalFileName).getFile();
-        String imageFileName = account.getEmail() + new SimpleDateFormat("HHmmss").format(new Date()) + (index + 1) + ".jpg";
+        String imageFileName = account.getId() + new SimpleDateFormat("HHmmss").format(new Date()) + (index + 1) + ".jpg";
         //로컬에 임시 이미지 파일 생성
         File tempFile = new File(imageFileName);
         if (tempFile.createNewFile()) {
             FileCopyUtils.copy(originalFile, tempFile);
         }
-        amazonS3.putObject(new PutObjectRequest(s3Properties.getBUCKET(), targetDirectory + File.separator + tempFile.getName(), tempFile).withCannedAcl(CannedAccessControlList.PublicRead));//mock s3 bucket에 파일 저장
+        amazonS3.putObject(new PutObjectRequest(s3Properties.getBUCKET(), targetDirectory + "/" + tempFile.getName(), tempFile).withCannedAcl(CannedAccessControlList.PublicRead));//mock s3 bucket에 파일 저장
         tempFile.delete();//로컬에 임시 파일 삭제
-        return amazonS3.getUrl(s3Properties.getBUCKET(), targetDirectory + File.separator + tempFile.getName()).toString();
+        return amazonS3.getUrl(s3Properties.getBUCKET(), targetDirectory + "/" + tempFile.getName()).toString();
     }
 
     private PostTag createPostTag(int index, Post post) {
@@ -724,6 +1119,8 @@ class PostControllerTest extends BaseControllerTest {
                 .location("somewhere")
                 .latitude(33.0000)
                 .longitude(127.0000)
+                .regDate(LocalDateTime.now())
+                .viewCount(100)
                 .build();
     }
 

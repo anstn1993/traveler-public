@@ -30,5 +30,4 @@ public abstract class AbstFollowLinkGenerator {
 
         return Links.of(selfLink, followOrUnfollowLink);
     }
-
 }
