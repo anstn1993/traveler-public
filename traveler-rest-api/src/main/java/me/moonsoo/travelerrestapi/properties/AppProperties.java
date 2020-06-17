@@ -69,4 +69,6 @@ public class AppProperties {
 
     private String updatePostAnchor;
 
+    private String createAccountAnchor;
+
 }

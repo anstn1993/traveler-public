@@ -20,7 +20,7 @@ import java.util.Set;
 @Entity
 public class Post {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     private Integer id;//pk
 
     @ManyToOne(targetEntity = Account.class)

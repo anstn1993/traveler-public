@@ -2,22 +2,13 @@ package me.moonsoo.travelerrestapi.post;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.findify.s3mock.S3Mock;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
-import me.moonsoo.travelerrestapi.config.MockS3Config;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
@@ -27,12 +18,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -40,8 +29,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
@@ -55,8 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@TestPropertySource({"classpath:/aws.properties", "classpath:/application-test.properties"})
-@Import(MockS3Config.class)
+
 class PostControllerTest extends BaseControllerTest {
 
     @Autowired
@@ -77,10 +63,17 @@ class PostControllerTest extends BaseControllerTest {
     @Autowired
     S3Properties s3Properties;
 
+    @BeforeAll
+    public static void startMockS3Server(@Autowired S3Mock s3Mock) {
+        s3Mock.stop();
+        s3Mock.start();
+    }
+
     @AfterAll
     public static void closeMockS3Server(@Autowired S3Mock s3Mock) {
         s3Mock.stop();
     }
+
 
     @AfterEach
     public void setUp() {
@@ -109,7 +102,7 @@ class PostControllerTest extends BaseControllerTest {
         part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
 
-        MvcResult mvcResult = mockMvc.perform(multipart("/api/posts")
+        mockMvc.perform(multipart("/api/posts")
                 .part(part)
                 .file(mockFile1)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -181,7 +174,7 @@ class PostControllerTest extends BaseControllerTest {
                                 fieldWithPath("_links.delete-post.href").description("업로드된 post 게시물을 삭제할 수 있는 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크")
                         )
-                )).andReturn();
+                ))  ;
     }
 
 

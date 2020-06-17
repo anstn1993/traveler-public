@@ -1,6 +1,6 @@
 package me.moonsoo.traveleroauthserver.config;
 
-import me.moonsoo.commonmodule.account.AccountService;
+import me.moonsoo.commonmodule.account.AccountAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHand
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    AccountService accountService;
+    AccountAuthService accountService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -31,6 +31,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.anonymous()
@@ -38,9 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 // /oauth/check_token요청을 할 때 forbidden response status를 방지하기 위해서 요청 허용
                 .antMatchers("/oauth/token").permitAll()
-                .antMatchers("/test/**").permitAll()
                 .antMatchers("/oauth/check_token").authenticated()
-                .antMatchers("/user").permitAll()
                 .and()
                 .csrf().disable()
                 .formLogin()

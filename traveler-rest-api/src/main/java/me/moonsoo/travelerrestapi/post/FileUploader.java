@@ -29,11 +29,11 @@ public class FileUploader {
     @Autowired
     S3Properties s3Properties;
 
-    public List<String> upload(List<MultipartFile> multipartFileList, Account account) throws IOException, IllegalArgumentException {
+    public List<String> upload(List<MultipartFile> multipartFileList, Account account, String targetDirectory) throws IOException, IllegalArgumentException {
 
         checkContentType(multipartFileList);
         List<File> tempFiles = convertToFiles(multipartFileList, account);
-        List<String> uploadedImageUrlList = uploadToS3(tempFiles);
+        List<String> uploadedImageUrlList = uploadToS3(tempFiles, targetDirectory);
         removeTempFiles(tempFiles);
         return uploadedImageUrlList;
     }
@@ -48,9 +48,8 @@ public class FileUploader {
     }
 
     //s3서버로 이미지 파일들 업로드
-    private List<String> uploadToS3(List<File> tempFiles) {
+    private List<String> uploadToS3(List<File> tempFiles, String targetDirectory) {
         List<String> uploadedImageUrlList = new ArrayList<>();
-        String targetDirectory = s3Properties.getPostImageDirectory();//파일을 저장할 s3서버의 디렉토리
         for (File file : tempFiles) {
             amazonS3.putObject(new PutObjectRequest(s3Properties.getBUCKET(), targetDirectory + "/" + file.getName(), file).withCannedAcl(CannedAccessControlList.PublicRead));//s3로 업로드
             uploadedImageUrlList.add(amazonS3.getUrl(s3Properties.getBUCKET(), targetDirectory + "/" + file.getName()).toString());
@@ -89,12 +88,19 @@ public class FileUploader {
         return contentType.split("/")[1];
     }
 
-    //s3서버에 저장된 이미지 삭제
-    public void delete(Set<PostImage> postImageList) throws AmazonServiceException {
+    //s3서버에 저장된 게시물 이미지 삭제
+    public void deletePostImage(Set<PostImage> postImageList) throws AmazonServiceException {
         for (PostImage postImage : postImageList) {
             String[] uriSplit = postImage.getUri().split("/");
             String target = s3Properties.getPostImageDirectory() + "/" + uriSplit[uriSplit.length - 1];
             amazonS3.deleteObject(s3Properties.getBUCKET(), target);
         }
+    }
+
+    //s3서버에 저장된 프로필 이미지 삭제
+    public void deleteProfileImage(String profileImageUri) {
+        String[] uriSplit = profileImageUri.split("/");
+        String target = s3Properties.getProfileImageDirectory() + "/" + uriSplit[uriSplit.length - 1];
+        amazonS3.deleteObject(s3Properties.getBUCKET(), target);
     }
 }

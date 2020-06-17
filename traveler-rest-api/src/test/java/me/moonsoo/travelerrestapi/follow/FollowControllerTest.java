@@ -62,13 +62,13 @@ class FollowControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("followingAccount.email").exists())
                 .andExpect(jsonPath("followingAccount.name").exists())
                 .andExpect(jsonPath("followingAccount.nickname").exists())
-                .andExpect(jsonPath("followingAccount.profileImagePath").hasJsonPath())
+                .andExpect(jsonPath("followingAccount.profileImageUri").hasJsonPath())
                 .andExpect(jsonPath("followingAccount.sex").exists())
                 .andExpect(jsonPath("followedAccount.id").exists())
                 .andExpect(jsonPath("followedAccount.email").exists())
                 .andExpect(jsonPath("followedAccount.name").exists())
                 .andExpect(jsonPath("followedAccount.nickname").exists())
-                .andExpect(jsonPath("followedAccount.profileImagePath").hasJsonPath())
+                .andExpect(jsonPath("followedAccount.profileImageUri").hasJsonPath())
                 .andExpect(jsonPath("followedAccount.sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())
@@ -97,13 +97,13 @@ class FollowControllerTest extends BaseControllerTest {
                                 fieldWithPath("followingAccount.email").description("팔로우하는 사용자의 email"),
                                 fieldWithPath("followingAccount.name").description("팔로우하는 사용자의 이름"),
                                 fieldWithPath("followingAccount.nickname").description("팔로우하는 사용자의 닉네임"),
-                                fieldWithPath("followingAccount.profileImagePath").description("팔로우하는 사용자의 프로필 이미지 경로"),
+                                fieldWithPath("followingAccount.profileImageUri").description("팔로우하는 사용자의 프로필 이미지 경로"),
                                 fieldWithPath("followingAccount.sex").description("팔로우하는 사용자의 성별"),
                                 fieldWithPath("followedAccount.id").description("팔로우의 대상이 되는 사용자의 id"),
                                 fieldWithPath("followedAccount.email").description("팔로우의 대상이 되는 사용자의 이메일"),
                                 fieldWithPath("followedAccount.name").description("팔로우의 대상이 되는 사용자의 이름"),
                                 fieldWithPath("followedAccount.nickname").description("팔로우의 대상이 되는 사용자의 닉네임"),
-                                fieldWithPath("followedAccount.profileImagePath").description("팔로우의 대상이 되는 사용자의 프로필 이미지 경로"),
+                                fieldWithPath("followedAccount.profileImageUri").description("팔로우의 대상이 되는 사용자의 프로필 이미지 경로"),
                                 fieldWithPath("followedAccount.sex").description("팔로우의 대상이 되는 사용자의 성별"),
                                 fieldWithPath("_links.self.href").description("팔로우의 대상이 되는 사용자 정보 조회 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크"),
@@ -293,7 +293,7 @@ class FollowControllerTest extends BaseControllerTest {
                                 fieldWithPath("_embedded.accountList[].email").description("사용자의 email"),
                                 fieldWithPath("_embedded.accountList[].nickname").description("사용자의 닉네임"),
                                 fieldWithPath("_embedded.accountList[].name").description("사용자의 이미지"),
-                                fieldWithPath("_embedded.accountList[].profileImagePath").description("사용자의 프로필 사진 경로"),
+                                fieldWithPath("_embedded.accountList[].profileImageUri").description("사용자의 프로필 사진 경로"),
                                 fieldWithPath("_embedded.accountList[].sex").description("사용자의 성별"),
                                 fieldWithPath("_embedded.accountList[]._links.self.href").description("해당 사용자 정보 조회 링크"),
                                 fieldWithPath("_embedded.accountList[]._links.delete-account-follow.href").description("해당 사용자 언팔로우 링크, 만약 언팔로우 상태인 경우에는 팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
@@ -358,7 +358,7 @@ class FollowControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
-                .andExpect(jsonPath("profileImagePath").hasJsonPath())
+                .andExpect(jsonPath("profileImageUri").hasJsonPath())
                 .andExpect(jsonPath("sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())
@@ -383,7 +383,7 @@ class FollowControllerTest extends BaseControllerTest {
                                 fieldWithPath("email").description("사용자의 email"),
                                 fieldWithPath("name").description("사용자의 이름"),
                                 fieldWithPath("nickname").description("사용자의 닉네임"),
-                                fieldWithPath("profileImagePath").description("사용자의 프로필 이미지 경로"),
+                                fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("sex").description("사용자의 성별"),
                                 fieldWithPath("_links.self.href").description("현재 리소스 조회 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크"),
@@ -411,7 +411,7 @@ class FollowControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
-                .andExpect(jsonPath("profileImagePath").hasJsonPath())
+                .andExpect(jsonPath("profileImageUri").hasJsonPath())
                 .andExpect(jsonPath("sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())
@@ -509,7 +509,7 @@ class FollowControllerTest extends BaseControllerTest {
                                 fieldWithPath("_embedded.accountList[].email").description("사용자의 email"),
                                 fieldWithPath("_embedded.accountList[].nickname").description("사용자의 닉네임"),
                                 fieldWithPath("_embedded.accountList[].name").description("사용자의 이미지"),
-                                fieldWithPath("_embedded.accountList[].profileImagePath").description("사용자의 프로필 사진 경로"),
+                                fieldWithPath("_embedded.accountList[].profileImageUri").description("사용자의 프로필 사진 경로"),
                                 fieldWithPath("_embedded.accountList[].sex").description("사용자의 성별"),
                                 fieldWithPath("_embedded.accountList[]._links.self.href").description("해당 사용자 정보 조회 링크"),
                                 fieldWithPath("_embedded.accountList[]._links.create-account-follow.href").description("해당 사용자 팔로우 링크, 만약 팔로우 상태인 경우에는 언팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
@@ -574,7 +574,7 @@ class FollowControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
-                .andExpect(jsonPath("profileImagePath").hasJsonPath())
+                .andExpect(jsonPath("profileImageUri").hasJsonPath())
                 .andExpect(jsonPath("sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())
@@ -599,7 +599,7 @@ class FollowControllerTest extends BaseControllerTest {
                                 fieldWithPath("email").description("사용자의 email"),
                                 fieldWithPath("name").description("사용자의 이름"),
                                 fieldWithPath("nickname").description("사용자의 닉네임"),
-                                fieldWithPath("profileImagePath").description("사용자의 프로필 이미지 경로"),
+                                fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("sex").description("사용자의 성별"),
                                 fieldWithPath("_links.self.href").description("현재 리소스 조회 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크"),
@@ -627,7 +627,7 @@ class FollowControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
-                .andExpect(jsonPath("profileImagePath").hasJsonPath())
+                .andExpect(jsonPath("profileImageUri").hasJsonPath())
                 .andExpect(jsonPath("sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())

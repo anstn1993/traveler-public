@@ -596,14 +596,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         String password = "user";
         String accessToken = getAuthToken(email, password, 0);
 
-        Account otherAccount = Account.builder()
-                .email("otheruser@email.com")
-                .password("otheruser")
-                .name("김랑")
-                .nickname("rang")
-                .roles(Set.of(AccountRole.USER))
-                .sex(Sex.FEMALE)
-                .build();
+        Account otherAccount = createAccount(email, password, 1);
         accountRepository.save(otherAccount);
 
         //수정할 데이터
@@ -726,14 +719,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         String password = "user";
         String accessToken = getAuthToken(email, password, 0);
 
-        Account otherAccount = Account.builder()
-                .email("otheruser@email.com")
-                .password("otheruser")
-                .name("김랑")
-                .nickname("rang")
-                .roles(Set.of(AccountRole.USER))
-                .sex(Sex.FEMALE)
-                .build();
+        Account otherAccount = createAccount(email, password, 1);
         accountRepository.save(otherAccount);
 
         Accompany savedAccompany = createAccompany(otherAccount, 0);

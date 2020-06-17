@@ -83,6 +83,28 @@
             <version>0.2.6</version>
             <scope>test</scope>
         </dependency>
+
+        <!--spring mail-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!--thymeleaf-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!--green mail-->
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>1.5.13</version>
+            <scope>test</scope>
+        </dependency>
+
+
     </dependencies>
 
 

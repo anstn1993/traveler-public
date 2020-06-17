@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class AccountServiceTest extends BaseControllerTest {
 
     @Autowired
-    AccountService accountService;
+    AccountAuthService accountService;
 
     @Autowired
     PasswordEncoder passwordEncoder;

@@ -1,6 +1,6 @@
 package me.moonsoo.travelerrestapi.config;
 
-import me.moonsoo.commonmodule.account.AccountService;
+import me.moonsoo.commonmodule.account.AccountAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    AccountService accountService;
+    AccountAuthService accountAuthService;
 
     @Bean
     @Override
@@ -37,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(accountService)
+        auth.userDetailsService(accountAuthService)
         ;
     }
 

@@ -20,6 +20,8 @@ public class QAccount extends EntityPathBase<Account> {
 
     public static final QAccount account = new QAccount("account");
 
+    public final StringPath authCode = createString("authCode");
+
     public final StringPath email = createString("email");
 
     public final BooleanPath emailAuth = createBoolean("emailAuth");
@@ -32,7 +34,9 @@ public class QAccount extends EntityPathBase<Account> {
 
     public final StringPath password = createString("password");
 
-    public final StringPath profileImagePath = createString("profileImagePath");
+    public final StringPath profileImageUri = createString("profileImageUri");
+
+    public final DateTimePath<java.time.LocalDateTime> regDate = createDateTime("regDate", java.time.LocalDateTime.class);
 
     public final SetPath<AccountRole, EnumPath<AccountRole>> roles = this.<AccountRole, EnumPath<AccountRole>>createSet("roles", AccountRole.class, EnumPath.class, PathInits.DIRECT2);
 

@@ -1,6 +1,6 @@
 package me.moonsoo.traveleroauthserver.config;
 
-import me.moonsoo.commonmodule.account.AccountService;
+import me.moonsoo.commonmodule.account.AccountAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    AccountService accountService;
+    AccountAuthService accountService;
 
     @Autowired
     DataSource dataSource;

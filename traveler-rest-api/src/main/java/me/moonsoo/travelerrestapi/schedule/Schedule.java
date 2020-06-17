@@ -19,7 +19,7 @@ import java.util.Set;
 @Entity
 public class Schedule {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     private Integer id;
 
     @ManyToOne(targetEntity = Account.class)

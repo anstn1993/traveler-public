@@ -3,6 +3,7 @@ package me.moonsoo.travelerrestapi.post;
 
 import com.amazonaws.AmazonServiceException;
 import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.travelerrestapi.properties.S3Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,10 +32,13 @@ public class PostService {
     @Autowired
     private PostImageRepository postImageRepository;
 
+    @Autowired
+    S3Properties s3Properties;
+
     //post게시물 생성 메소드(이미지 파일을 s3서버에 저장하고 저장에 성공하면 db에 post엔티티 정보들을 저장한다)
     public Post save(List<MultipartFile> multipartFileList, Post post, Account account) throws IOException, IllegalArgumentException {
         try {
-            List<String> uploadedImageUriList = fileUploader.upload(multipartFileList, account);
+            List<String> uploadedImageUriList = fileUploader.upload(multipartFileList, account, s3Properties.getPostImageDirectory());
             post.setAccount(account);
             post.setRegDate(LocalDateTime.now());
             post.setViewCount(0);
@@ -103,7 +107,7 @@ public class PostService {
     //post게시물 update 메소드(s3서버에 저장된 기존의 이미지들을 제거하고 제거에 성공하는 경우 새로운 이미지 파일 업로드 및 엔티티 업데이트 작업 수행)
     public Post updatePost(Post post, Set<PostTag> postTagList, List<MultipartFile> imageFiles) throws IOException, IllegalArgumentException {
         try {
-            fileUploader.delete(post.getPostImageList());//기존 이미지 파일 s3서버에서 제거
+            fileUploader.deletePostImage(post.getPostImageList());//기존 이미지 파일 s3서버에서 제거
 
             deleteTagAndImage(post);//기존 tag, image를 제거
             post.setPostTagList(postTagList);//새로운 post tag set
@@ -112,7 +116,7 @@ public class PostService {
                 postTagRepository.save(postTag);//tag db에 저장
             }
 
-            List<String> uploadedImageUriList = fileUploader.upload(imageFiles, post.getAccount());//multipart로 넘어온 이미지 파일 s3서버로 업로드
+            List<String> uploadedImageUriList = fileUploader.upload(imageFiles, post.getAccount(), s3Properties.getPostImageDirectory());//multipart로 넘어온 이미지 파일 s3서버로 업로드
             Set<PostImage> postImageList = new LinkedHashSet<>();
             //post image set
             for (String uri : uploadedImageUriList) {
@@ -140,7 +144,7 @@ public class PostService {
     public void delete(Post post) throws AmazonServiceException{
 
         try {
-            fileUploader.delete(post.getPostImageList());//s3서버에서 이미지 파일 삭제
+            fileUploader.deletePostImage(post.getPostImageList());//s3서버에서 이미지 파일 삭제
             postRepository.delete(post);//삭제에 성공하면 post 엔티티 delete
         }
         catch (AmazonServiceException e) {

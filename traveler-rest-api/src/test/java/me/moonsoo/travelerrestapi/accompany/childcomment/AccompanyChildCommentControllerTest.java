@@ -485,14 +485,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         String email = "anstn1993@email.com";
         String password = "1111";
         String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = Account.builder()//다른 사용자
-                .email("otheruser@email.com")
-                .password("otheruser")
-                .name("김랑")
-                .nickname("rang")
-                .roles(Set.of(AccountRole.USER))
-                .sex(Sex.FEMALE)
-                .build();
+        Account otherAccount = createAccount(email, password, 1);
         accountRepository.save(otherAccount);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany1에 달린 댓글
@@ -779,14 +772,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
-        Account otherAccount = Account.builder()//다른 사용자
-                .email("otheruser@email.com")
-                .password("otheruser")
-                .name("김랑")
-                .nickname("rang")
-                .roles(Set.of(AccountRole.USER))
-                .sex(Sex.FEMALE)
-                .build();
+        Account otherAccount = createAccount(email, password, 1);
         accountRepository.save(otherAccount);
         AccompanyChildComment childComment = createChildComment(otherAccount, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
 
@@ -975,14 +961,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
-        Account otherAccount = Account.builder()//다른 사용자
-                .email("otheruser@email.com")
-                .password("otheruser")
-                .name("김랑")
-                .nickname("rang")
-                .roles(Set.of(AccountRole.USER))
-                .sex(Sex.FEMALE)
-                .build();
+        Account otherAccount = createAccount(email, password, 1);
         accountRepository.save(otherAccount);
         AccompanyChildComment childComment = createChildComment(otherAccount, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
 
@@ -1090,8 +1069,6 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isNotFound())
         ;
     }
-
-
 
 
     public AccompanyChildCommentDto createChildCommentDto(String comment) {

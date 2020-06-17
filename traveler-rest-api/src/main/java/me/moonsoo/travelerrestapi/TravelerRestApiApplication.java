@@ -26,7 +26,8 @@ public class TravelerRestApiApplication {
             "spring.config.location=" +
                     "classpath:application.properties," +
                     "classpath:datasource.properties," +
-                    "classpath:aws.properties"
+                    "classpath:aws.properties," +
+                    "classpath:email.properties"
             ;
 
     public static void main(String[] args) {

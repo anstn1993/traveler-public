@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthServerConfigTest extends BaseControllerTest {
 
     @Autowired
-    AccountService accountService;
+    AccountAuthService accountService;
 
     @Autowired
     AccountRepository accountRepository;

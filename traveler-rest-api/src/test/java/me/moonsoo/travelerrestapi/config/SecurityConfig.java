@@ -1,6 +1,6 @@
 package me.moonsoo.travelerrestapi.config;
 
-import me.moonsoo.commonmodule.account.AccountService;
+import me.moonsoo.commonmodule.account.AccountAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    AccountService accountService;
+    AccountAuthService accountAuthService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -28,7 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(accountService)
+        auth.userDetailsService(accountAuthService)
                 .passwordEncoder(passwordEncoder)
         ;
     }

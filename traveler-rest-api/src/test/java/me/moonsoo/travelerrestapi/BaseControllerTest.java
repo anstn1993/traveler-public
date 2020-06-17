@@ -1,6 +1,5 @@
 package me.moonsoo.travelerrestapi;
 
-import ch.qos.logback.classic.spi.EventArgUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import me.moonsoo.commonmodule.account.*;
@@ -19,8 +18,10 @@ import org.springframework.restdocs.hypermedia.LinksSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
@@ -36,7 +37,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Slf4j
-@Import({AuthServerConfig.class, ResourceServerConfig.class, SecurityConfig.class, RestDocsConfig.class})
+@Import({AuthServerConfig.class, ResourceServerConfig.class, SecurityConfig.class, RestDocsConfig.class, MockS3Config.class})
+@TestPropertySource({"classpath:/aws.properties", "classpath:/application-test.properties"})
 @Disabled
 public class BaseControllerTest {
 
@@ -53,7 +55,7 @@ public class BaseControllerTest {
     protected AccountRepository accountRepository;
 
     @Autowired
-    protected AccountService accountService;
+    protected AccountAuthService accountAuthService;
 
     protected Account account;
 
@@ -95,11 +97,14 @@ public class BaseControllerTest {
                 .password(password)
                 .name("user" + index)
                 .nickname("user" + index)
-                .emailAuth(false)
+                .emailAuth(true)
+                .profileImageUri(null)
+                .regDate(LocalDateTime.now())
+                .authCode("authcode")
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))
                 .build();
-        return accountService.saveAccount(account);
+        return accountAuthService.saveAccount(account);
     }
 
     //인자로 들어가는 account는 save된 상태

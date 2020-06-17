@@ -6,6 +6,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -13,7 +14,7 @@ import java.util.Set;
 public class AppRunner implements ApplicationRunner {
 
     @Autowired
-    AccountService accountService;
+    AccountAuthService accountService;
 
     @Autowired
     AccountRepository accountRepository;
@@ -28,6 +29,8 @@ public class AppRunner implements ApplicationRunner {
                 .emailAuth(false)
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))
+                .authCode("salkdjflakf")
+                .regDate(LocalDateTime.now())
                 .build();
 
         Account admin = Account.builder()
@@ -38,6 +41,8 @@ public class AppRunner implements ApplicationRunner {
                 .emailAuth(false)
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.ADMIN))
+                .authCode("salkdjflakf")
+                .regDate(LocalDateTime.now())
                 .build();
 
         Optional<Account> userOpt = accountRepository.findByEmail(user.getEmail());

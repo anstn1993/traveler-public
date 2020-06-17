@@ -17,7 +17,7 @@ public class FollowAccountSerializer extends JsonSerializer<Account> {
         jsonGenerator.writeStringField("email", account.getEmail());
         jsonGenerator.writeStringField("name", account.getName());
         jsonGenerator.writeStringField("nickname", account.getNickname());
-        jsonGenerator.writeStringField("profileImagePath", account.getProfileImagePath());
+        jsonGenerator.writeStringField("profileImageUri", account.getProfileImageUri());
         jsonGenerator.writeStringField("sex", account.getSex().name());
         jsonGenerator.writeEndObject();
     }

@@ -1,8 +1,7 @@
 package me.moonsoo.commonmodule.config;
 
-import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountFormatter;
-import me.moonsoo.commonmodule.account.AccountService;
+import me.moonsoo.commonmodule.account.AccountAuthService;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +34,8 @@ public class CommonBeanConfig {
     }
 
     @Bean
-    public AccountService accountService() {
-        return new AccountService();
+    public AccountAuthService accountAuthService() {
+        return new AccountAuthService();
     }
 
     @Bean

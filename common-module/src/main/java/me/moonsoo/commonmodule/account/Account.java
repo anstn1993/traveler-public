@@ -1,13 +1,11 @@
 package me.moonsoo.commonmodule.account;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 
@@ -22,36 +20,38 @@ public class Account implements Serializable {
     private Integer id;//pk
 
     @Column(unique = true)
-    @Email
-    @NotNull
     private String email;
 
     @Column(nullable = false)
-    @NotNull
     @JsonIgnore
     private String password;
 
     @Column(unique = true)
-    private String profileImagePath;
+    private String profileImageUri;
 
     @Column(nullable = false)
-    @NotNull
     private String name;
 
     @Column(nullable = false, unique = true)
-    @NotNull
     private String nickname;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
-    private Sex sex;
+    private Sex sex;//성별
 
     @JsonIgnore
     private boolean emailAuth;//회원가입 시 이메일 인증 여부
+
+    @JsonIgnore
+    @Column(nullable = false)
+    private String authCode;//이메일 인증에 필요한 인증 코드
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @JsonIgnore
     private Set<AccountRole> roles;//권한
+
+    @Column(nullable = false)
+    @JsonIgnore
+    private LocalDateTime regDate;//가입 일자
 
 }

@@ -2,9 +2,7 @@ package me.moonsoo.travelerrestapi.account;
 
 import me.moonsoo.commonmodule.account.*;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
-import org.aspectj.lang.annotation.After;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class AccountServiceTest extends BaseControllerTest {
 
     @Autowired
-    AccountService accountService;
+    AccountAuthService accountAuthService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -45,16 +44,18 @@ class AccountServiceTest extends BaseControllerTest {
                 .password(password)
                 .name("김문수")
                 .nickname("만수")
-                .emailAuth(false)
+                .emailAuth(true)
+                .authCode("code")
+                .profileImageUri(null)
                 .sex(Sex.MALE)
+                .regDate(LocalDateTime.now())
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
 
-        accountService.saveAccount(account);
+        accountAuthService.saveAccount(account);
 
         //When
-        UserDetailsService userDetailsService = accountService;
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = accountAuthService.loadUserByUsername(username);
 
         //Then
         assertThat(passwordEncoder.matches(password, userDetails.getPassword())).isTrue();
@@ -65,7 +66,7 @@ class AccountServiceTest extends BaseControllerTest {
    public void findByEmailFail() {
         String username = "anstn1993@email.com";
         UsernameNotFoundException usernameNotFoundException = assertThrows(UsernameNotFoundException.class, () -> {
-            accountService.loadUserByUsername(username);
+            accountAuthService.loadUserByUsername(username);
         });
         assertThat(usernameNotFoundException.getMessage()).contains(username);
     }

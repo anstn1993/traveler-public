@@ -23,5 +23,8 @@ public class S3Properties {
     @Value("${cloud.aws.s3.post-image-directory}")
     private String postImageDirectory;
 
+    @Value("profile-image")
+    private String profileImageDirectory;
+
 
 }

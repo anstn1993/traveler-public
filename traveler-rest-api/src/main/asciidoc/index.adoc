@@ -45,10 +45,16 @@
 | 새 리소스를 성공적으로 생성. 응답의 `Location` 헤더는 해당 리소스의 URI다.
 
 | `204 No Content`
-| 기존 리소스를 성공적으로 수정.
+| 기존 리소스를 성공적으로 삭제.
 
 | `400 Bad Request`
 | 잘못된 요청을 보낸 경우. 응답 본문에 더 오류에 대한 정보가 담겨있다.
+
+| '401 Unauthorized'
+| oauth인증이 필요한 리소스에 인증 없이 접근.
+
+| '403 Forbidden'
+| 인증 여부와 무관하게 접근 권한이 없는 리소스에 접근.
 
 | `404 Not Found`
 | 요청한 리소스가 없음.
@@ -87,6 +93,20 @@ include::{snippets}/errors/http-response.adoc[]
 `GET` 요청을 사용하여 인덱스에 접근할 수 있다.
 
 operation::index[snippets='response-body,http-response,links']
+
+[[resources-account]]
+== 사용자 리소스
+
+사용자 리소스는 traveler 서비스의 이용 주체인 사용자를 생성, 수정, 삭제, 조회할 때 사용한다.
+
+사용자 리소스의 email, password를 사용하여 oauth인증을 하고 다른 리소스들을 제어할 수 있다.
+
+[[resources-account-create]]
+=== 사용자 생성
+
+`POST` 요청을 사용해서 새로운 사용자를 만들 수 있다. 만든 후에 생성 당시에 사용한 email을 통해 인증을 해야 oauth인증을 할 수 있다.
+
+operation::create-account[snippets='curl-request,http-request,request-headers,request-parts,request-part-account-fields,http-response,response-headers,response-fields,links']
 
 [[resources-accompany]]
 == 동행 게시물
