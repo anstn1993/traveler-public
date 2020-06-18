@@ -441,7 +441,6 @@ class PostControllerTest extends BaseControllerTest {
                                 fieldWithPath("_embedded.postList[]._links.get-post-comments.href").description("post 게시물의 댓글 목록 조회 링크"),
                                 fieldWithPath("_links.create-post.href").description("post 게시물 생성 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         )
-
                 ))
         ;
     }

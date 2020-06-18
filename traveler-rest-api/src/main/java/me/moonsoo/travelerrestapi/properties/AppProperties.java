@@ -71,4 +71,6 @@ public class AppProperties {
 
     private String createAccountAnchor;
 
+    private String getAccountsAnchor;
+
 }

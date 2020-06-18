@@ -1,6 +1,5 @@
 package me.moonsoo.travelerrestapi.account;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import io.findify.s3mock.S3Mock;
@@ -8,13 +7,13 @@ import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountRole;
 import me.moonsoo.commonmodule.account.Sex;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
-import me.moonsoo.travelerrestapi.config.MockS3Config;
 import me.moonsoo.travelerrestapi.email.EmailService;
-import me.moonsoo.travelerrestapi.properties.S3Properties;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
@@ -22,8 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
-import org.springframework.restdocs.headers.HeaderDocumentation;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -31,6 +29,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,9 +40,8 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -317,6 +316,161 @@ class AccountControllerTest extends BaseControllerTest {
         });
     }
 
+    @Test
+    @DisplayName("인증 상태에서 사용자 목록 조회(totalElement=30, size=10, page=1)")
+    public void getAccounts_With_Auth() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+        IntStream.range(1, 31).forEach(i -> {
+            createAccount(email, password, i);
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,ASC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.accountList").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.self").exists())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+        ;
+    }
+
+    @ParameterizedTest(name="{index} => filter = {0}, search = {1}")
+    @MethodSource("filterAndSearchProvider")
+    @DisplayName("인증 상태에서 사용자 목록 조회(totalElement=30, size=10, page=0)")
+    public void getAccounts_With_Auth_And_Filter(String filter, String search) throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+        IntStream.range(1, 31).forEach(i -> {
+            createAccount(email, password, i);
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,ASC")
+                .param("filter", filter)
+                .param("search", search))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.accountList").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.self").exists())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+        ;
+    }
+
+    @Test
+    @DisplayName("이메일 인증이 안 된 사용자 제외")
+    public void getNotEmailAuthAccounts() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        IntStream.range(0, 30).forEach(i -> {
+            createAccountWithoutEmailAuth(email, password, i);
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("page", "0")
+                .param("size", "10")
+                .param("sort", "id,ASC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.accountList").doesNotHaveJsonPath())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+        ;
+    }
+
+    @ParameterizedTest(name="{index} => filter = {0}, search = {1}")
+    @MethodSource("filterAndSearchProvider")
+    @DisplayName("미인증 상태에서 사용자 목록 조회(totalElement=30, size=10, page=0)")
+    public void getAccounts_Without_Auth(String filter, String search) throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        IntStream.range(1, 31).forEach(i -> {
+            createAccount(email, password, i);
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,ASC")
+                .param("filter", filter)
+                .param("search", search))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.accountList").exists())
+                .andExpect(jsonPath("_embedded.accountList[0]._links.self").exists())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+                .andExpect(jsonPath("_links.create-account").exists())
+                .andDo(document("get-accounts",
+                        pagingLinks.and(
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("create-account").description("사용자 추가 링크(미인증 상태에서 요청한 경우 활성화)")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        requestParameters(
+                                parameterWithName("page").optional().description("페이지 번호"),
+                                parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
+                                parameterWithName("sort").optional().description("정렬 기준(id-게시물 id)"),
+                                parameterWithName("filter").optional().description("검색어 필터(name-이름, nickname-닉네임)"),
+                                parameterWithName("search").optional().description("검색어")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responsePageFields.and(
+                                fieldWithPath("_embedded.accountList[].id").description("사용자 id"),
+                                fieldWithPath("_embedded.accountList[].email").description("사용자 email"),
+                                fieldWithPath("_embedded.accountList[].profileImageUri").description("사용자 프로필 이미지 경로"),
+                                fieldWithPath("_embedded.accountList[].name").description("사용자 이름"),
+                                fieldWithPath("_embedded.accountList[].nickname").description("사용자 닉네임"),
+                                fieldWithPath("_embedded.accountList[].sex").description("사용자 성별"),
+                                fieldWithPath("_embedded.accountList[]._links.self.href").description("해당 사용자 조회 링크"),
+                                fieldWithPath("_links.create-account.href").description("사용자 추가 링크(미인증 상태에서 요청한 경우 활성화)")
+                        )
+
+                ))
+        ;
+    }
+
+    //매개변수 테스트의 인자를 생성해주는 메소드
+    private static Stream<Arguments> filterAndSearchProvider() {
+        return Stream.of(
+                Arguments.of("nickname", "user"),
+                Arguments.of("name", "user")
+        );
+    }
 
     //비즈니스 로직에 맞지 않는 account dto 생성
     private AccountDto createAccountDtoWithWrongValue() {
@@ -356,6 +510,24 @@ class AccountControllerTest extends BaseControllerTest {
                 .nickname("user")
                 .sex(Sex.MALE)
                 .build();
+    }
+
+    //이메일 인증이 이루어지지 않은 계정 생성
+    private Account createAccountWithoutEmailAuth(String email, String password, int index) {
+        //Given
+        Account account = Account.builder()
+                .email(index + email)
+                .password(password)
+                .name("user" + index)
+                .nickname("user" + index)
+                .emailAuth(false)
+                .profileImageUri(null)
+                .regDate(LocalDateTime.now())
+                .authCode("authcode")
+                .sex(Sex.MALE)
+                .roles(Set.of(AccountRole.USER))
+                .build();
+        return accountAuthService.saveAccount(account);
     }
 
 }

@@ -7,6 +7,8 @@ import me.moonsoo.travelerrestapi.email.EmailService;
 import me.moonsoo.travelerrestapi.post.FileUploader;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +33,8 @@ public class AccountService {
     @Autowired
     FileUploader fileUploader;
 
+
+    //사용자 추가
     public Account save(Account account, List<MultipartFile> imageFile) throws IOException, IllegalArgumentException {
         account.setPassword(passwordEncoder.encode(account.getPassword()));//비밀번호 암호화
         account.setEmailAuth(false);//이메일 인증 여부
@@ -57,6 +61,7 @@ public class AccountService {
         return savedAccount;
     }
 
+    //사용자 삭제
     public void delete(Account account) {
         if(account.getProfileImageUri() != null) {
             fileUploader.deleteProfileImage(account.getProfileImageUri());//s3서버에서 프로필 이미지 제거
@@ -64,8 +69,22 @@ public class AccountService {
         accountRepository.delete(account);
     }
 
+    //이메일 인증 상태로 update
     public void updateEmailAuth(Account account) {
         account.setEmailAuth(true);
         accountRepository.save(account);
+    }
+
+    //페이징, 검색어 조건에 따른 사용자 목록 return
+    public Page<Account> findAccounts(Pageable pageable, String filter, String search) {
+        if(filter == null || filter.isBlank() || search == null || search.isBlank()) {
+            return accountRepository.findAllByEmailAuthIsTrue(pageable);
+        }
+        else if(filter.equals("name")) {
+            return accountRepository.findAllByEmailAuthIsTrueAndNameContains(pageable, search);
+        }
+        else {//filter.equals("nickname")
+            return accountRepository.findAllByEmailAuthIsTrueAndNicknameContains(pageable, search);
+        }
     }
 }
