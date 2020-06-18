@@ -4,6 +4,8 @@ import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.CurrentAccount;
 import me.moonsoo.travelerrestapi.email.EmailService;
 import me.moonsoo.travelerrestapi.errors.ErrorsModel;
+import me.moonsoo.travelerrestapi.follow.Follow;
+import me.moonsoo.travelerrestapi.follow.FollowService;
 import me.moonsoo.travelerrestapi.properties.AppProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -44,6 +47,9 @@ public class AccountController {
 
     @Autowired
     AppProperties appProperties;
+
+    @Autowired
+    FollowService followService;
 
     //사용자 추가 핸들러
     @PostMapping("/api/accounts")
@@ -143,5 +149,41 @@ public class AccountController {
             accountModels.add(createAccountLink);
         }
         return ResponseEntity.ok(accountModels);
+    }
+
+    //사용자 한 명 조회 핸들러
+    @GetMapping("/api/accounts/{accountId}")
+    public ResponseEntity getAccount(@PathVariable("accountId") Account targetAccount,
+                                     @CurrentAccount Account account) {
+        if(targetAccount == null || !targetAccount.isEmailAuth()) {//존재하지 않는 사용자이거나 이메일 인증이 되지 않은 사용자인 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        //Hateoas적용
+        Link link = new Link(appProperties.getBaseUrl() + "/api/accounts/" + targetAccount.getId());
+        AccountModel accountModel = new AccountModel(targetAccount, link.withSelfRel());
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountAnchor()).withRel("profile");//profile 링크
+        Link getAccountsLink = new Link(appProperties.getBaseUrl() + "/api/accounts").withRel("get-accounts");
+        accountModel.add(profileLink, getAccountsLink);
+
+        if(account != null) {
+            if(account.equals(targetAccount)) {//인증 상태에서 자기 자신을 조회한 경우
+                Link updateAccountLink = link.withRel("update-account");
+                Link deleteAccountLink = link.withRel("delete-account");
+                accountModel.add(updateAccountLink, deleteAccountLink);
+            } else {//인증 상태에서 다른 사용자를 조회한 경우
+                Optional<Follow> followOpt = followService.getFollow(account, targetAccount);
+                if(followOpt.isEmpty()) {//조회한 사용자를 팔로잉하고 있지 않은 경우
+                    Link followLink = new Link(appProperties.getBaseUrl() + "/api/accounts/" + account.getId() + "/followings").withRel("create-account-following");
+                    accountModel.add(followLink);
+                }
+                else {//조회한 사용자를 팔로잉하고 있는 경우
+                    Link unfollowLink = new Link(appProperties.getBaseUrl() + "/api/accounts/" + account.getId() + "/followings/" + targetAccount.getId()).withRel("delete-account-following");
+                    accountModel.add(unfollowLink);
+                }
+            }
+        }
+
+        return ResponseEntity.ok(accountModel);
     }
 }

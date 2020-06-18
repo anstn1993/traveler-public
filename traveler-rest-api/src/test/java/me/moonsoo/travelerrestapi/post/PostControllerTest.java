@@ -521,8 +521,8 @@ class PostControllerTest extends BaseControllerTest {
                                 linkWithRel("profile").description("api 문서 링크"),
                                 linkWithRel("get-post-comments").description("조회한 post 게시물의 댓글 목록을 조회할 수 있는 링크"),
                                 linkWithRel("get-posts").description("post 게시물 목록을 조회할 수 있는 링크"),
-                                linkWithRel("update-post").description("post 게시물을 수정할 수 있는 링크"),
-                                linkWithRel("delete-post").description("post 게시물을 삭제할 수 있는 링크")
+                                linkWithRel("update-post").description("post 게시물을 수정할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)"),
+                                linkWithRel("delete-post").description("post 게시물을 삭제할 수 있는 링크(인증상태에서 자신의 게시물을 조회한 경우에 활성화)")
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),

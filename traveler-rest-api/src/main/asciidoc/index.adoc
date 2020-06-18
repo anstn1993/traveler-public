@@ -108,12 +108,25 @@ operation::index[snippets='response-body,http-response,links']
 
 operation::create-account[snippets='curl-request,http-request,request-headers,request-parts,request-part-account-fields,http-response,response-headers,response-fields,links']
 
-[[resources-account-get]]
+[[resources-accounts-get]]
 === 사용자 목록 조회
 
 'GET' 요청을 사용해서 사용자 목록을 조회할 수 있다.
 
 operation::get-accounts[snippets='curl-request,http-request,request-headers,request-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-account-get]]
+=== 사용자 조회
+
+'GET' 요청을 사용해서 사용자를 조회할 수 있다.
+
+==== 자기 자신 조회
+
+operation::get-my-account[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+==== 다른 사용자 조쇠
+
+operation::get-other-account[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
 [[resources-accompany]]
 == 동행 게시물

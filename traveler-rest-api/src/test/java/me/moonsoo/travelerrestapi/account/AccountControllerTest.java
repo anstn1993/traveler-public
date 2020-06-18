@@ -41,7 +41,6 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -139,12 +138,12 @@ class AccountControllerTest extends BaseControllerTest {
                                 headerWithName(HttpHeaders.LOCATION).description("생성된 account 리소스 링크")
                         ),
                         responseFields(
-                                fieldWithPath("id").description("post 게시물의 id"),
-                                fieldWithPath("email").description("게시물 작성자 id"),
-                                fieldWithPath("profileImageUri").description("게시물의 본문"),
-                                fieldWithPath("name").description("게시물에 붙은 태그의 id"),
-                                fieldWithPath("nickname").description("태그가 붙은 게시물의 id"),
-                                fieldWithPath("sex").description("태그"),
+                                fieldWithPath("id").description("생성된 사용자 id"),
+                                fieldWithPath("email").description("사용자 이메일"),
+                                fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
+                                fieldWithPath("name").description("사용자 이름"),
+                                fieldWithPath("nickname").description("사용자 닉네임"),
+                                fieldWithPath("sex").description("사용자 성별"),
                                 fieldWithPath("_links.self.href").description("생성된 account 리소스 링크"),
                                 fieldWithPath("_links.get-accounts.href").description("account 목록을 조회할 수 있는 링크"),
                                 fieldWithPath("_links.update-account.href").description("생성된 account를 수정할 수 있는 링크"),
@@ -346,7 +345,7 @@ class AccountControllerTest extends BaseControllerTest {
         ;
     }
 
-    @ParameterizedTest(name="{index} => filter = {0}, search = {1}")
+    @ParameterizedTest(name = "{index} => filter = {0}, search = {1}")
     @MethodSource("filterAndSearchProvider")
     @DisplayName("인증 상태에서 사용자 목록 조회(totalElement=30, size=10, page=0)")
     public void getAccounts_With_Auth_And_Filter(String filter, String search) throws Exception {
@@ -402,7 +401,7 @@ class AccountControllerTest extends BaseControllerTest {
         ;
     }
 
-    @ParameterizedTest(name="{index} => filter = {0}, search = {1}")
+    @ParameterizedTest(name = "{index} => filter = {0}, search = {1}")
     @MethodSource("filterAndSearchProvider")
     @DisplayName("미인증 상태에서 사용자 목록 조회(totalElement=30, size=10, page=0)")
     public void getAccounts_Without_Auth(String filter, String search) throws Exception {
@@ -459,8 +458,174 @@ class AccountControllerTest extends BaseControllerTest {
                                 fieldWithPath("_embedded.accountList[]._links.self.href").description("해당 사용자 조회 링크"),
                                 fieldWithPath("_links.create-account.href").description("사용자 추가 링크(미인증 상태에서 요청한 경우 활성화)")
                         )
-
                 ))
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 자기 자신 조회")
+    public void getMyAccount_With_Auth() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", account.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("email").exists())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("profileImageUri").doesNotExist())
+                .andExpect(jsonPath("sex").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-accounts").exists())
+                .andExpect(jsonPath("_links.update-account").exists())
+                .andExpect(jsonPath("_links.delete-account").exists())
+                .andExpect(jsonPath("_links.create-account-following").doesNotHaveJsonPath())
+                .andDo(document("get-my-account",
+                        links(
+                                linkWithRel("self").description("조회한 사용자 리소스 조회 링크"),
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("get-accounts").description("사용자 목록 조회 링크"),
+                                linkWithRel("update-account").description("사용자 리소스 수정 링크(인증상태에서 자신을 조회한 경우에 활성화)"),
+                                linkWithRel("delete-account").description("사용자 리소스 삭제 링크(인증상태에서 자신을 조회한 경우에 활성화)")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                        ),
+                        pathParameters(
+                                parameterWithName("accountId").description("사용자 id")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("조회한 사용자 id"),
+                                fieldWithPath("email").description("사용자 이메일"),
+                                fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
+                                fieldWithPath("name").description("사용자 이름"),
+                                fieldWithPath("nickname").description("사용자 닉네임"),
+                                fieldWithPath("sex").description("사용자 성별"),
+                                fieldWithPath("_links.self.href").description("조회한 account 리소스 링크"),
+                                fieldWithPath("_links.get-accounts.href").description("account 목록을 조회할 수 있는 링크"),
+                                fieldWithPath("_links.update-account.href").description("사용자 리소스 수정 링크(인증상태에서 자신을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.delete-account.href").description("사용자 리소스 삭제 링크(인증상태에서 자신을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 다른 사용자 조회")
+    public void getOtherAccount_With_Auth() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", otherAccount.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("email").exists())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("profileImageUri").doesNotExist())
+                .andExpect(jsonPath("sex").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-accounts").exists())
+                .andExpect(jsonPath("_links.update-account").doesNotHaveJsonPath())
+                .andExpect(jsonPath("_links.delete-account").doesNotHaveJsonPath())
+                .andExpect(jsonPath("_links.create-account-following").exists())
+                .andDo(document("get-other-account",
+                        links(
+                                linkWithRel("self").description("조회한 사용자 리소스 조회 링크"),
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("get-accounts").description("사용자 목록 조회 링크"),
+                                linkWithRel("create-account-following").description("조회한 사용자를 팔로우할 수 있는 링크(인증상태에서 다른 사용자를 조회한 경우에 활성화)")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                        ),
+                        pathParameters(
+                                parameterWithName("accountId").description("사용자 id")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("생성된 사용자 id"),
+                                fieldWithPath("email").description("사용자 이메일"),
+                                fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
+                                fieldWithPath("name").description("사용자 이름"),
+                                fieldWithPath("nickname").description("사용자 닉네임"),
+                                fieldWithPath("sex").description("사용자 성별"),
+                                fieldWithPath("_links.self.href").description("생성된 account 리소스 링크"),
+                                fieldWithPath("_links.get-accounts.href").description("account 목록을 조회할 수 있는 링크"),
+                                fieldWithPath("_links.create-account-following.href").description("조회한 사용자를 팔로우할 수 있는 링크(인증상태에서 다른 사용자를 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("미인증 상태에서 사용자 조회")
+    public void getAccount_Without_Auth() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        Account account = createAccount(email, password, 1);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", account.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("email").exists())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("profileImageUri").doesNotExist())
+                .andExpect(jsonPath("sex").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-accounts").exists())
+                .andExpect(jsonPath("_links.update-account").doesNotHaveJsonPath())
+                .andExpect(jsonPath("_links.delete-account").doesNotHaveJsonPath())
+                .andExpect(jsonPath("_links.create-account-following").doesNotHaveJsonPath())
+        ;
+    }
+
+    @Test
+    @DisplayName("이메일 인증을 하지 않은 사용자 조회")
+    public void getNotEmailAuthAccount_Without_Auth() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        Account account = createAccountWithoutEmailAuth(email, password, 1);//이메일 인증을 하지 않은 사용자
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", account.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("사용자 조회 실패-존재하지 않는 사용자(404 Not found)")
+    public void getAccountFail_Not_Found() throws Exception {
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", 404)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
         ;
     }
 
