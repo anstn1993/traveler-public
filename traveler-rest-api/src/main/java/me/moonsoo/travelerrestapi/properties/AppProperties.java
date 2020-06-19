@@ -75,4 +75,6 @@ public class AppProperties {
 
     private String getAccountAnchor;
 
+    private String updateAccountAnchor;
+
 }

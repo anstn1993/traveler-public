@@ -39,7 +39,7 @@ public class FileUploader {
     }
 
     //이미지 파일인지 검사하고 아닐 경우 에러를 던진다.
-    private void checkContentType(List<MultipartFile> multipartFileList) {
+    private void checkContentType(List<MultipartFile> multipartFileList) throws IllegalArgumentException {
         multipartFileList.forEach(f -> {
             if (!f.getContentType().startsWith("image")) {
                 throw new IllegalArgumentException("You can only upload image files.");

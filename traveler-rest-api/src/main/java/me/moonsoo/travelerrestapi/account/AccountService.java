@@ -43,7 +43,7 @@ public class AccountService {
         account.setProfileImageUri(null);
         account.setRoles(Set.of(AccountRole.USER));
         Account savedAccount = accountRepository.save(account);
-        if(!imageFile.isEmpty()) {//프로필 이미지가 존재하는 경우 s3서버에 저장
+        if (!imageFile.isEmpty()) {//프로필 이미지가 존재하는 경우 s3서버에 저장
             try {
                 List<String> uploadedProfileImageUri = fileUploader.upload(imageFile, savedAccount, s3Properties.getProfileImageDirectory());
                 savedAccount.setProfileImageUri(uploadedProfileImageUri.get(0));
@@ -63,7 +63,7 @@ public class AccountService {
 
     //사용자 삭제
     public void delete(Account account) {
-        if(account.getProfileImageUri() != null) {
+        if (account.getProfileImageUri() != null) {
             fileUploader.deleteProfileImage(account.getProfileImageUri());//s3서버에서 프로필 이미지 제거
         }
         accountRepository.delete(account);
@@ -77,14 +77,40 @@ public class AccountService {
 
     //페이징, 검색어 조건에 따른 사용자 목록 return
     public Page<Account> findAccounts(Pageable pageable, String filter, String search) {
-        if(filter == null || filter.isBlank() || search == null || search.isBlank()) {
+        if (filter == null || filter.isBlank() || search == null || search.isBlank()) {
             return accountRepository.findAllByEmailAuthIsTrue(pageable);
-        }
-        else if(filter.equals("name")) {
+        } else if (filter.equals("name")) {
             return accountRepository.findAllByEmailAuthIsTrueAndNameContains(pageable, search);
-        }
-        else {//filter.equals("nickname")
+        } else {//filter.equals("nickname")
             return accountRepository.findAllByEmailAuthIsTrueAndNicknameContains(pageable, search);
+        }
+    }
+
+    //사용자 리소스 수정
+    public Account update(Account targetAccount, List<MultipartFile> imageFile) throws IOException, IllegalArgumentException {
+        try {
+            //비밀번호 암호화
+            targetAccount.setPassword(passwordEncoder.encode(targetAccount.getPassword()));
+
+            if (targetAccount.getProfileImageUri() != null) {//기존 프로필 사진이 존재하는 경우
+                //s3서버에서 프로필 이미지 제거
+                fileUploader.deleteProfileImage(targetAccount.getProfileImageUri());
+                targetAccount.setProfileImageUri(null);
+            }
+
+            if (!imageFile.isEmpty()) {//요청 part에 이미지 파일이 넘어온 경우
+                //s3서버에 프로필 이미지 추가
+                List<String> uploadedImageUriList = fileUploader.upload(imageFile, targetAccount, s3Properties.getProfileImageDirectory());
+                targetAccount.setProfileImageUri(uploadedImageUriList.get(0));
+            }
+
+            return accountRepository.save(targetAccount);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(e.getMessage());
         }
     }
 }

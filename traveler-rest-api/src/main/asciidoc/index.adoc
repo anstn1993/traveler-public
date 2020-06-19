@@ -128,6 +128,15 @@ operation::get-my-account[snippets='curl-request,http-request,request-headers,pa
 
 operation::get-other-account[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
+[[resources-account-update]]
+=== 사용자 리소스 수정
+
+'POST' 요청을 사용해서 사용자 정보를 수정할 수 있다.
+
+Content-Type이 multipart/form-data인 경우 POST method로만 요청이 가능하기 때문에 이 리소스의 경우 'POST' method로 수정한다.
+
+operation::update-account[snippets='curl-request,http-request,request-headers,request-parts,request-part-account-fields,http-response,response-headers,response-fields,links']
+
 [[resources-accompany]]
 == 동행 게시물
 

@@ -92,9 +92,7 @@ class PostControllerTest extends BaseControllerTest {
         String accessToken = getAuthToken(email, password, 0);
 
         //이미지 파일 part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile1 = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile1 = createMockMultipartFile();
 
         //post part
         PostDto postDto = createPostDto(0, 5);
@@ -187,9 +185,7 @@ class PostControllerTest extends BaseControllerTest {
         String accessToken = getAuthToken(email, password, 0);
 
 
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile1 = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile1 = createMockMultipartFile();
 
         mockMvc.perform(multipart("/api/posts")
                 .file(mockFile1)
@@ -210,9 +206,7 @@ class PostControllerTest extends BaseControllerTest {
         String accessToken = getAuthToken(email, password, 0);
 
         //이미지 파일 part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile1 = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile1 = createMockMultipartFile();
 
         //post part
         Post postDto = createPostWithUnknowValue();
@@ -239,9 +233,7 @@ class PostControllerTest extends BaseControllerTest {
         String accessToken = getAuthToken(email, password, 0);
 
         //이미지 파일 part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = createMockMultipartFile();
 
         //post part
         PostDto postDto = createPostWithWrongValue();
@@ -291,9 +283,7 @@ class PostControllerTest extends BaseControllerTest {
         String accessToken = getAuthToken(email, password, 0);
 
         //이미지 파일 part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = createMockMultipartFile();
 
         //post part
         PostDto postDto = createPostDto(0, 3);
@@ -664,9 +654,7 @@ class PostControllerTest extends BaseControllerTest {
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
         //mock image part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = createMockMultipartFile();
 
         //post part
         PostDto postDto = createPostDto(0, 5);
@@ -746,6 +734,12 @@ class PostControllerTest extends BaseControllerTest {
         ;
     }
 
+    private MockMultipartFile createMockMultipartFile() throws IOException {
+        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
+        return new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+    }
+
     @Test
     @DisplayName("post 게시물 수정 실패-post part가 없는 경우(400 Bad request)")
     public void updatePostFail_Empty_Post_Part() throws Exception {
@@ -757,9 +751,7 @@ class PostControllerTest extends BaseControllerTest {
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
         //mock file
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = createMockMultipartFile();
 
         mockMvc.perform(multipart("/api/posts/{postId}", post.getId())
                 .file(mockFile)
@@ -782,9 +774,7 @@ class PostControllerTest extends BaseControllerTest {
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
         //이미지 파일 part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = createMockMultipartFile();
 
         //post part
         Post postDto = createPostWithUnknowValue();//허용되지 않는 값이 포함된 dto
@@ -813,9 +803,7 @@ class PostControllerTest extends BaseControllerTest {
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
         //이미지 파일 part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = createMockMultipartFile();
 
         //post part
         PostDto postDto = createPostWithWrongValue();
@@ -869,9 +857,7 @@ class PostControllerTest extends BaseControllerTest {
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
         //이미지 파일 part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = createMockMultipartFile();
 
         //post part
         PostDto postDto = createPostWithWrongValue();
@@ -939,9 +925,7 @@ class PostControllerTest extends BaseControllerTest {
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
         //이미지 파일 part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = createMockMultipartFile();
 
         //post part
         PostDto postDto = createPostWithWrongValue();
@@ -969,9 +953,7 @@ class PostControllerTest extends BaseControllerTest {
         Post post = createPost(otherAccount, 0, 2, 2);//게시물 생성
 
         //mock image part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = createMockMultipartFile();
 
         //post part
         PostDto postDto = createPostDto(0, 5);
@@ -999,9 +981,7 @@ class PostControllerTest extends BaseControllerTest {
         String accessToken = getAuthToken(email, password, 0);
 
         //mock image part
-        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
-        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
-        MockMultipartFile mockFile = new MockMultipartFile("imageFiles", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+        MockMultipartFile mockFile = createMockMultipartFile();
 
         //post part
         PostDto postDto = createPostDto(0, 5);

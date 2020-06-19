@@ -155,7 +155,7 @@ public class AccountController {
     @GetMapping("/api/accounts/{accountId}")
     public ResponseEntity getAccount(@PathVariable("accountId") Account targetAccount,
                                      @CurrentAccount Account account) {
-        if(targetAccount == null || !targetAccount.isEmailAuth()) {//존재하지 않는 사용자이거나 이메일 인증이 되지 않은 사용자인 경우
+        if (targetAccount == null || !targetAccount.isEmailAuth()) {//존재하지 않는 사용자이거나 이메일 인증이 되지 않은 사용자인 경우
             return ResponseEntity.notFound().build();
         }
 
@@ -166,18 +166,17 @@ public class AccountController {
         Link getAccountsLink = new Link(appProperties.getBaseUrl() + "/api/accounts").withRel("get-accounts");
         accountModel.add(profileLink, getAccountsLink);
 
-        if(account != null) {
-            if(account.equals(targetAccount)) {//인증 상태에서 자기 자신을 조회한 경우
+        if (account != null) {
+            if (account.equals(targetAccount)) {//인증 상태에서 자기 자신을 조회한 경우
                 Link updateAccountLink = link.withRel("update-account");
                 Link deleteAccountLink = link.withRel("delete-account");
                 accountModel.add(updateAccountLink, deleteAccountLink);
             } else {//인증 상태에서 다른 사용자를 조회한 경우
                 Optional<Follow> followOpt = followService.getFollow(account, targetAccount);
-                if(followOpt.isEmpty()) {//조회한 사용자를 팔로잉하고 있지 않은 경우
+                if (followOpt.isEmpty()) {//조회한 사용자를 팔로잉하고 있지 않은 경우
                     Link followLink = new Link(appProperties.getBaseUrl() + "/api/accounts/" + account.getId() + "/followings").withRel("create-account-following");
                     accountModel.add(followLink);
-                }
-                else {//조회한 사용자를 팔로잉하고 있는 경우
+                } else {//조회한 사용자를 팔로잉하고 있는 경우
                     Link unfollowLink = new Link(appProperties.getBaseUrl() + "/api/accounts/" + account.getId() + "/followings/" + targetAccount.getId()).withRel("delete-account-following");
                     accountModel.add(unfollowLink);
                 }
@@ -185,5 +184,53 @@ public class AccountController {
         }
 
         return ResponseEntity.ok(accountModel);
+    }
+
+    //사용자 리소스 수정
+    @PostMapping("/api/accounts/{accountId}")
+    public ResponseEntity updateAccount(@PathVariable("accountId") Account targetAccount,
+                                        @RequestPart("imageFile") List<MultipartFile> imageFile,
+                                        @RequestPart("account") @Valid AccountDtoForUpdate accountDtoForUpdate,
+                                        Errors errors,
+                                        @CurrentAccount Account account) {
+        if (targetAccount == null) {//존재하지 않는 사용자인 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!targetAccount.equals(account)) {//다른 사용자인 경우
+            errors.reject("forbidden", "You can not update other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        if (errors.hasErrors()) {//account part의 값이 유효하지 않은 값인 경우
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+
+        if (imageFile.size() >= 2) {//프로필 이미지가 2개 이상이 넘어오는 경우
+            errors.reject("imageFile", "Max image count is 1.");
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+        modelMapper.map(accountDtoForUpdate, targetAccount);
+        try {
+            //hateoas적용
+            Account savedAccount = accountService.update(targetAccount, imageFile);
+            Link link = new Link(appProperties.getBaseUrl() + "/api/accounts/" + targetAccount.getId());
+            AccountModel accountModel = new AccountModel(savedAccount, link.withSelfRel());
+            Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getUpdateAccountAnchor()).withRel("profile");//profile 링크
+            Link getAccountsLink = new Link(appProperties.getBaseUrl() + "/api/accounts").withRel("get-accounts");
+            Link deleteAccountLink = link.withRel("delete-account");
+            accountModel.add(profileLink, getAccountsLink, deleteAccountLink);
+            return ResponseEntity.ok(accountModel);
+        } catch (IOException e) {//파일 생성 실패
+            e.printStackTrace();
+            errors.reject("imageFile", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorsModel(errors));
+        } catch (IllegalArgumentException e) {//multipart content type이 image가 아닌 경우
+            e.printStackTrace();
+            errors.reject("imageFile", "You have to send only image file.");
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
     }
 }
