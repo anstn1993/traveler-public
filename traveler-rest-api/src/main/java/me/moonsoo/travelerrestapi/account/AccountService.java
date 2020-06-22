@@ -3,14 +3,21 @@ package me.moonsoo.travelerrestapi.account;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountRepository;
 import me.moonsoo.commonmodule.account.AccountRole;
+import me.moonsoo.travelerrestapi.accompany.AccompanyRepository;
+import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildCommentRepository;
+import me.moonsoo.travelerrestapi.accompany.comment.AccompanyCommentRepository;
 import me.moonsoo.travelerrestapi.email.EmailService;
+import me.moonsoo.travelerrestapi.follow.FollowRepository;
 import me.moonsoo.travelerrestapi.post.FileUploader;
+import me.moonsoo.travelerrestapi.post.PostRepository;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
+import me.moonsoo.travelerrestapi.schedule.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -23,6 +30,24 @@ public class AccountService {
 
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    AccompanyRepository accompanyRepository;
+
+    @Autowired
+    AccompanyCommentRepository accompanyCommentRepository;
+
+    @Autowired
+    AccompanyChildCommentRepository accompanyChildCommentRepository;
+
+    @Autowired
+    ScheduleRepository scheduleRepository;
+
+    @Autowired
+    PostRepository postRepository;
+
+    @Autowired
+    FollowRepository followRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -59,14 +84,6 @@ public class AccountService {
             }
         }
         return savedAccount;
-    }
-
-    //사용자 삭제
-    public void delete(Account account) {
-        if (account.getProfileImageUri() != null) {
-            fileUploader.deleteProfileImage(account.getProfileImageUri());//s3서버에서 프로필 이미지 제거
-        }
-        accountRepository.delete(account);
     }
 
     //이메일 인증 상태로 update
@@ -112,5 +129,23 @@ public class AccountService {
             e.printStackTrace();
             throw new IllegalArgumentException(e.getMessage());
         }
+    }
+
+    //사용자 삭제
+    @Transactional
+    public void delete(Account account) {
+        if (account.getProfileImageUri() != null) {
+            fileUploader.deleteProfileImage(account.getProfileImageUri());//s3서버에서 프로필 이미지 제거
+        }
+
+        //사용자가 생성한 모든 리소스 제거
+        accompanyChildCommentRepository.deleteByAccount(account);
+        accompanyCommentRepository.deleteByAccount(account);
+        accompanyRepository.deleteByAccount(account);
+        scheduleRepository.deleteByAccount(account);
+        postRepository.deleteByAccount(account);
+        followRepository.deleteByFollowingAccount(account);
+        followRepository.deleteByFollowedAccount(account);
+        accountRepository.delete(account);
     }
 }

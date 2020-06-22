@@ -10,8 +10,18 @@ import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountRole;
 import me.moonsoo.commonmodule.account.Sex;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
+import me.moonsoo.travelerrestapi.accompany.Accompany;
+import me.moonsoo.travelerrestapi.accompany.AccompanyRepository;
+import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildComment;
+import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildCommentRepository;
+import me.moonsoo.travelerrestapi.accompany.comment.AccompanyComment;
+import me.moonsoo.travelerrestapi.accompany.comment.AccompanyCommentRepository;
 import me.moonsoo.travelerrestapi.email.EmailService;
+import me.moonsoo.travelerrestapi.follow.Follow;
+import me.moonsoo.travelerrestapi.follow.FollowRepository;
+import me.moonsoo.travelerrestapi.post.*;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
+import me.moonsoo.travelerrestapi.schedule.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,9 +49,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -79,6 +88,37 @@ class AccountControllerTest extends BaseControllerTest {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    AccompanyRepository accompanyRepository;
+
+    @Autowired
+    AccompanyCommentRepository accompanyCommentRepository;
+
+    @Autowired
+    AccompanyChildCommentRepository accompanyChildCommentRepository;
+
+    @Autowired
+    FollowRepository followRepository;
+
+    @Autowired
+    PostRepository postRepository;
+
+    @Autowired
+    PostTagRepository postTagRepository;
+
+    @Autowired
+    PostImageRepository postImageRepository;
+
+    @Autowired
+    ScheduleRepository scheduleRepository;
+
+    @Autowired
+    ScheduleLocationRepository scheduleLocationRepository;
+
+    @Autowired
+    ScheduleDetailRepository scheduleDetailRepository;
+
+
     @BeforeAll
     public static void startMockS3Server(@Autowired S3Mock s3Mock) {
         s3Mock.stop();
@@ -92,6 +132,12 @@ class AccountControllerTest extends BaseControllerTest {
 
     @AfterEach
     public void setUp() {
+        accompanyChildCommentRepository.deleteAll();
+        accompanyCommentRepository.deleteAll();
+        accompanyRepository.deleteAll();
+        postRepository.deleteAll();
+        scheduleRepository.deleteAll();
+        followRepository.deleteAll();
         accountRepository.deleteAll();
     }
 
@@ -1021,6 +1067,92 @@ class AccountControllerTest extends BaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("사용자 리소스 삭제")
+    public void deleteAccount() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+
+        //사용자 리소스가 삭제될 때 그 사용자가 생성한 모든 컨텐츠를 다 삭제해줘야 하기 때문에 사용자가 여러 컨텐츠를 생성했다고 가정한다.
+        createContents(account);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}", account.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-account",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                        ),
+                        pathParameters(
+                                parameterWithName("accountId").description("삭제할 사용자 리소스 id")
+                        )
+                ))
+        ;
+
+        //제거된 사용자가 생성한 모든 컨텐츠가 잘 삭제되었는지 확인
+        Optional<Accompany> accompanyOpt = accompanyRepository.findByAccount(account);
+        Optional<AccompanyComment> accompanyCommentOpt = accompanyCommentRepository.findByAccount(account);
+        Optional<AccompanyChildComment> accompanyChildCommentOpt = accompanyChildCommentRepository.findByAccount(account);
+        Optional<Post> postOpt = postRepository.findByAccount(account);
+        Optional<Schedule> scheduleOpt = scheduleRepository.findByAccount(account);
+        Optional<Follow> followingOpt = followRepository.findByFollowingAccount(account);
+        Optional<Follow> followedOpt = followRepository.findByFollowedAccount(account);
+
+        assertAll("모든 컨텐츠 제거 검사",
+                () -> assertThat(accompanyOpt.isPresent()).isFalse(),
+                () -> assertThat(accompanyCommentOpt.isPresent()).isFalse(),
+                () -> assertThat(accompanyChildCommentOpt.isPresent()).isFalse(),
+                () -> assertThat(postOpt.isPresent()).isFalse(),
+                () -> assertThat(scheduleOpt.isPresent()).isFalse(),
+                () -> assertThat(followingOpt.isPresent()).isFalse(),
+                () -> assertThat(followedOpt.isPresent()).isFalse()
+        );
+    }
+
+    @Test
+    @DisplayName("사용자 리소스 삭제 실패-인증하지 않은 상태(401 Unauthorized)")
+    public void deleteAccountFail_Unauthorized() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        Account account = createAccount(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}", account.getId()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @DisplayName("사용자 리소스 삭제 실패-다른 사용자 리소스를 삭제하려고 하는 경우(403 Forbidden)")
+    public void deleteAccountFail_Forbidden() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Account otherAccount = createAccount(email, password, 1);//다른 사용자
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}", otherAccount.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+    }
+
+    @Test
+    @DisplayName("사용자 리소스 삭제 실패-존재하지 않는 사용자(404 Not found)")
+    public void deleteAccountFail_Not_Found() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}", 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
 
     //매개변수 테스트의 인자를 생성해주는 메소드
     private static Stream<Arguments> filterAndSearchProvider() {
@@ -1166,6 +1298,195 @@ class AccountControllerTest extends BaseControllerTest {
         String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
         Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
         return new MockMultipartFile("imageFile", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
+    }
+
+    private Accompany createAccompany(Account account, int index) {
+        Accompany accompany = Accompany.builder()
+                .title("title" + index)
+                .article("article" + index)
+                .location("somewhere")
+                .latitude(30.1111)
+                .longitude(120.1111)
+                .startDate(LocalDateTime.of(2020, 4, 24, 13, 00, 00))
+                .endDate(LocalDateTime.of(2020, 4, 25, 13, 00, 00))
+                .account(account)
+                .regDate(LocalDateTime.now())
+                .viewCount(0)
+                .build();
+        return accompanyRepository.save(accompany);
+    }
+
+    private AccompanyComment createComment(Account account, Accompany accompany, int index) {
+        AccompanyComment accompanyComment = AccompanyComment.builder()
+                .comment("This is comment" + index)
+                .account(account)
+                .accompany(accompany)
+                .regDate(LocalDateTime.now())
+                .build();
+        return accompanyCommentRepository.save(accompanyComment);
+    }
+
+    private AccompanyChildComment createChildComment(Account account, Accompany accompany, AccompanyComment accompanyComment, int index) {
+        AccompanyChildComment accompanyChildComment = AccompanyChildComment.builder()
+                .account(account)
+                .accompany(accompany)
+                .accompanyComment(accompanyComment)
+                .comment("This is child comment" + index)
+                .regDate(LocalDateTime.now())
+                .build();
+        return accompanyChildCommentRepository.save(accompanyChildComment);
+    }
+
+    //일정 게시물 생성 메소드
+    public Schedule createSchedule(Account account, int index, int locationCount, int detailCount, Scope scope) {
+        Schedule schedule = Schedule.builder()
+                .account(account)
+                .title("schedule" + index)
+                .scope(scope)
+                .regDate(LocalDateTime.now())
+                .viewCount(0)
+                .build();
+        Schedule savedSchedule = scheduleRepository.save(schedule);
+        Set<ScheduleLocation> scheduleLocations = createScheduleLocations(savedSchedule, locationCount, detailCount);
+        savedSchedule.setScheduleLocations(scheduleLocations);
+        return savedSchedule;
+    }
+
+    //일정의 세부 장소 아이템 생성 메소드
+    private Set<ScheduleLocation> createScheduleLocations(Schedule schedule, int locationCount, int detailCount) {
+        Set<ScheduleLocation> scheduleLocations = new LinkedHashSet<>();
+        for (int i = 0; i < locationCount; i++) {
+            ScheduleLocation scheduleLocation = ScheduleLocation.builder()
+                    .schedule(schedule)
+                    .location("location" + i)
+                    .latitude(33.0000000)
+                    .longitude(120.0000000)
+                    .build();
+            ScheduleLocation savedScheduleLocation = scheduleLocationRepository.save(scheduleLocation);
+            scheduleLocations.add(savedScheduleLocation);
+        }
+        AtomicInteger numForDateValid = new AtomicInteger();//세부 일정 간의 날짜 유효성을 맞춰주기 위해서 생성한 변수
+        numForDateValid.set(detailCount);
+        createScheduleDetails(scheduleLocations, numForDateValid, detailCount);
+        return scheduleLocations;
+    }
+
+    //세부 장소의 세부 일정 아이템 생성 메소드
+    private void createScheduleDetails(Set<ScheduleLocation> scheduleLocations, AtomicInteger numForDateValid, int detailCount) {
+        scheduleLocations.forEach(scheduleLocation -> {
+            Set<ScheduleDetail> scheduleDetails = new LinkedHashSet<>();
+            for (int i = numForDateValid.get() - detailCount; i < numForDateValid.get(); i++) {
+                ScheduleDetail scheduleDetail = ScheduleDetail.builder()
+                        .place("Place" + i + " in location")
+                        .plan("Do something in place" + i)
+                        .startDate(LocalDateTime.of(2020, 5, i + 1, 13, 0, 0))
+                        .endDate(LocalDateTime.of(2020, 5, i + 2, 12, 0, 0))
+                        .scheduleLocation(scheduleLocation)
+                        .build();
+                ScheduleDetail savedScheduleDetail = scheduleDetailRepository.save(scheduleDetail);
+                scheduleDetails.add(savedScheduleDetail);
+                //마지막 루프에서 날짜 유효성을 위해서 numForDateValid변수를 update해준다.
+                if (i == numForDateValid.get() - 1) {
+                    numForDateValid.set(detailCount + numForDateValid.get());
+                    break;
+                }
+            }
+            scheduleLocation.setScheduleDetails(scheduleDetails);
+        });
+    }
+
+    private Post createPost(Account account, int index, int tagCount, int imageCount) {
+        Post post = Post.builder()
+                .account(account)
+                .article("This is article" + index)
+                .location("somewhere" + index)
+                .latitude(33.0000)
+                .longitude(127.0000)
+                .regDate(LocalDateTime.now())
+                .viewCount(0)
+                .build();
+        Post savedPost = postRepository.save(post);
+        //post tag set
+        Set<PostTag> postTagList = new LinkedHashSet<>();
+        IntStream.range(0, tagCount).forEach(i -> {
+            PostTag postTag = createPostTag(i, post);
+            postTagList.add(postTag);
+        });
+        savedPost.setPostTagList(postTagList);
+
+        //post image set
+        Set<PostImage> postImageList = new LinkedHashSet<>();
+        IntStream.range(0, imageCount).forEach(i -> {
+            PostImage postImage = null;
+            try {
+                postImage = createPostImage(i, savedPost);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            postImageList.add(postImage);
+        });
+        savedPost.setPostImageList(postImageList);
+        return savedPost;
+    }
+
+    private PostImage createPostImage(int index, Post post) throws IOException {
+        String uri = uploadImage(index, post.getAccount());//이미지를 mock s3서버에 업로드
+        PostImage postImage = PostImage.builder()
+                .uri(uri)
+                .post(post)
+                .build();
+        return postImageRepository.save(postImage);
+    }
+
+    private String uploadImage(int index, Account account) throws IOException {
+        String targetDirectory = s3Properties.getPostImageDirectory();//이미지를 저장할 디렉토리
+        //이미지 파일
+        String originalFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        File originalFile = resourceLoader.getResource("classpath:image/" + originalFileName).getFile();
+        String imageFileName = account.getId() + new SimpleDateFormat("HHmmss").format(new Date()) + (index + 1) + ".jpg";
+        //로컬에 임시 이미지 파일 생성
+        File tempFile = new File(imageFileName);
+        if (tempFile.createNewFile()) {
+            FileCopyUtils.copy(originalFile, tempFile);
+        }
+        amazonS3.putObject(new PutObjectRequest(s3Properties.getBUCKET(), targetDirectory + "/" + tempFile.getName(), tempFile).withCannedAcl(CannedAccessControlList.PublicRead));//mock s3 bucket에 파일 저장
+        tempFile.delete();//로컬에 임시 파일 삭제
+        return amazonS3.getUrl(s3Properties.getBUCKET(), targetDirectory + "/" + tempFile.getName()).toString();
+    }
+
+    private PostTag createPostTag(int index, Post post) {
+        PostTag postTag = PostTag.builder()
+                .post(post)
+                .tag("tag" + index)
+                .build();
+        return postTagRepository.save(postTag);
+    }
+
+    private Follow createFollow(Account followingAccount, Account followedAccount) {
+        Follow follow = Follow.builder()
+                .followingAccount(followingAccount)
+                .followedAccount(followedAccount)
+                .build();
+
+        return followRepository.save(follow);
+    }
+
+    //모든 서비스 컨텐츠 생성
+    private void createContents(Account account) {
+        //동행 게시물 생성
+        Accompany accompany = createAccompany(account, 0);
+        //동행 게시물 댓글 생성
+        AccompanyComment comment = createComment(account, accompany, 0);
+        //동행 게시물 대댓글 생성
+        createChildComment(account, accompany, comment, 0);
+        //일정 게시물 생성
+        createSchedule(account, 0, 3, 3, Scope.ALL);
+        //post게시물 생성
+        createPost(account, 0, 1, 1);
+        //팔로우 생성
+        Account followedAccount = createAccount("email@email.com", "1111", 1);
+        createFollow(account, followedAccount);
+
     }
 
 }

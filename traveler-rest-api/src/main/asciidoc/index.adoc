@@ -137,6 +137,13 @@ Content-Type이 multipart/form-data인 경우 POST method로만 요청이 가능
 
 operation::update-account[snippets='curl-request,http-request,request-headers,request-parts,request-part-account-fields,http-response,response-headers,response-fields,links']
 
+[[resources-account-delete]]
+=== 사용자 리소스 삭제
+
+'DELETE' 요청을 사용해서 사용자 리소스를 삭제할 수 있다.
+
+operation::delete-account[snippets='curl-request,http-request,request-headers,path-parameters,http-response']
+
 [[resources-accompany]]
 == 동행 게시물
 

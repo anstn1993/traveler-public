@@ -17,6 +17,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.DirectFieldBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -198,7 +199,7 @@ public class AccountController {
         }
 
         if (!targetAccount.equals(account)) {//다른 사용자인 경우
-            errors.reject("forbidden", "You can not update other user's contents.");
+            errors.reject("forbidden", "You can not update other user's information.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
         }
 
@@ -232,5 +233,22 @@ public class AccountController {
             errors.reject("imageFile", "You have to send only image file.");
             return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
+    }
+
+    @DeleteMapping("/api/accounts/{accountId}")
+    public ResponseEntity deleteAccount(@PathVariable("accountId") Account targetAccount,
+                                        @CurrentAccount Account account) {
+        if (targetAccount == null) {//존재하지 않는 사용자인 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!targetAccount.equals(account)) {//다른 사용자인 경우
+            Errors errors = new DirectFieldBindingResult(account, "account");
+            errors.reject("forbidden", "You can not delete other user resource.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        accountService.delete(targetAccount);//사용자 리소스 제거
+        return ResponseEntity.noContent().build();
     }
 }

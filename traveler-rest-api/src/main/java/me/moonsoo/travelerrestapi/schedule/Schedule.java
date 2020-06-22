@@ -41,8 +41,4 @@ public class Schedule {
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<ScheduleLocation> scheduleLocations = new LinkedHashSet<>();
 
-    public void addScheduleLocation(ScheduleLocation scheduleLocation) {
-        scheduleLocation.setSchedule(this);
-        this.scheduleLocations.add(scheduleLocation);
-    }
 }
