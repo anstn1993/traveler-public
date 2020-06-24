@@ -12,4 +12,8 @@ public class LikeModel extends EntityModel<Like> {
         //self 링크 추가
         add(linkTo(LikeController.class).slash(like.getPost().getId()).slash("likes").slash(like.getId()).withSelfRel());
     }
+
+    public LikeModel(Like content, Iterable<Link> links) {
+        super(content, links);
+    }
 }

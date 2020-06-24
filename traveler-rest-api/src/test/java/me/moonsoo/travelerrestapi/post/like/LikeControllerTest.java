@@ -1,5 +1,6 @@
 package me.moonsoo.travelerrestapi.post.like;
 
+import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.post.Post;
 import me.moonsoo.travelerrestapi.post.PostBaseControllerTest;
 import org.junit.jupiter.api.AfterEach;
@@ -10,6 +11,8 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
+import java.util.stream.IntStream;
+
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
@@ -17,8 +20,7 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -127,17 +129,115 @@ class LikeControllerTest extends PostBaseControllerTest {
         String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);
 
-        Like like = Like.builder()
-                .post(post)
-                .account(account)
-                .build();
-
-        likeRepository.save(like);//좋아요 리소스 추가
+        createLike(post, account);//좋아요 리소스 생성
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/likes", post.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 좋아요 리소스 목록 조회")
+    public void getLikes_With_Auth() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Post post = createPost(account, 0, 1, 1);
+
+        //좋아요 리소스 30개 생성
+        IntStream.rangeClosed(1, 30).forEach(i -> {
+            Account account = createAccount(email, password, i);
+            createLike(post, account);
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/likes", post.getId())
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,ASC")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(jsonPath("_embedded.likeList").exists())
+                .andExpect(jsonPath("_embedded.likeList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.likeList[0]._links.create-account-follow").exists())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+                .andDo(document("get-likes",
+                        pagingLinks.and(
+                                linkWithRel("profile").description("api 문서 링크")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        pathParameters(
+                                parameterWithName("postId").description("좋아요가 달린 게시물 id")
+                        ),
+                        requestParameters(
+                                parameterWithName("page").optional().description("페이지 번호"),
+                                parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
+                                parameterWithName("sort").optional().description("정렬 기준(id-게시물 id)")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responsePageFields.and(
+                                fieldWithPath("_embedded.likeList[].id").description("좋아요 리소스 id"),
+                                fieldWithPath("_embedded.likeList[].account.id").description("좋아요 리소스의 주인 id"),
+                                fieldWithPath("_embedded.likeList[].post.id").description("좋아요가 달린 post 게시물의 id"),
+                                fieldWithPath("_embedded.likeList[]._links.self.href").description("좋아요 리소스 조회 링크"),
+                                fieldWithPath("_embedded.likeList[]._links.create-account-follow.href").description("좋아요 리소스의 주인 팔로우 링크, 만약 이미 팔로우 상태인 경우에는 언팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("미인증 상태에서 좋아요 리소스 목록 조회")
+    public void getLikes_Without_Auth() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        account = createAccount(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Post post = createPost(account, 0, 1, 1);
+
+        //좋아요 리소스 30개 생성
+        IntStream.rangeClosed(1, 30).forEach(i -> {
+            Account account = createAccount(email, password, i);
+            createLike(post, account);
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/likes", post.getId())
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,ASC")
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(jsonPath("_embedded.likeList").exists())
+                .andExpect(jsonPath("_embedded.likeList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.likeList[0]._links.create-account-follow").doesNotExist())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+        ;
+    }
+
+    private Like createLike(Post post, Account account) {
+        Like like = Like.builder()
+                .post(post)
+                .account(account)
+                .build();
+
+        return likeRepository.save(like);//좋아요 리소스 추가
     }
 }

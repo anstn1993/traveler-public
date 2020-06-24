@@ -111,8 +111,9 @@ public class FollowController {
                 .currentUser(account)
                 .resourceAccount(followingAccount)
                 .followService(followService)
+                .followingOrFollower("following")
                 .build();
-        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(linkGenerator, "following");
+        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(linkGenerator);
         PagedModel<FollowAccountModel> accountModels = assembler.toModel(followedAccounts, followAccountModelAssembler);
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowingsAnchor()).withRel("profile");//profile 링크
         accountModels.add(profileLink);
@@ -139,9 +140,10 @@ public class FollowController {
                 .currentUser(account)
                 .resourceAccount(followingAccount)
                 .followService(followService)
+                .followingOrFollower("following")
                 .build();
 
-        Links links = linkGenerator.makeLinks(followedAccount, "following");//self, create-account-follow or delete-account-follow링크 생성
+        Links links = linkGenerator.makeLinks(followedAccount);//self, create-account-follow or delete-account-follow링크 생성
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowingAnchor()).withRel("profile");//profile 링크
         FollowAccountModel followAccountModel = new FollowAccountModel(followedAccount, links);
         followAccountModel.add(profileLink);
@@ -161,9 +163,10 @@ public class FollowController {
                 .followService(followService)
                 .currentUser(account)
                 .resourceAccount(followedAccount)
+                .followingOrFollower("follower")
                 .build();
 
-        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(followLinkGenerator, "follower");
+        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(followLinkGenerator);
 
         PagedModel<FollowAccountModel> accountModels = assembler.toModel(followingAccounts, followAccountModelAssembler);
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowersAnchor()).withRel("profile");//profile 링크
@@ -192,9 +195,10 @@ public class FollowController {
                 .currentUser(account)
                 .resourceAccount(followedAccount)
                 .followService(followService)
+                .followingOrFollower("follower")
                 .build();
 
-        Links links = linkGenerator.makeLinks(followingAccount, "follower");//self, create-account-follow or delete-account-follow링크 생성
+        Links links = linkGenerator.makeLinks(followingAccount);//self, create-account-follow or delete-account-follow링크 생성
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowerAnchor()).withRel("profile");//profile 링크
         FollowAccountModel followAccountModel = new FollowAccountModel(followingAccount, links);
         followAccountModel.add(profileLink);

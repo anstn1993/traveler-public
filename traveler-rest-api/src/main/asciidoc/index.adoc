@@ -413,3 +413,10 @@ operation::delete-post[snippets='curl-request,http-request,request-headers,path-
 'POST' 요청을 사용해서 좋아요를 추가할 수 있다.
 
 operation::create-like[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-likes-get]]
+=== 좋아요 목록 조회
+
+'GET' 요청을 사용해서 특정 post 게시물에 달린 좋아요 목록을 조회할 수 있다.
+
+operation::get-likes[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
