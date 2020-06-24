@@ -77,4 +77,6 @@ public class AppProperties {
 
     private String updateAccountAnchor;
 
+    private String createLikeAnchor;
+
 }

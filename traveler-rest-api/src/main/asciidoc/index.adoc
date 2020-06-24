@@ -401,3 +401,15 @@ operation::update-post[snippets='curl-request,http-request,request-headers,reque
 'DELETE' 요청을 사용해서 post 게시물을 삭제할 수 있다.
 
 operation::delete-post[snippets='curl-request,http-request,request-headers,path-parameters,http-response']
+
+[[resources-like]]
+== 좋아요
+
+좋아요 리소스는 좋아요를 post게시물에 추가, 조회, 삭제할 때 사용한다.
+
+[[resources-like-create]]
+=== 좋아요 추가
+
+'POST' 요청을 사용해서 좋아요를 추가할 수 있다.
+
+operation::create-like[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']

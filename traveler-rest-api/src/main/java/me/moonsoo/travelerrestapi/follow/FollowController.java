@@ -74,8 +74,8 @@ public class FollowController {
         //이미 팔로잉 중인 사용자를 팔로우 하려고 하는 경우
         Optional<Follow> existingFollowOpt = followService.getFollow(followingAccount, followDto.getFollowedAccount());
         if (existingFollowOpt.isPresent()) {
-            errors.reject("bad request", "You are already following that user");
-            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+            errors.reject("conflict", "You are already following that user");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
         }
 
         Optional<Account> followedAccountOtp = accountRepository.findById(followDto.getFollowedAccount().getId());
@@ -229,8 +229,8 @@ public class FollowController {
         Optional<Follow> followOpt = followService.getFollow(followingAccount, followedAccount);
         if(followOpt.isEmpty()) {
             Errors errors = new DirectFieldBindingResult(followingAccount, "followingAccount");
-            errors.reject("bad request", "You are not following that user");
-            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+            errors.reject("conflict", "You are not following that user");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
         }
 
         Follow follow = followOpt.get();

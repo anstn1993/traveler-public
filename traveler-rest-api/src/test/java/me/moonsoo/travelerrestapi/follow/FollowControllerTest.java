@@ -216,7 +216,7 @@ class FollowControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @DisplayName("특정 사용자 팔로우 실패-이미 팔로우 중인 사용자를 팔로우하는 경우(400 Bad request)")
+    @DisplayName("특정 사용자 팔로우 실패-이미 팔로우 중인 사용자를 팔로우하는 경우(409 Conflict)")
     public void followUserFail_Already_Following() throws Exception {
         //Given
         String email = "anstn1993@email.com";
@@ -233,7 +233,7 @@ class FollowControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(followDto)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
         ;
     }
 
@@ -696,7 +696,7 @@ class FollowControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @DisplayName("팔로잉 중이던 사용자 언팔로우 실패-팔로잉 중인 사용자가 아닌 경우(400 Bad request)")
+    @DisplayName("팔로잉 중이던 사용자 언팔로우 실패-팔로잉 중인 사용자가 아닌 경우(409 Conflict)")
     public void unfollowUserFail_Not_Following() throws Exception {
         //Given
         String email = "anstn1993@email.com";
@@ -707,7 +707,7 @@ class FollowControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}/followings/{followedId}", account.getId(), otherAccount.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
         ;
 
     }
