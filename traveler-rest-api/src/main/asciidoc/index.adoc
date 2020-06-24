@@ -433,3 +433,10 @@ operation::get-my-like[snippets='curl-request,http-request,request-headers,path-
 ==== 다른 사용자의 좋아요 리소스 조회
 
 operation::get-other-like[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-like-delete]]
+=== 좋아요 리소스 삭제
+
+'DELETE' 요청을 사용해서 like 리소스를 삭제할 수 있다.
+
+operation::delete-post[snippets='curl-request,http-request,request-headers,path-parameters,http-response']

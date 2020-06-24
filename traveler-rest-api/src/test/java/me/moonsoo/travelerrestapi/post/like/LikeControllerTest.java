@@ -408,13 +408,102 @@ class LikeControllerTest extends PostBaseControllerTest {
         String password = "user";
         String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);//post 리소스 추가
-        Like like = createLike(post, account);//post 게시물에 좋아요 리소스 추가
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/likes/{likeId}", post.getId(), 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("좋아요 리소스 삭제")
+    public void deleteLike() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Post post = createPost(account, 0, 1, 1);//post 리소스 추가
+        Like like = createLike(post, account);//post 게시물에 좋아요 리소스 추가
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/likes/{likeId}", post.getId(), like.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+        .andDo(document("delete-like",
+                requestHeaders(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                ),
+                pathParameters(
+                        parameterWithName("postId").description("삭제할 좋아요 리소스의 부모 post 게시물 리소스 id"),
+                        parameterWithName("likeId").description("삭제할 좋아요 리소스의 id")
+                )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("좋아요 리소스 삭제 실패-다른 사용자의 리소스를 제거하려고 하는 경우(403 Forbidden)")
+    public void deleteLikeFail_Forbidden() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Account otherAccount = createAccount(email, password, 1);
+        Post post = createPost(account, 0, 1, 1);//post 리소스 추가
+        Like like = createLike(post, otherAccount);//post 게시물에 다른 사용자의 좋아요 리소스 추가
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/likes/{likeId}", post.getId(), like.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+    }
+
+    @Test
+    @DisplayName("좋아요 리소스 삭제 실패-존재하지 않는 post 리소스(404 Not found)")
+    public void deleteLikeFail_Not_Found_Post() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Post post = createPost(account, 0, 1, 1);//post 리소스 추가
+        Like like = createLike(post, account);//post 게시물에 다른 사용자의 좋아요 리소스 추가
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/likes/{likeId}", 404, like.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("좋아요 리소스 삭제 실패-존재하지 않는 like 리소스(404 Not found)")
+    public void deleteLikeFail_Not_Found_Like() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Post post = createPost(account, 0, 1, 1);//post 리소스 추가
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/likes/{likeId}", post.getId(), 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("좋아요 리소스 삭제 실패-Post 리소스의 자식 like 리소스가 아닌 경우(409 Conflict)")
+    public void deleteLikeFail_Conflict() throws Exception {
+        String email = "user@email.com";
+        String password = "user";
+        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Post post1 = createPost(account, 0, 1, 1);//post 리소스 추가
+        Post post2 = createPost(account, 0, 1, 1);//post 리소스 추가
+        Like like = createLike(post2, account);//post2 게시물에 좋아요 리소스 추가
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/likes/{likeId}", post1.getId(), like.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isConflict())
         ;
     }
 

@@ -26,4 +26,8 @@ public class LikeService {
     public Page<Like> findAllByPost(Post post, Pageable pageable) {
         return likeRepository.findAllByPost(post, pageable);
     }
+
+    public void delete(Like like) {
+        likeRepository.delete(like);
+    }
 }

@@ -38,9 +38,6 @@ public class LikeController {
     private LikeService likeService;
 
     @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
     private AppProperties appProperties;
 
     @Autowired
@@ -139,6 +136,31 @@ public class LikeController {
         }
 
         return ResponseEntity.ok(likeModel);
+    }
+
+    //좋아요 리소스 삭제 핸들러
+    @DeleteMapping("/{postId}/likes/{likeId}")
+    public ResponseEntity deleteLike(@PathVariable("postId") Post post,
+                                     @PathVariable("likeId") Like like,
+                                     @CurrentAccount Account account) {
+        if(post == null || like == null) {//존재하지 않는 post, like리소스인 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if(!post.equals(like.getPost())) {//post리소스의 자식 like리소스가 아닌 경우
+            Errors errors = new DirectFieldBindingResult(like, "like");
+            errors.reject("conflict", "The like resource is not a child of the post");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        if(!like.getAccount().equals(account)) {//자신의 리소스가 아닌 경우
+            Errors errors = new DirectFieldBindingResult(like, "like");
+            errors.reject("forbidden", "You can not delete other user's like resource");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        likeService.delete(like);
+        return ResponseEntity.noContent().build();
     }
 
 }
