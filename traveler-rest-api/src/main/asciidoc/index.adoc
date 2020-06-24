@@ -124,7 +124,7 @@ operation::get-accounts[snippets='curl-request,http-request,request-headers,requ
 
 operation::get-my-account[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
-==== 다른 사용자 조쇠
+==== 다른 사용자 조회
 
 operation::get-other-account[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
@@ -420,3 +420,16 @@ operation::create-like[snippets='curl-request,http-request,request-headers,path-
 'GET' 요청을 사용해서 특정 post 게시물에 달린 좋아요 목록을 조회할 수 있다.
 
 operation::get-likes[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-like-get]]
+=== 좋아요 리소스 하나 조회
+
+'GET' 요청을 사용해서 특정 post 게시물에 달린 좋아요 리소스 하나를 조회할 수 있다.
+
+==== 자신의 좋아요 리소스 조회
+
+operation::get-my-like[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+==== 다른 사용자의 좋아요 리소스 조회
+
+operation::get-other-like[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']

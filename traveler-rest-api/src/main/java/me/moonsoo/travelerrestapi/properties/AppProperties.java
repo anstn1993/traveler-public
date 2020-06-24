@@ -81,4 +81,6 @@ public class AppProperties {
 
     private String getLikesAnchor;
 
+    private String getLikeAnchor;
+
 }
