@@ -3,6 +3,7 @@ package me.moonsoo.travelerrestapi.post;
 
 import com.amazonaws.AmazonServiceException;
 import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.travelerrestapi.post.like.LikeRepository;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,9 @@ public class PostService {
 
     @Autowired
     private PostImageRepository postImageRepository;
+
+    @Autowired
+    private LikeRepository likeRepository;
 
     @Autowired
     S3Properties s3Properties;
@@ -145,6 +149,7 @@ public class PostService {
 
         try {
             fileUploader.deletePostImage(post.getPostImageList());//s3서버에서 이미지 파일 삭제
+            likeRepository.deleteByPost(post);//삭제할 post에 달린 좋아요 리소스 제거
             postRepository.delete(post);//삭제에 성공하면 post 엔티티 delete
         }
         catch (AmazonServiceException e) {

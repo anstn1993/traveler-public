@@ -56,7 +56,7 @@ class ScheduleControllerTest extends BaseControllerTest {
     private FollowRepository followRepository;
 
     @AfterEach
-    public void setUp() {
+    public void tearDown() {
         followRepository.deleteAll();
         scheduleRepository.deleteAll();
         accountRepository.deleteAll();

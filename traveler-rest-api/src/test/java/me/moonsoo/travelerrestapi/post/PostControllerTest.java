@@ -47,7 +47,7 @@ class PostControllerTest extends PostBaseControllerTest {
 
 
     @AfterEach
-    public void setUp() {
+    public void tearDown() {
         postImageRepository.deleteAll();
         postTagRepository.deleteAll();
         postRepository.deleteAll();
@@ -284,7 +284,7 @@ class PostControllerTest extends PostBaseControllerTest {
     }
 
     @Test
-    @DisplayName("post 게시물 추가 실패-이미지 파일이 아닌 경우 400(bad request)")
+    @DisplayName("post 게시물 추가 실패-이미지 파일이 아닌 경우 415(Unsupported Media Type)")
     public void createPostFail_Not_Image_File() throws Exception {
         //Given
         String email = "user@email.com";
@@ -306,7 +306,7 @@ class PostControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnsupportedMediaType())
         ;
     }
 
@@ -857,7 +857,7 @@ class PostControllerTest extends PostBaseControllerTest {
     }
 
     @Test
-    @DisplayName("post 게시물 수정 실패-이미지 파일이 아닌 경우(400 Bad request)")
+    @DisplayName("post 게시물 수정 실패-이미지 파일이 아닌 경우(415 Unsupported media type)")
     public void updatePostFail_Not_Image_File() throws Exception {
         //Given
         String email = "user@email.com";
@@ -870,7 +870,7 @@ class PostControllerTest extends PostBaseControllerTest {
         MockMultipartFile mockFile = new MockMultipartFile("imageFiles", "test.txt", "text/plain", "This is not a image file.".getBytes());
 
         //post part
-        PostDto postDto = createPostWithWrongValue();
+        PostDto postDto = createPostDto(0, 3);
         MockPart part = new MockPart("post", "post", objectMapper.writeValueAsString(postDto).getBytes());
         part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
@@ -881,7 +881,7 @@ class PostControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnsupportedMediaType())
         ;
     }
 

@@ -32,7 +32,7 @@ class LikeControllerTest extends PostBaseControllerTest {
     private LikeRepository likeRepository;
 
     @AfterEach
-    public void setUp() {
+    public void tearDown() {
         postImageRepository.deleteAll();
         postTagRepository.deleteAll();
         likeRepository.deleteAll();

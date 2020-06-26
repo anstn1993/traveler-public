@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
 
     @AfterEach
-    public void setUp() {
+    public void tearDown() {
         accompanyChildCommentRepository.deleteAll();
         accompanyCommentRepository.deleteAll();
         accompanyRepository.deleteAll();
@@ -151,7 +151,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
     }
 
     @Test
-    @DisplayName("동행 게시물에 대댓글 추가 실패-존재하지 않는 동행 게시물 리소스(400 Bad request)")
+    @DisplayName("동행 게시물에 대댓글 추가 실패-존재하지 않는 동행 게시물 리소스(404 Not found)")
     public void createChildCommentFail_Not_Existing_Accompany() throws Exception {
 
         //Given
@@ -169,12 +169,12 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(childCommentDto)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
         ;
     }
 
     @Test
-    @DisplayName("동행 게시물에 대댓글 추가 실패-존재하지 않는 댓글 리소스(400 Bad request)")
+    @DisplayName("동행 게시물에 대댓글 추가 실패-존재하지 않는 댓글 리소스(404 Not found)")
     public void createChildCommentFail_Not_Existing_Comment() throws Exception {
 
         //Given
@@ -192,12 +192,12 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(childCommentDto)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
         ;
     }
 
     @Test
-    @DisplayName("동행 게시물에 대댓글 추가 실패-동행 게시물에 존재하지 않는 댓글(400 Bad request)")
+    @DisplayName("동행 게시물에 대댓글 추가 실패-동행 게시물에 존재하지 않는 댓글(409 Conflict)")
     public void createChildCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
 
         //Given
@@ -216,7 +216,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(childCommentDto)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
         ;
     }
 
@@ -364,7 +364,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
     }
 
     @Test
-    @DisplayName("동행 게시물의 대댓글 목록 조회 실패-존재하지 않는 댓글-404 Not found")
+    @DisplayName("동행 게시물의 대댓글 목록 조회 실패-존재하지 않는 댓글(404 Not found)")
     public void getAccompanyChildComments_Not_Existing_Comment() throws Exception {
         //Given
         String email = "anstn1993@email.com";
@@ -389,7 +389,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
     }
 
     @Test
-    @DisplayName("동행 게시물의 대댓글 목록 조회 실패-존재하지 않는 댓글-404 Not found")
+    @DisplayName("동행 게시물의 대댓글 목록 조회 실패-조회한 동행 게시물의 자식 댓글이 아닌 경우(409 Conflict)")
     public void getAccompanyChildComments_Not_Existing_Comment_In_Accompany() throws Exception {
         //Given
         String email = "anstn1993@email.com";
@@ -410,7 +410,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .param("size", "10")
                 .param("sort", "id,ASC"))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
         ;
     }
 
@@ -599,7 +599,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
     }
 
     @Test
-    @DisplayName("동행 게시물의 대댓글 하나 조회 실패-동행 게시물에 존재하지 않는 댓글(404 Not Found)")
+    @DisplayName("동행 게시물의 대댓글 하나 조회 실패-동행 게시물에 존재하지 않는 댓글(409 Conflict)")
     public void getAccompanyChildComment_Not_Existing_Comment_In_Accompany() throws Exception {
         //Given
         String email = "anstn1993@email.com";
@@ -614,12 +614,12 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
         ;
     }
 
     @Test
-    @DisplayName("동행 게시물의 대댓글 하나 조회 실패-댓글의 자식 댓글이 아닌 경우(404 Not Found)")
+    @DisplayName("동행 게시물의 대댓글 하나 조회 실패-댓글의 자식 댓글이 아닌 경우(409 Conflict)")
     public void getAccompanyChildComment_Not_Existing_Child_Comment_In_Comment() throws Exception {
         //Given
         String email = "anstn1993@email.com";
@@ -634,7 +634,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
         ;
     }
 
@@ -858,7 +858,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
     }
 
     @Test
-    @DisplayName("동행 게시물 대댓글 수정 실패-게시물에 존재하지 않는 댓글(404 Not found)")
+    @DisplayName("동행 게시물 대댓글 수정 실패-게시물에 존재하지 않는 댓글(409 Conflict)")
     public void updateAccompanyChildCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
         //Given
         String email = "anstn1993@email.com";
@@ -877,12 +877,12 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(childCommentDto)))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
         ;
     }
 
     @Test
-    @DisplayName("동행 게시물 대댓글 수정 실패-부모댓글에 존재하지 않는 대댓글(404 Not found)")
+    @DisplayName("동행 게시물 대댓글 수정 실패-부모댓글에 존재하지 않는 대댓글(409 Conflict)")
     public void updateAccompanyChildCommentFail_Not_Existing_Child_Comment_In_Comment() throws Exception {
         //Given
         String email = "anstn1993@email.com";
@@ -901,7 +901,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(childCommentDto)))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
         ;
     }
 
@@ -1031,7 +1031,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
     }
 
     @Test
-    @DisplayName("동행 게시물 대댓글 삭제 실패-게시물에 존재하지 않는 댓글(404 Not found)")
+    @DisplayName("동행 게시물 대댓글 삭제 실패-게시물에 존재하지 않는 댓글(409 Conflict)")
     public void deleteAccompanyChildCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
         //Given
         String email = "anstn1993@email.com";
@@ -1046,12 +1046,12 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany2.getId(), accompanyComment.getId(), childComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
         ;
     }
 
     @Test
-    @DisplayName("동행 게시물 대댓글 삭제 실패-해당 댓글에 달리지 않은 대댓글(404 Not found)")
+    @DisplayName("동행 게시물 대댓글 삭제 실패-해당 댓글에 달리지 않은 대댓글(409 Conflict)")
     public void deleteAccompanyChildCommentFail_Not_Existing_Child_Comment_In_Comment() throws Exception {
         //Given
         String email = "anstn1993@email.com";
@@ -1066,7 +1066,7 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment2.getId(), childComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
         ;
     }
 

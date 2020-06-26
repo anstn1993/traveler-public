@@ -46,8 +46,7 @@ public class AccompanyCommentController {
                                         @CurrentAccount Account account) {
         //동행 게시물 리소스가 존재하지 않는 경우
         if (accompany == null) {
-            errors.reject("accompany.id", "Accompany resource is not found");
-            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+            return ResponseEntity.notFound().build();
         }
         //요청 본문에 문제가 있는 경우
         if (errors.hasErrors()) {
@@ -99,8 +98,14 @@ public class AccompanyCommentController {
     public ResponseEntity getComment(@PathVariable("accompanyId") Accompany accompany,
                                      @PathVariable("commentId") AccompanyComment accompanyComment,
                                      @CurrentAccount Account account) {
-        if (accompany == null || accompanyComment == null || !accompanyComment.getAccompany().equals(accompany)) {//존재하지 않는 게시물, 댓글 리소스이거나 해당 게시물의 댓글이 아닌 경우
+        if (accompany == null || accompanyComment == null) {//존재하지 않는 게시물, 댓글 리소스이거나
             return ResponseEntity.notFound().build();
+        }
+
+        if (!accompanyComment.getAccompany().equals(accompany)) {//해당 게시물의 댓글이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(accompanyComment, "accompanyComment");
+            errors.reject("conflict", "The comment resource is not a child of the accompany resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
         }
 
         //Hateoas적용
@@ -126,8 +131,13 @@ public class AccompanyCommentController {
                                         @RequestBody @Valid AccompanyCommentDto accompanyCommentDto,
                                         Errors errors,
                                         @CurrentAccount Account account) {
-        if (accompany == null || accompanyComment == null || !accompanyComment.getAccompany().equals(accompany)) {//존재하지 않는 게시물, 댓글 리소스이거나 해당 게시물의 댓글이 아닌 경우
+        if (accompany == null || accompanyComment == null){//존재하지 않는 게시물, 댓글 리소스이거나
             return ResponseEntity.notFound().build();
+        }
+
+        if (!accompanyComment.getAccompany().equals(accompany)) {//해당 게시물의 댓글이 아닌 경우
+            errors.reject("conflict", "The comment resource is not a child of the accompany resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
         }
 
         if (!accompanyComment.getAccount().equals(account)) {//다른 사용자의 댓글을 수정하려고 하는 경우
@@ -156,12 +166,19 @@ public class AccompanyCommentController {
     public ResponseEntity deleteComment(@PathVariable("accompanyId") Accompany accompany,
                                         @PathVariable("commentId") AccompanyComment accompanyComment,
                                         @CurrentAccount Account account) {
-        if (accompany == null || accompanyComment == null || !accompanyComment.getAccompany().equals(accompany)) {//리소스가 존재하지 않거나 요청한 게시물에 달린 댓글이 아닌 경우
+
+        if (accompany == null || accompanyComment == null) {//존재하지 않는 게시물, 댓글 리소스이거나
             return ResponseEntity.notFound().build();
         }
 
+        if (!accompanyComment.getAccompany().equals(accompany)) {//해당 게시물의 댓글이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(accompanyComment, "accompanyComment");
+            errors.reject("conflict", "The comment resource is not a child of the accompany resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
         if (!accompanyComment.getAccount().equals(account)) {//자신의 댓글이 아닌 경우
-            Errors errors = new DirectFieldBindingResult(account,"account");
+            Errors errors = new DirectFieldBindingResult(account, "account");
             errors.reject("forbidden", "You can not delete other user's contents.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
         }

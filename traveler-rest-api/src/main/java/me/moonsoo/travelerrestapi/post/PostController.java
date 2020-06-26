@@ -98,7 +98,7 @@ public class PostController {
         } catch (IllegalArgumentException e) {//multipart content type이 image가 아닌 경우
             e.printStackTrace();
             errors.reject("imageFiles", "You have to send only image files.");
-            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(new ErrorsModel(errors));
         }
     }
 
@@ -203,7 +203,7 @@ public class PostController {
         } catch (IllegalArgumentException e) {//multipart content type이 image가 아닌 경우
             e.printStackTrace();
             errors.reject("imageFiles", "You have to send only image files.");
-            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(new ErrorsModel(errors));
         } catch (AmazonServiceException e) {
             e.printStackTrace();
             errors.reject("500 error", e.getMessage());

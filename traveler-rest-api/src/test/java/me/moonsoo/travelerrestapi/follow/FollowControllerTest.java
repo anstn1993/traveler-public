@@ -34,7 +34,7 @@ class FollowControllerTest extends BaseControllerTest {
     FollowRepository followRepository;
 
     @AfterEach
-    public void setUp() {
+    public void tearDown() {
         followRepository.deleteAll();
         accountRepository.deleteAll();
     }

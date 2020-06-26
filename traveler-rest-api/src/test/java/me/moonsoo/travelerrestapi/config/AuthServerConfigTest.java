@@ -40,7 +40,7 @@ class AuthServerConfigTest extends BaseControllerTest {
     AccountRepository accountRepository;
 
     @AfterEach
-    public void setUp() {
+    public void tearDown() {
         accountRepository.deleteAll();
     }
 

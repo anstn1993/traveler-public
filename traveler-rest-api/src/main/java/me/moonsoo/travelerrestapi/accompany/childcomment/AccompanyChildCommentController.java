@@ -52,9 +52,13 @@ public class AccompanyChildCommentController {
             return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
 
-        if (accompany == null || comment == null || !comment.getAccompany().equals(accompany)) {//동행 게시물, 댓글이 존재하지 않거나 댓글이 해당 동행 게시물에 달린 댓글이 아닌 경우
-            errors.reject("resource not found error", "Url resource you requested was not found.");
-            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        if (accompany == null || comment == null) {//동행 게시물, 댓글이 존재하지 않는 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if(!comment.getAccompany().equals(accompany)) {//댓글이 해당 동행 게시물에 달린 댓글이 아닌 경우
+            errors.reject("conflict", "The comment resource is not a child of the accompany resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
         }
 
         AccompanyChildComment childComment = modelMapper.map(commentDto, AccompanyChildComment.class);
@@ -85,10 +89,14 @@ public class AccompanyChildCommentController {
                                            @PathVariable("commentId") AccompanyComment comment,
                                            PagedResourcesAssembler<AccompanyChildComment> pagedResourcesAssembler,
                                            @CurrentAccount Account account) {
-
-        //동행 게시물이나 댓글이 존재하지 않거나 댓글이 해당 동행 게시물에 달린 댓글이 아닌 경우
-        if (accompany == null || comment == null || !comment.getAccompany().equals(accompany)) {
+        if (accompany == null || comment == null) {//동행 게시물, 댓글이 존재하지 않는 경우
             return ResponseEntity.notFound().build();
+        }
+
+        if(!comment.getAccompany().equals(accompany)) {//댓글이 해당 동행 게시물에 달린 댓글이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(comment, "accompanyComment");
+            errors.reject("conflict", "The comment resource is not a child of the accompany resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
         }
 
         Page<AccompanyChildComment> childComments = accompanyChildCommentService.findAllByAccompanyComment(comment, pageable);//대댓글 리스트 조회
@@ -113,9 +121,21 @@ public class AccompanyChildCommentController {
                                           @PathVariable("commentId") AccompanyComment comment,
                                           @PathVariable("childCommentId") AccompanyChildComment childComment,
                                           @CurrentAccount Account account) {
-        //동행 게시물, 댓글, 대댓글 리소스가 존재하지 않거나, 해당 게시물에 달린 댓글이 아니거나, 해당 댓글에 달린 대댓글이 아닌 경우
-        if (accompany == null || comment == null || childComment == null || !comment.getAccompany().equals(accompany) || !childComment.getAccompanyComment().equals(comment)) {
+        //동행 게시물, 댓글, 대댓글 리소스가 존재하지 않는 경우
+        if (accompany == null || comment == null || childComment == null) {
             return ResponseEntity.notFound().build();
+        }
+
+        if(!comment.getAccompany().equals(accompany)){//해당 게시물에 달린 댓글이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(comment, "accompanyComment");
+            errors.reject("conflict", "The comment resource is not a child of the accompany resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        if(!childComment.getAccompanyComment().equals(comment)) {//해당 댓글에 달린 대댓글이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(childComment, "accompanyChildComment");
+            errors.reject("conflict", "The child comment resource is not a child of the comment resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
         }
 
         //Hateoas 적용
@@ -144,10 +164,21 @@ public class AccompanyChildCommentController {
                                              @RequestBody @Valid AccompanyChildCommentDto childCommentDto,
                                              Errors errors,
                                              @CurrentAccount Account account) {
-        //동행 게시물, 댓글, 대댓글 리소스가 존재하지 않거나, 해당 게시물에 달린 댓글이 아니거나, 해당 댓글에 달린 대댓글이 아닌 경우
-        if (accompany == null || comment == null || childComment == null || !comment.getAccompany().equals(accompany) || !childComment.getAccompanyComment().equals(comment)) {
+        //동행 게시물, 댓글, 대댓글 리소스가 존재하지 않는 경우
+        if (accompany == null || comment == null || childComment == null) {
             return ResponseEntity.notFound().build();
         }
+
+        if(!comment.getAccompany().equals(accompany)){//해당 게시물에 달린 댓글이 아닌 경우
+            errors.reject("conflict", "The comment resource is not a child of the accompany resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        if(!childComment.getAccompanyComment().equals(comment)) {//해당 댓글에 달린 대댓글이 아닌 경우
+            errors.reject("conflict", "The child comment resource is not a child of the comment resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
 
         //자신의 대댓글이 아닌 경우
         if (!childComment.getAccount().equals(account)) {
@@ -181,9 +212,21 @@ public class AccompanyChildCommentController {
                                              @PathVariable("commentId") AccompanyComment comment,
                                              @PathVariable("childCommentId") AccompanyChildComment childComment,
                                              @CurrentAccount Account account) {
-        //동행 게시물, 댓글, 대댓글 리소스가 존재하지 않거나, 해당 게시물에 달린 댓글이 아니거나, 해당 댓글에 달린 대댓글이 아닌 경우
-        if (accompany == null || comment == null || childComment == null || !comment.getAccompany().equals(accompany) || !childComment.getAccompanyComment().equals(comment)) {
+        //동행 게시물, 댓글, 대댓글 리소스가 존재하지 않는 경우
+        if (accompany == null || comment == null || childComment == null) {
             return ResponseEntity.notFound().build();
+        }
+
+        if(!comment.getAccompany().equals(accompany)){//해당 게시물에 달린 댓글이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(comment, "accompanyComment");
+            errors.reject("conflict", "The comment resource is not a child of the accompany resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        if(!childComment.getAccompanyComment().equals(comment)) {//해당 댓글에 달린 대댓글이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(childComment, "accompanyChildComment");
+            errors.reject("conflict", "The child comment resource is not a child of the comment resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
         }
 
         //자신의 대댓글이 아닌 경우

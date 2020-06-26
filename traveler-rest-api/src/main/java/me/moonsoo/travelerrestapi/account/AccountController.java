@@ -92,7 +92,7 @@ public class AccountController {
         } catch (IllegalArgumentException e) {//multipart content type이 image가 아닌 경우
             e.printStackTrace();
             errors.reject("imageFile", "You have to send only image file.");
-            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(new ErrorsModel(errors));
         } catch (MessagingException e) {//이메일 전송 실패 시
             e.printStackTrace();
             errors.reject("email", "fail to send Auth Email.");
@@ -231,7 +231,7 @@ public class AccountController {
         } catch (IllegalArgumentException e) {//multipart content type이 image가 아닌 경우
             e.printStackTrace();
             errors.reject("imageFile", "You have to send only image file.");
-            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(new ErrorsModel(errors));
         }
     }
 

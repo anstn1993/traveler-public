@@ -131,7 +131,7 @@ class AccountControllerTest extends BaseControllerTest {
     }
 
     @AfterEach
-    public void setUp() {
+    public void tearDown() {
         accompanyChildCommentRepository.deleteAll();
         accompanyCommentRepository.deleteAll();
         accompanyRepository.deleteAll();
@@ -279,7 +279,7 @@ class AccountControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @DisplayName("사용자 추가 테스트 실패-이미지 파일이 아닌 경우(400 Bad request)")
+    @DisplayName("사용자 추가 테스트 실패-이미지 파일이 아닌 경우(415 Unsupported media type)")
     public void createAccountFail_Not_Image_File() throws Exception {
         //파일 part
         MockMultipartFile mockFile = new MockMultipartFile("imageFile", "test.txt", "text/plain", "This is not a image file.".getBytes());
@@ -295,7 +295,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .accept(MediaTypes.HAL_JSON))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnsupportedMediaType())
         ;
     }
 
@@ -895,7 +895,7 @@ class AccountControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @DisplayName("사용자 리소스 수정 실패-이미지 파일이 아닌 경우(400 Bad request)")
+    @DisplayName("사용자 리소스 수정 실패-이미지 파일이 아닌 경우(415 Unsupported media type)")
     public void updateAccount_Not_Image_File() throws Exception {
         String email = "user@email.com";
         String password = "user";
@@ -916,7 +916,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .accept(MediaTypes.HAL_JSON))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnsupportedMediaType())
         ;
     }
 

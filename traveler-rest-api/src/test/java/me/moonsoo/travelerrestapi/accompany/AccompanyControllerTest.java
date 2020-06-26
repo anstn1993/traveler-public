@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AccompanyControllerTest extends AccompanyBaseControllerTest {
 
     @AfterEach
-    public void setUp() {
+    public void tearDown() {
         accompanyRepository.deleteAll();
         accountRepository.deleteAll();
     }
