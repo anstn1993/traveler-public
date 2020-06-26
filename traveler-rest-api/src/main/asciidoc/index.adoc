@@ -440,3 +440,16 @@ operation::get-other-like[snippets='curl-request,http-request,request-headers,pa
 'DELETE' 요청을 사용해서 like 리소스를 삭제할 수 있다.
 
 operation::delete-post[snippets='curl-request,http-request,request-headers,path-parameters,http-response']
+
+[[resources-post-comment]]
+== post 게시물의 댓글
+
+post 게시물의 댓글 리소스는 post 게시물에 댓글을 생성, 수정, 삭제, 조회할 때 사용한다.
+
+[[resources-post-comment-create]]
+=== post 게시물에 댓글 생성
+
+`POST` 요청을 사용해서 특정 post 게시물에 댓글을 추가할 수 있다.
+
+operation::create-post-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+

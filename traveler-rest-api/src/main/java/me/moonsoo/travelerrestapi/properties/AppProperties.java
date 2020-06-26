@@ -83,4 +83,6 @@ public class AppProperties {
 
     private String getLikeAnchor;
 
+    private String createPostCommentAnchor;
+
 }

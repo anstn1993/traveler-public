@@ -5,13 +5,20 @@ import me.moonsoo.commonmodule.account.CurrentAccount;
 import me.moonsoo.travelerrestapi.errors.ErrorsModel;
 import me.moonsoo.travelerrestapi.post.Post;
 import me.moonsoo.travelerrestapi.post.PostDto;
+import me.moonsoo.travelerrestapi.properties.AppProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.net.URI;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -22,6 +29,9 @@ public class PostCommentController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    AppProperties appProperties;
 
     //post 게시물에 댓글 리소스 추가 핸들러
     @PostMapping("/{postId}/comments")
@@ -42,8 +52,14 @@ public class PostCommentController {
 
         //Hateoas 적용
         PostCommentModel postCommentModel = new PostCommentModel(savedPostComment);
-
-
+        URI uri = postCommentModel.getLink("self").get().toUri();
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getCreatePostCommentAnchor()).withRel("profile");
+        WebMvcLinkBuilder linkBuilder = linkTo(PostCommentController.class).slash(post.getId()).slash("comments");
+        Link getPostCommentsLink = linkBuilder.withRel("get-post-comments");
+        Link updatePostCommentLink = linkBuilder.slash(savedPostComment.getId()).withRel("update-post-comment");
+        Link deletePostCommentLink = linkBuilder.slash(savedPostComment.getId()).withRel("delete-post-comment");
+        postCommentModel.add(profileLink, getPostCommentsLink, updatePostCommentLink, deletePostCommentLink);
+        return ResponseEntity.created(uri).body(postCommentModel);
     }
 
 }

@@ -8,10 +8,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,6 +50,7 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/comments", post.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
@@ -54,6 +64,38 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .andExpect(jsonPath("_links.get-post-comments").exists())
                 .andExpect(jsonPath("_links.update-post-comment").exists())
                 .andExpect(jsonPath("_links.delete-post-comment").exists())
+        .andDo(document("create-post-comment",
+                links(
+                        linkWithRel("self").description("추가된 post 게시물 댓글의 리소스 링크"),
+                        linkWithRel("get-post-comments").description("post 게시물 댓글 리스트를 조회할 수 있는 링크"),
+                        linkWithRel("update-post-comment").description("추가된 댓글을 수정할 수 있는 링크"),
+                        linkWithRel("delete-post-comment").description("추가된 댓글을 삭제할 수 있는 링크"),
+                        linkWithRel("profile").description("api 문서 링크")
+                ),
+                requestHeaders,
+                pathParameters(
+                        parameterWithName("postId").description("댓글을 추가할 post 게시물 id")
+                ),
+                requestFields(
+                        fieldWithPath("comment").description("댓글")
+                ),
+                responseHeaders.and(
+                        headerWithName(HttpHeaders.LOCATION).description("추가한 댓글의 리소스 링크"),
+                        headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                ),
+                responseFields(
+                        fieldWithPath("id").description("추가한 댓글의 id"),
+                        fieldWithPath("account.id").description("댓글 작성자 id"),
+                        fieldWithPath("post.id").description("댓글이 추가된 post 게시물의 id"),
+                        fieldWithPath("comment").description("댓글"),
+                        fieldWithPath("regDate").description("댓글 추가 시간"),
+                        fieldWithPath("_links.self.href").description("추가된 댓글 리소스 링크"),
+                        fieldWithPath("_links.get-post-comments.href").description("댓글 목록을 조회할 수 있는 링크"),
+                        fieldWithPath("_links.update-post-comment.href").description("추가된 댓글을 수정할 수 있는 링크"),
+                        fieldWithPath("_links.delete-post-comment.href").description("추가된 댓글을 삭제할 수 있는 링크"),
+                        fieldWithPath("_links.profile.href").description("api 문서 링크")
+                )
+                ))
         ;
     }
 
@@ -87,6 +129,7 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/comments", post.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
@@ -107,6 +150,7 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/comments", post.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
@@ -127,9 +171,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/comments", post.getId())
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnauthorized())
         ;
     }
 
@@ -145,6 +190,7 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/comments", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
