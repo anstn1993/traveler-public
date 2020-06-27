@@ -14,7 +14,9 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.DirectFieldBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -94,6 +96,37 @@ public class PostCommentController {
             postCommentModels.add(createPostCommentLink);
         }
         return ResponseEntity.ok(postCommentModels);
+    }
+
+    //post 게시물의 댓글 하나 조회 핸들러
+    @GetMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity getPostComment(@PathVariable("postId") Post post,
+                                         @PathVariable("commentId") PostComment postComment,
+                                         @CurrentAccount Account account) {
+        if(post == null || postComment == null) {//post리소스나 댓글 리소스가 존재하지 않는 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if(!post.equals(postComment.getPost())) {//댓글이 post 게시물의 자식이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(postComment, "postComment");
+            errors.reject("conflict", "The comment resource is not a child of the post resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        //hateoas적용
+        PostCommentModel postCommentModel = new PostCommentModel(postComment);
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetPostCommentAnchor()).withRel("profile");
+        WebMvcLinkBuilder linkBuilder = linkTo(PostCommentController.class).slash(post.getId()).slash("comments");
+        Link getPostCommentsLink = linkBuilder.withRel("get-post-comments");//댓글 목록 조회 링크
+        Link getPostChildCommentsLink = linkBuilder.slash(postComment.getId()).slash("child-comments").withRel("get-post-child-comments");//댓글의 대댓글 목록 조회 링크
+        postCommentModel.add(profileLink, getPostCommentsLink, getPostChildCommentsLink);
+        if(account != null && postComment.getAccount().equals(account)) {//인증된 상태에서 자신의 댓글을 조회한 경우
+            //댓글 수정, 삭제 링크 추가
+            Link updatePostComment = linkBuilder.slash(postComment.getId()).withRel("update-post-comment");
+            Link deletePostComment = linkBuilder.slash(postComment.getId()).withRel("delete-post-comment");
+            postCommentModel.add(updatePostComment, deletePostComment);
+        }
+        return ResponseEntity.ok(postCommentModel);
     }
 
 }

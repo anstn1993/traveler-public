@@ -320,6 +320,183 @@ class PostCommentControllerTest extends PostBaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("인증 상태에서 post 게시물의 자신의 댓글 하나 조회")
+    public void getMyPostComment_With_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+        Post post = createPost(account, 0, 1, 1);
+        PostComment postComment = createPostComment(0, account, post);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("post.id").exists())
+                .andExpect(jsonPath("comment").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-post-comments").exists())
+                .andExpect(jsonPath("_links.get-post-child-comments").exists())
+                .andExpect(jsonPath("_links.update-post-comment").exists())
+                .andExpect(jsonPath("_links.delete-post-comment").exists())
+                .andDo(document("get-post-comment",
+                        links(
+                                linkWithRel("self").description("조회한 post 게시물 댓글의 리소스 링크"),
+                                linkWithRel("get-post-child-comments").description("조회한 post 게시물 댓글의 대댓글 목록 조회 링크"),
+                                linkWithRel("get-post-comments").description("post 게시물 댓글 목록을 조회할 수 있는 링크"),
+                                linkWithRel("update-post-comment").description("조회한 댓글을 수정할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
+                                linkWithRel("delete-post-comment").description("조회한 댓글을 삭제할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
+                                linkWithRel("profile").description("api 문서 링크")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        pathParameters(
+                                parameterWithName("postId").description("post 게시물 id"),
+                                parameterWithName("commentId").description("댓글 id")
+                        ),
+                        responseHeaders,
+                        responseFields(
+                                fieldWithPath("id").description("댓글의 id"),
+                                fieldWithPath("account.id").description("댓글 작성자 id"),
+                                fieldWithPath("post.id").description("post 게시물의 id"),
+                                fieldWithPath("comment").description("댓글"),
+                                fieldWithPath("regDate").description("댓글 추가 시간"),
+                                fieldWithPath("_links.self.href").description("조회한 댓글 리소스 링크"),
+                                fieldWithPath("_links.get-post-child-comments.href").description("조회한 post 게시물 댓글의 대댓글 목록 조회 링크"),
+                                fieldWithPath("_links.get-post-comments.href").description("댓글 목록을 조회할 수 있는 링크"),
+                                fieldWithPath("_links.update-post-comment.href").description("조회한 댓글을 수정할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.delete-post-comment.href").description("조회한 댓글을 삭제할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 post 게시물의 다른 사용자의 댓글 하나 조회")
+    public void getOthersPostComment_With_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+        Post post = createPost(account, 0, 1, 1);
+        PostComment postComment = createPostComment(0, otherAccount, post);//다른 사용자가 생성한 댓글 리소스
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("post.id").exists())
+                .andExpect(jsonPath("comment").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-post-comments").exists())
+                .andExpect(jsonPath("_links.get-post-child-comments").exists())
+                .andExpect(jsonPath("_links.update-post-comment").doesNotHaveJsonPath())
+                .andExpect(jsonPath("_links.delete-post-comment").doesNotHaveJsonPath())
+        ;
+    }
+
+    @Test
+    @DisplayName("미인증 상태에서 post 게시물의 댓글 하나 조회")
+    public void getPostComment_Without_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        account = createAccount(email, password, 1);
+        Post post = createPost(account, 0, 1, 1);
+        PostComment postComment = createPostComment(0, account, post);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("post.id").exists())
+                .andExpect(jsonPath("comment").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-post-comments").exists())
+                .andExpect(jsonPath("_links.get-post-child-comments").exists())
+                .andExpect(jsonPath("_links.update-post-comment").doesNotHaveJsonPath())
+                .andExpect(jsonPath("_links.delete-post-comment").doesNotHaveJsonPath())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물의 댓글 하나 조회 실패-존재하지 않는 post게시물(404 Not found)")
+    public void getPostCommentFail_Not_Found_Post() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+        Post post = createPost(account, 0, 1, 1);
+        PostComment postComment = createPostComment(0, account, post);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", 404, postComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물의 댓글 하나 조회 실패-존재하지 않는 댓글(404 Not found)")
+    public void getPostCommentFail_Not_Found_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+        Post post = createPost(account, 0, 1, 1);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", post.getId(), 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물의 댓글 하나 조회 실패-Post게시물의 자식 댓글이 아닌 경우(409 Conflict)")
+    public void getPostCommentFail_Conflict() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+        Post post1 = createPost(account, 0, 1, 1);
+        Post post2 = createPost(account, 1, 1, 1);
+        PostComment postComment = createPostComment(0, account, post1);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", post2.getId(), postComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isConflict())
+        ;
+    }
+
     private PostCommentDto createPostCommentDto(int index) {
         return PostCommentDto.builder()
                 .comment("comment" + index)

@@ -459,3 +459,10 @@ operation::create-post-comment[snippets='request-fields,curl-request,http-reques
 'GET' 요청을 사용해서 특정 post 게시물에 달린 댓글 목록을 조회할 수 있다.
 
 operation::get-post-comments[snippets='curl-request,http-request,request-headers,path-parameters,request-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-post-comment-get]]
+=== post 게시물의 댓글 조회
+
+'GET' 요청을 사용해서 특정 post 게시물에 달린 댓글 하나를 조회할 수 있다.
+
+operation::get-post-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
