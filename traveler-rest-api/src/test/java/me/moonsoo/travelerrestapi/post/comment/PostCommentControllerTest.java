@@ -728,6 +728,117 @@ class PostCommentControllerTest extends PostBaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("post 게시물 댓글 삭제")
+    public void deletePostComment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-post-comment",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                        ),
+                        pathParameters(
+                                parameterWithName("postId").description("post 게시물 id"),
+                                parameterWithName("commentId").description("댓글 id")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 댓글 삭제 실패-인증을 하지 않은 경우(401 Unauthorized)")
+    public void deletePostCommentFail_Unauthorized() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        account = createAccount(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 댓글 삭제 실패-다른 사용자의 댓글을 수정하는 경우(403 Forbidden)")
+    public void deletePostCommentFail_Forbidden() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, otherAccount, post);//다른 사용자의 댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 댓글 삭제 실패-존재하지 않는 post 게시물(404 Not found)")
+    public void deletePostCommentFail_Not_Found_Post() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}", 404, postComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 댓글 삭제 실패-존재하지 않는 댓글 게시물(404 Not found)")
+    public void deletePostCommentFail_Not_Found_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}", post.getId(), 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 댓글 삭제 실패-post게시물의 자식 댓글이 아닌 경우(409 Conflict)")
+    public void deletePostCommentFail_Conflict() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post1 = createPost(account, 0, 0, 1);//post 게시물 생성
+        Post post2 = createPost(account, 1, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post1);//post1에 댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}", post2.getId(), postComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isConflict())
+        ;
+    }
+
 
     private PostCommentDto createPostCommentDto(int index) {
         return PostCommentDto.builder()

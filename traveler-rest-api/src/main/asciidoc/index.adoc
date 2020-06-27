@@ -474,3 +474,9 @@ operation::get-post-comment[snippets='curl-request,http-request,request-headers,
 
 operation::update-post-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
 
+[[resources-post-comment-delete]]
+=== post 게시물의 댓글 삭제
+
+'DELETE' 요청을 사용해서 특정 post 게시물에 단 자신의 댓글을 삭제할 수 있다.
+
+operation::delete-post-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response']

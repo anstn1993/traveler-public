@@ -166,4 +166,28 @@ public class PostCommentController {
         return ResponseEntity.ok(postCommentModel);
     }
 
+    //post게시물의 댓글 삭제 핸들러
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity deletePostComment(@PathVariable("postId") Post post,
+                                            @PathVariable("commentId") PostComment postComment,
+                                            @CurrentAccount Account account) {
+        if (post == null || postComment == null) {//post 게시물이나 댓글 리소스가 존재하지 않는 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!postComment.getPost().equals(post)) {//post 게시물의 자식 댓글이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(postComment, "postComment");
+            errors.reject("conflict", "The comment resource is not a child of the post resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        if (!postComment.getAccount().equals(account)) {//다른 사용자의 댓글 리소스를 수정하려고 하는 경우
+            Errors errors = new DirectFieldBindingResult(postComment, "postComment");
+            errors.reject("forbidden", "You can not update other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        postCommentService.delete(postComment);//db에서 댓글 삭제
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -31,4 +31,8 @@ public class PostCommentService {
         postComment.setComment(postCommentDto.getComment());
         return postCommentRepository.save(postComment);
     }
+
+    public void delete(PostComment postComment) {
+        postCommentRepository.delete(postComment);
+    }
 }
