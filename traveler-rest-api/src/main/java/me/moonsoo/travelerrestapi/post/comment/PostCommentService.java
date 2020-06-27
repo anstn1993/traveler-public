@@ -26,4 +26,9 @@ public class PostCommentService {
     public Page<PostComment> findAllByPost(Post post, Pageable pageable) {
         return postCommentRepository.findAllByPost(post, pageable);
     }
+
+    public PostComment update(PostComment postComment, PostCommentDto postCommentDto) {
+        postComment.setComment(postCommentDto.getComment());
+        return postCommentRepository.save(postComment);
+    }
 }

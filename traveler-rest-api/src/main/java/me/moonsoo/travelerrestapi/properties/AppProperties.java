@@ -89,4 +89,5 @@ public class AppProperties {
 
     private String getPostCommentAnchor;
 
+    private String updatePostCommentAnchor;
 }

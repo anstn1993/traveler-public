@@ -91,7 +91,7 @@ public class PostCommentController {
                                 .withRel("get-post-child-comments")));
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetPostCommentsAnchor()).withRel("profile");
         postCommentModels.add(profileLink);
-        if(account != null) {//인증 상태인 경우
+        if (account != null) {//인증 상태인 경우
             Link createPostCommentLink = linkTo(PostCommentController.class).slash(post.getId()).slash("comments").withRel("create-post-comment");
             postCommentModels.add(createPostCommentLink);
         }
@@ -103,11 +103,11 @@ public class PostCommentController {
     public ResponseEntity getPostComment(@PathVariable("postId") Post post,
                                          @PathVariable("commentId") PostComment postComment,
                                          @CurrentAccount Account account) {
-        if(post == null || postComment == null) {//post리소스나 댓글 리소스가 존재하지 않는 경우
+        if (post == null || postComment == null) {//post리소스나 댓글 리소스가 존재하지 않는 경우
             return ResponseEntity.notFound().build();
         }
 
-        if(!post.equals(postComment.getPost())) {//댓글이 post 게시물의 자식이 아닌 경우
+        if (!post.equals(postComment.getPost())) {//댓글이 post 게시물의 자식이 아닌 경우
             Errors errors = new DirectFieldBindingResult(postComment, "postComment");
             errors.reject("conflict", "The comment resource is not a child of the post resource.");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
@@ -120,12 +120,49 @@ public class PostCommentController {
         Link getPostCommentsLink = linkBuilder.withRel("get-post-comments");//댓글 목록 조회 링크
         Link getPostChildCommentsLink = linkBuilder.slash(postComment.getId()).slash("child-comments").withRel("get-post-child-comments");//댓글의 대댓글 목록 조회 링크
         postCommentModel.add(profileLink, getPostCommentsLink, getPostChildCommentsLink);
-        if(account != null && postComment.getAccount().equals(account)) {//인증된 상태에서 자신의 댓글을 조회한 경우
+        if (account != null && postComment.getAccount().equals(account)) {//인증된 상태에서 자신의 댓글을 조회한 경우
             //댓글 수정, 삭제 링크 추가
             Link updatePostComment = linkBuilder.slash(postComment.getId()).withRel("update-post-comment");
             Link deletePostComment = linkBuilder.slash(postComment.getId()).withRel("delete-post-comment");
             postCommentModel.add(updatePostComment, deletePostComment);
         }
+        return ResponseEntity.ok(postCommentModel);
+    }
+
+    //post게시물의 댓글 수정 핸들러
+    @PutMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity updatePostComment(@PathVariable("postId") Post post,
+                                            @PathVariable("commentId") PostComment postComment,
+                                            @RequestBody @Valid PostCommentDto postCommentDto,
+                                            Errors errors,
+                                            @CurrentAccount Account account) {
+
+        if (post == null || postComment == null) {//post 게시물이나 댓글 리소스가 존재하지 않는 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!postComment.getPost().equals(post)) {//post 게시물의 자식 댓글이 아닌 경우
+            errors.reject("conflict", "The comment resource is not a child of the post resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        if (!postComment.getAccount().equals(account)) {//다른 사용자의 댓글 리소스를 수정하려고 하는 경우
+            errors.reject("forbidden", "You can not update other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+        PostComment updatedComment = postCommentService.update(postComment, postCommentDto);//db에 댓글 update
+        //hateoas 적용
+        PostCommentModel postCommentModel = new PostCommentModel(updatedComment);
+        WebMvcLinkBuilder linkBuilder = linkTo(PostCommentController.class).slash(post.getId()).slash("comments");
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getUpdatePostCommentAnchor()).withRel("profile");
+        Link getPostComments = linkBuilder.withRel("get-post-comments");
+        Link deletePostComments = linkBuilder.slash(updatedComment.getId()).withRel("delete-post-comment");
+        postCommentModel.add(profileLink, getPostComments, deletePostComments);
         return ResponseEntity.ok(postCommentModel);
     }
 
