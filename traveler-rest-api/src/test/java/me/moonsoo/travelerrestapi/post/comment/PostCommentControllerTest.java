@@ -1,5 +1,6 @@
 package me.moonsoo.travelerrestapi.post.comment;
 
+import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.post.Post;
 import me.moonsoo.travelerrestapi.post.PostBaseControllerTest;
 import org.junit.jupiter.api.AfterEach;
@@ -12,15 +13,16 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.time.LocalDateTime;
+import java.util.stream.IntStream;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -64,37 +66,37 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .andExpect(jsonPath("_links.get-post-comments").exists())
                 .andExpect(jsonPath("_links.update-post-comment").exists())
                 .andExpect(jsonPath("_links.delete-post-comment").exists())
-        .andDo(document("create-post-comment",
-                links(
-                        linkWithRel("self").description("추가된 post 게시물 댓글의 리소스 링크"),
-                        linkWithRel("get-post-comments").description("post 게시물 댓글 리스트를 조회할 수 있는 링크"),
-                        linkWithRel("update-post-comment").description("추가된 댓글을 수정할 수 있는 링크"),
-                        linkWithRel("delete-post-comment").description("추가된 댓글을 삭제할 수 있는 링크"),
-                        linkWithRel("profile").description("api 문서 링크")
-                ),
-                requestHeaders,
-                pathParameters(
-                        parameterWithName("postId").description("댓글을 추가할 post 게시물 id")
-                ),
-                requestFields(
-                        fieldWithPath("comment").description("댓글")
-                ),
-                responseHeaders.and(
-                        headerWithName(HttpHeaders.LOCATION).description("추가한 댓글의 리소스 링크"),
-                        headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
-                ),
-                responseFields(
-                        fieldWithPath("id").description("추가한 댓글의 id"),
-                        fieldWithPath("account.id").description("댓글 작성자 id"),
-                        fieldWithPath("post.id").description("댓글이 추가된 post 게시물의 id"),
-                        fieldWithPath("comment").description("댓글"),
-                        fieldWithPath("regDate").description("댓글 추가 시간"),
-                        fieldWithPath("_links.self.href").description("추가된 댓글 리소스 링크"),
-                        fieldWithPath("_links.get-post-comments.href").description("댓글 목록을 조회할 수 있는 링크"),
-                        fieldWithPath("_links.update-post-comment.href").description("추가된 댓글을 수정할 수 있는 링크"),
-                        fieldWithPath("_links.delete-post-comment.href").description("추가된 댓글을 삭제할 수 있는 링크"),
-                        fieldWithPath("_links.profile.href").description("api 문서 링크")
-                )
+                .andDo(document("create-post-comment",
+                        links(
+                                linkWithRel("self").description("추가된 post 게시물 댓글의 리소스 링크"),
+                                linkWithRel("get-post-comments").description("post 게시물 댓글 리스트를 조회할 수 있는 링크"),
+                                linkWithRel("update-post-comment").description("추가된 댓글을 수정할 수 있는 링크"),
+                                linkWithRel("delete-post-comment").description("추가된 댓글을 삭제할 수 있는 링크"),
+                                linkWithRel("profile").description("api 문서 링크")
+                        ),
+                        requestHeaders,
+                        pathParameters(
+                                parameterWithName("postId").description("댓글을 추가할 post 게시물 id")
+                        ),
+                        requestFields(
+                                fieldWithPath("comment").description("댓글")
+                        ),
+                        responseHeaders.and(
+                                headerWithName(HttpHeaders.LOCATION).description("추가한 댓글의 리소스 링크"),
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("추가한 댓글의 id"),
+                                fieldWithPath("account.id").description("댓글 작성자 id"),
+                                fieldWithPath("post.id").description("댓글이 추가된 post 게시물의 id"),
+                                fieldWithPath("comment").description("댓글"),
+                                fieldWithPath("regDate").description("댓글 추가 시간"),
+                                fieldWithPath("_links.self.href").description("추가된 댓글 리소스 링크"),
+                                fieldWithPath("_links.get-post-comments.href").description("댓글 목록을 조회할 수 있는 링크"),
+                                fieldWithPath("_links.update-post-comment.href").description("추가된 댓글을 수정할 수 있는 링크"),
+                                fieldWithPath("_links.delete-post-comment.href").description("추가된 댓글을 삭제할 수 있는 링크"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
                 ))
         ;
     }
@@ -198,6 +200,126 @@ class PostCommentControllerTest extends PostBaseControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("인증 상태에서 post 게시물의 댓글 목록 조회")
+    public void getPostComments_With_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+
+        //댓글 리소스 30개 생성
+        IntStream.range(0, 30).forEach(i -> {
+            createPostComment(i, account, post);
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments", post.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,ASC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.postCommentList").exists())
+                .andExpect(jsonPath("_embedded.postCommentList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.postCommentList[0]._links.get-post-child-comments").exists())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.create-post-comment").exists())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+                .andDo(document("get-post-comments",
+                        pagingLinks.and(
+                                linkWithRel("self").description("현재 페이지 리소스 링크"),
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("create-post-comment").description("댓글 추가 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                        ),
+                        pathParameters(
+                                parameterWithName("postId").description("댓글을 추가할 post 게시물 id")
+                        ),
+                        requestParameters(
+                                parameterWithName("page").optional().description("페이지 번호"),
+                                parameterWithName("size").optional().description("한 페이지 당 게시물 수"),
+                                parameterWithName("sort").optional().description("정렬 기준(id-게시물 id, regDate-등록 날짜)")
+                        )
+                        , responseHeaders.and(
+                                headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
+                        )
+                        , responsePageFields.and(
+                                fieldWithPath("_embedded.postCommentList[].id").description("댓글 id"),
+                                fieldWithPath("_embedded.postCommentList[].account.id").description("댓글 작성자의 id"),
+                                fieldWithPath("_embedded.postCommentList[].post.id").description("댓글이 달린 post 게시물 id"),
+                                fieldWithPath("_embedded.postCommentList[].comment").description("댓글"),
+                                fieldWithPath("_embedded.postCommentList[].regDate").description("댓글 추가 시간"),
+                                fieldWithPath("_embedded.postCommentList[]._links.self.href").description("댓글 리소스 링크"),
+                                fieldWithPath("_embedded.postCommentList[]._links.get-post-child-comments.href").description("댓글의 대댓글 목록 조회 링크"),
+                                fieldWithPath("_links.create-post-comment.href").description("댓글 추가 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
+                        )
+                ))
+        ;
+    }
+
+
+    @Test
+    @DisplayName("미인증 상태에서 post 게시물의 댓글 목록 조회")
+    public void getPostComments_Without_Auth() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        account = createAccount(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+
+        //댓글 리소스 30개 생성
+        IntStream.range(0, 30).forEach(i -> {
+            createPostComment(i, account, post);
+        });
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments", post.getId())
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "id,ASC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.postCommentList").exists())
+                .andExpect(jsonPath("_embedded.postCommentList[0]._links.self").exists())
+                .andExpect(jsonPath("_embedded.postCommentList[0]._links.get-post-child-comments").exists())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.create-post-comment").doesNotHaveJsonPath())
+                .andExpect(jsonPath("_links.first").exists())
+                .andExpect(jsonPath("_links.prev").exists())
+                .andExpect(jsonPath("_links.next").exists())
+                .andExpect(jsonPath("_links.last").exists())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물의 댓글 목록 조회 실패-존재하지 않는 post 게시물(404 Not found)")
+    public void getPostCommentsFail_Not_Found() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments", 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
     private PostCommentDto createPostCommentDto(int index) {
         return PostCommentDto.builder()
                 .comment("comment" + index)
@@ -217,5 +339,16 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .id(100)
                 .regDate(LocalDateTime.now())
                 .build();
+    }
+
+    private PostComment createPostComment(int index, Account account, Post post) {
+        PostComment postComment = PostComment.builder()
+                .post(post)
+                .account(account)
+                .comment("comment" + index)
+                .regDate(LocalDateTime.now())
+                .build();
+
+        return postCommentRepository.save(postComment);
     }
 }

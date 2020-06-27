@@ -8,7 +8,11 @@ import me.moonsoo.travelerrestapi.post.PostDto;
 import me.moonsoo.travelerrestapi.properties.AppProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -39,11 +43,11 @@ public class PostCommentController {
                                             @RequestBody @Valid PostCommentDto postCommentDto,
                                             Errors errors,
                                             @CurrentAccount Account account) {
-        if(post == null) {//post 리소스가 존재하지 않는 경우
+        if (post == null) {//post 리소스가 존재하지 않는 경우
             return ResponseEntity.notFound().build();
         }
 
-        if(errors.hasErrors()) {//요청 본문의 값이 유효하지 않은 경우
+        if (errors.hasErrors()) {//요청 본문의 값이 유효하지 않은 경우
             return ResponseEntity.badRequest().body(new ErrorsModel(errors));
         }
 
@@ -60,6 +64,36 @@ public class PostCommentController {
         Link deletePostCommentLink = linkBuilder.slash(savedPostComment.getId()).withRel("delete-post-comment");
         postCommentModel.add(profileLink, getPostCommentsLink, updatePostCommentLink, deletePostCommentLink);
         return ResponseEntity.created(uri).body(postCommentModel);
+    }
+
+    //post 게시물의 댓글 목록 조회 핸들러
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity getPostComments(Pageable pageable,
+                                          @PathVariable("postId") Post post,
+                                          PagedResourcesAssembler<PostComment> assembler,
+                                          @CurrentAccount Account account) {
+        if (post == null) {//존재하지 않은 post 게시물인 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        Page<PostComment> postComments = postCommentService.findAllByPost(post, pageable);//댓글 목록 fetch
+
+        //Hateoas적용
+        PagedModel<PostCommentModel> postCommentModels =
+                assembler.toModel(postComments,
+                        postComment -> new PostCommentModel(postComment, linkTo(PostCommentController.class)
+                                .slash(post.getId())
+                                .slash("comments")
+                                .slash(postComment.getId())
+                                .slash("child-comments")
+                                .withRel("get-post-child-comments")));
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetPostCommentsAnchor()).withRel("profile");
+        postCommentModels.add(profileLink);
+        if(account != null) {//인증 상태인 경우
+            Link createPostCommentLink = linkTo(PostCommentController.class).slash(post.getId()).slash("comments").withRel("create-post-comment");
+            postCommentModels.add(createPostCommentLink);
+        }
+        return ResponseEntity.ok(postCommentModels);
     }
 
 }
