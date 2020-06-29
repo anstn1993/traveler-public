@@ -81,6 +81,8 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("title").exists())
                 .andExpect(jsonPath("scope").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -128,6 +130,8 @@ class ScheduleControllerTest extends BaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("일정 게시물의 id"),
                                 fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("account.nickname").description("게시물 작성자의 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("게시물 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("title").description("일정 게시물의 제목"),
                                 fieldWithPath("scope").description("일정 게시물의 공개 범위(NONE, FOLLOWER, ALL)"),
                                 fieldWithPath("regDate").description("일정 게시물의 작성 시간"),
@@ -282,6 +286,8 @@ class ScheduleControllerTest extends BaseControllerTest {
                         responsePageFields.and(
                                 fieldWithPath("_embedded.scheduleList[].id").description("일정 게시물 id"),
                                 fieldWithPath("_embedded.scheduleList[].account.id").description("일정 게시물 작성자 id"),
+                                fieldWithPath("_embedded.scheduleList[].account.nickname").description("일정 게시물 작성자 닉네임"),
+                                fieldWithPath("_embedded.scheduleList[].account.profileImageUri").description("일정 게시물 작성자 프로필 이미지 경로"),
                                 fieldWithPath("_embedded.scheduleList[].title").description("일정 게시물 제목"),
                                 fieldWithPath("_embedded.scheduleList[].scope").description("일정 게시물 공개 범위(NONE인 게시물은 자신의 게시물이 아닌 경우에는 조회되지 않는다.)"),
                                 fieldWithPath("_embedded.scheduleList[].regDate").description("일정 게시물 작성 시간"),
@@ -694,6 +700,8 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("title").exists())
                 .andExpect(jsonPath("scope").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -725,6 +733,8 @@ class ScheduleControllerTest extends BaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("일정 게시물의 id"),
                                 fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("account.nickname").description("게시물 작성자의 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("게시물 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("title").description("일정 게시물의 제목"),
                                 fieldWithPath("scope").description("일정 게시물의 공개 범위(NONE, FOLLOWER, ALL)"),
                                 fieldWithPath("regDate").description("일정 게시물의 작성 시간"),
@@ -783,6 +793,8 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("title").exists())
                 .andExpect(jsonPath("scope").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -815,6 +827,8 @@ class ScheduleControllerTest extends BaseControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("id").exists())
                     .andExpect(jsonPath("account.id").exists())
+                    .andExpect(jsonPath("account.nickname").exists())
+                    .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                     .andExpect(jsonPath("title").exists())
                     .andExpect(jsonPath("scope").exists())
                     .andExpect(jsonPath("regDate").exists())
@@ -916,6 +930,8 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("title").value(title))
                 .andExpect(jsonPath("scope").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -954,6 +970,8 @@ class ScheduleControllerTest extends BaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("일정 게시물의 id"),
                                 fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("account.nickname").description("게시물 작성자의 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("게시물 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("title").description("일정 게시물의 제목"),
                                 fieldWithPath("scope").description("일정 게시물의 공개 범위(NONE, FOLLOWER, ALL)"),
                                 fieldWithPath("regDate").description("일정 게시물의 작성 시간"),

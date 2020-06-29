@@ -4,6 +4,8 @@ import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.post.Post;
 import me.moonsoo.travelerrestapi.post.comment.PostComment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,5 +25,9 @@ public class PostChildCommentService {
                 .comment(postChildCommentDto.getComment())
                 .build();
         return postChildCommentRepository.save(postChildComment);
+    }
+
+    public Page<PostChildComment> findAllByPostComment(PostComment postComment, Pageable pageable) {
+        return postChildCommentRepository.findAllByPostComment(postComment, pageable);
     }
 }

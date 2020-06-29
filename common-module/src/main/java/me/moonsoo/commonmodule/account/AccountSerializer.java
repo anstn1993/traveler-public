@@ -10,6 +10,8 @@ public class AccountSerializer extends JsonSerializer<Account> {
     public void serialize(Account account, com.fasterxml.jackson.core.JsonGenerator jsonGenerator, com.fasterxml.jackson.databind.SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeNumberField("id", account.getId());
+        jsonGenerator.writeStringField("nickname", account.getNickname());
+        jsonGenerator.writeStringField("profileImageUri", account.getProfileImageUri());
         jsonGenerator.writeEndObject();
     }
 }

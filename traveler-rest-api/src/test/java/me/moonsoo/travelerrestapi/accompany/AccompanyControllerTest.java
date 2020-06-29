@@ -59,6 +59,8 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("title").exists())
                 .andExpect(jsonPath("article").exists())
                 .andExpect(jsonPath("startDate").exists())
@@ -99,6 +101,8 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("동행 게시물의 id"),
                                 fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("account.nickname").description("게시물 작성자의 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("게시물 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("title").description("동행 게시물의 제목"),
                                 fieldWithPath("article").description("동행 게시물의 본문"),
                                 fieldWithPath("startDate").description("동행 시작 시간"),
@@ -307,6 +311,8 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                         responsePageFields.and(
                                 fieldWithPath("_embedded.accompanyList[].id").description("동행 게시물의 id"),
                                 fieldWithPath("_embedded.accompanyList[].account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("_embedded.accompanyList[].account.nickname").description("게시물 작성자의 닉네임"),
+                                fieldWithPath("_embedded.accompanyList[].account.profileImageUri").description("게시물 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("_embedded.accompanyList[].title").description("동행 게시물의 제목"),
                                 fieldWithPath("_embedded.accompanyList[].article").description("동행 게시물의 본문"),
                                 fieldWithPath("_embedded.accompanyList[].startDate").description("동행 시작 시간"),
@@ -340,6 +346,8 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("title").exists())
                 .andExpect(jsonPath("article").exists())
                 .andExpect(jsonPath("startDate").exists())
@@ -373,6 +381,8 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("title").exists())
                 .andExpect(jsonPath("article").exists())
                 .andExpect(jsonPath("startDate").exists())
@@ -410,6 +420,8 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("동행 게시물의 id"),
                                 fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("account.nickname").description("게시물 작성자의 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("게시물 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("title").description("동행 게시물의 제목"),
                                 fieldWithPath("article").description("동행 게시물의 본문"),
                                 fieldWithPath("startDate").description("동행 시작 시간"),
@@ -467,6 +479,8 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("title").value(title))
                 .andExpect(jsonPath("article").value(article))
                 .andExpect(jsonPath("startDate").exists())
@@ -506,6 +520,8 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("동행 게시물의 id"),
                                 fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("account.nickname").description("게시물 작성자의 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("게시물 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("title").description("동행 게시물의 제목"),
                                 fieldWithPath("article").description("동행 게시물의 본문"),
                                 fieldWithPath("startDate").description("동행 시작 시간"),

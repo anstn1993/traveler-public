@@ -56,6 +56,8 @@ class LikeControllerTest extends PostBaseControllerTest {
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("post.id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())
                 .andExpect(jsonPath("_links.get-likes").exists())
@@ -80,6 +82,8 @@ class LikeControllerTest extends PostBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("좋아요 리소스 id"),
                                 fieldWithPath("account.id").description("좋아요 리소스를 추가한 사용자 id"),
+                                fieldWithPath("account.nickname").description("좋아요 리소스를 추가한 사용자 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("좋아요 리소스를 추가한 사용자 프로필 이미지 경로"),
                                 fieldWithPath("post.id").description("좋아요가 달린 post 게시물 id"),
                                 fieldWithPath("_links.self.href").description("추가된 좋아요 리소스 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크"),
@@ -192,6 +196,8 @@ class LikeControllerTest extends PostBaseControllerTest {
                         responsePageFields.and(
                                 fieldWithPath("_embedded.likeList[].id").description("좋아요 리소스 id"),
                                 fieldWithPath("_embedded.likeList[].account.id").description("좋아요 리소스의 주인 id"),
+                                fieldWithPath("_embedded.likeList[].account.nickname").description("좋아요 리소스의 주인 닉네임"),
+                                fieldWithPath("_embedded.likeList[].account.profileImageUri").description("좋아요 리소스의 주인 프로필 이미지 경로"),
                                 fieldWithPath("_embedded.likeList[].post.id").description("좋아요가 달린 post 게시물의 id"),
                                 fieldWithPath("_embedded.likeList[]._links.self.href").description("좋아요 리소스 조회 링크"),
                                 fieldWithPath("_embedded.likeList[]._links.create-account-follow.href").description("좋아요 리소스의 주인 팔로우 링크, 만약 이미 팔로우 상태인 경우에는 언팔로우 링크가 제공된다.(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
@@ -277,6 +283,8 @@ class LikeControllerTest extends PostBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("조회한 좋아요 리소스 id"),
                                 fieldWithPath("account.id").description("좋아요 리소스의 주인 id"),
+                                fieldWithPath("account.nickname").description("좋아요 리소스의 주인 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("좋아요 리소스의 주인 프로필 이미지 경로"),
                                 fieldWithPath("post.id").description("좋아요가 달린 post 게시물 리소스 id"),
                                 fieldWithPath("_links.self.href").description("조회한 좋아요 리소스 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크"),
@@ -304,6 +312,8 @@ class LikeControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("post.id").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())
@@ -331,6 +341,8 @@ class LikeControllerTest extends PostBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("조회한 좋아요 리소스 id"),
                                 fieldWithPath("account.id").description("좋아요 리소스의 주인 id"),
+                                fieldWithPath("account.nickname").description("좋아요 리소스의 주인 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("좋아요 리소스의 주인 프로필 이미지 경로"),
                                 fieldWithPath("post.id").description("좋아요가 달린 post 게시물 리소스 id"),
                                 fieldWithPath("_links.self.href").description("조회한 좋아요 리소스 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크"),
@@ -356,6 +368,8 @@ class LikeControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("post.id").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())

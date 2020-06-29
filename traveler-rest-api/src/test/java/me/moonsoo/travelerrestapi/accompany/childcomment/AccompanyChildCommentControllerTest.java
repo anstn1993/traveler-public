@@ -61,6 +61,8 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("accompany.id").exists())
                 .andExpect(jsonPath("accompanyComment.id").exists())
                 .andExpect(jsonPath("comment").exists())
@@ -87,12 +89,14 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                                 fieldWithPath("comment").description("대댓글")
                         ),
                         responseHeaders.and(
-                                headerWithName(HttpHeaders.LOCATION).description("추가한 댓글의 리소스 url"),
+                                headerWithName(HttpHeaders.LOCATION).description("추가한 댓글의 리소스 링크"),
                                 headerWithName(HttpHeaders.CONTENT_LENGTH).description("응답 본문 데이터의 크기")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("대댓글 id"),
                                 fieldWithPath("account.id").description("작성자 id"),
+                                fieldWithPath("account.nickname").description("작성자 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("작성자 프로필 이미지 경로"),
                                 fieldWithPath("accompany.id").description("동행 게시물 id"),
                                 fieldWithPath("accompanyComment.id").description("부모 댓글 id"),
                                 fieldWithPath("comment").description("대댓글"),
@@ -182,7 +186,6 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         String password = "1111";
         String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
-        AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
 
         AccompanyChildCommentDto childCommentDto = createChildCommentDto("This is a child comment0");
 
@@ -244,6 +247,8 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].account.id").exists())
+                .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].account.nickname").exists())
+                .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].accompany.id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].accompanyComment.id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].comment").exists())
@@ -284,11 +289,13 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                         responsePageFields.and(
                                 fieldWithPath("_embedded.accompanyChildCommentList[].id").description("대댓글 id"),
                                 fieldWithPath("_embedded.accompanyChildCommentList[].account.id").description("대댓글 작성자의 id"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[].account.nickname").description("대댓글 작성자의 닉네임"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[].account.profileImageUri").description("대댓글 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("_embedded.accompanyChildCommentList[].accompany.id").description("동행 게시물 id"),
                                 fieldWithPath("_embedded.accompanyChildCommentList[].accompanyComment.id").description("부모 댓글 id"),
                                 fieldWithPath("_embedded.accompanyChildCommentList[].comment").description("대댓글"),
                                 fieldWithPath("_embedded.accompanyChildCommentList[].regDate").description("대댓글 추가 시간"),
-                                fieldWithPath("_embedded.accompanyChildCommentList[]._links.self.href").description("대댓글 리소스 url"),
+                                fieldWithPath("_embedded.accompanyChildCommentList[]._links.self.href").description("대댓글 리소스 링크"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크"),
                                 fieldWithPath("_links.create-accompany-child-comment.href").description("대댓글 추가 링크(유효한 access token을 헤더에 포함시켜서 요청할 경우에만 활성화)")
                         )
@@ -319,6 +326,8 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].account.id").exists())
+                .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].account.nickname").exists())
+                .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].accompany.id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].accompanyComment.id").exists())
                 .andExpect(jsonPath("_embedded.accompanyChildCommentList[0].comment").exists())
@@ -432,6 +441,8 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("accompany.id").exists())
                 .andExpect(jsonPath("accompanyComment.id").exists())
                 .andExpect(jsonPath("comment").exists())
@@ -464,12 +475,14 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("대댓글의 id"),
                                 fieldWithPath("account.id").description("댓글 작성자 id"),
+                                fieldWithPath("account.nickname").description("댓글 작성자 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("댓글 작성자 프로필 이미지 경로"),
                                 fieldWithPath("accompany.id").description("동행 게시물 id"),
                                 fieldWithPath("accompanyComment.id").description("부모 댓글의 id"),
                                 fieldWithPath("comment").description("대댓글"),
                                 fieldWithPath("regDate").description("대댓글 추가 시간"),
-                                fieldWithPath("_links.self.href").description("조회한 대댓글 리소스 url"),
-                                fieldWithPath("_links.get-accompany-child-comments.href").description("대댓글 목록을 조회할 수 있는 url"),
+                                fieldWithPath("_links.self.href").description("조회한 대댓글 리소스 링크"),
+                                fieldWithPath("_links.get-accompany-child-comments.href").description("대댓글 목록을 조회할 수 있는 링크"),
                                 fieldWithPath("_links.update-accompany-child-comment.href").description("조회한 대댓글을 수정할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
                                 fieldWithPath("_links.delete-accompany-child-comment.href").description("조회한 대댓글을 삭제할 수 있는 링크(인증상태에서 자신의 댓글을 조회한 경우에 활성화)"),
                                 fieldWithPath("_links.profile.href").description("api 문서 링크")
@@ -498,6 +511,8 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("accompany.id").exists())
                 .andExpect(jsonPath("accompanyComment.id").exists())
                 .andExpect(jsonPath("comment").exists())
@@ -528,6 +543,8 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("accompany.id").exists())
                 .andExpect(jsonPath("accompanyComment.id").exists())
                 .andExpect(jsonPath("comment").exists())
@@ -660,6 +677,8 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("accompany.id").exists())
                 .andExpect(jsonPath("accompanyComment.id").exists())
                 .andExpect(jsonPath("comment").exists())
@@ -688,6 +707,8 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("대댓글 id"),
                                 fieldWithPath("account.id").description("작성자 id"),
+                                fieldWithPath("account.nickname").description("작성자 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("작성자 프로필 이미지"),
                                 fieldWithPath("accompany.id").description("작성자 id"),
                                 fieldWithPath("accompanyComment.id").description("부모 댓글 id"),
                                 fieldWithPath("comment").description("대댓글"),
@@ -1020,8 +1041,6 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         String accessToken = getAuthToken(email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);//accompany에 달린 댓글
-        AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment, 0);//accomoanyComment에 달린 대댓글
-
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment.getId(), 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
@@ -1042,7 +1061,6 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany1, accompanyComment, 0);//accomoanyComment에 달린 대댓글
 
-
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany2.getId(), accompanyComment.getId(), childComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andDo(print())
@@ -1061,7 +1079,6 @@ class AccompanyChildCommentControllerTest extends AccompanyBaseControllerTest {
         AccompanyComment accompanyComment1 = createComment(account, accompany, 0);//accompany1에 달린 댓글
         AccompanyComment accompanyComment2 = createComment(account, accompany, 0);//accompany1에 달린 댓글
         AccompanyChildComment childComment = createChildComment(account, accompany, accompanyComment1, 0);//accomoanyComment1에 달린 대댓글
-
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{accompanyId}/comments/{commentId}/child-comments/{childCommentId}", accompany.getId(), accompanyComment2.getId(), childComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))

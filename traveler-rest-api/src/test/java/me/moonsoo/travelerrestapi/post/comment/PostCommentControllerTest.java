@@ -56,6 +56,8 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("post.id").exists())
                 .andExpect(jsonPath("comment").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -85,6 +87,8 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("추가한 댓글의 id"),
                                 fieldWithPath("account.id").description("댓글 작성자 id"),
+                                fieldWithPath("account.nickname").description("댓글 작성자 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("댓글 작성자 프로필 이미지 경로"),
                                 fieldWithPath("post.id").description("댓글이 추가된 post 게시물의 id"),
                                 fieldWithPath("comment").description("댓글"),
                                 fieldWithPath("regDate").description("댓글 추가 시간"),
@@ -254,6 +258,8 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                         , responsePageFields.and(
                                 fieldWithPath("_embedded.postCommentList[].id").description("댓글 id"),
                                 fieldWithPath("_embedded.postCommentList[].account.id").description("댓글 작성자의 id"),
+                                fieldWithPath("_embedded.postCommentList[].account.nickname").description("댓글 작성자의 닉네임"),
+                                fieldWithPath("_embedded.postCommentList[].account.profileImageUri").description("댓글 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("_embedded.postCommentList[].post.id").description("댓글이 달린 post 게시물 id"),
                                 fieldWithPath("_embedded.postCommentList[].comment").description("댓글"),
                                 fieldWithPath("_embedded.postCommentList[].regDate").description("댓글 추가 시간"),
@@ -335,6 +341,8 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("post.id").exists())
                 .andExpect(jsonPath("comment").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -365,6 +373,8 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("댓글의 id"),
                                 fieldWithPath("account.id").description("댓글 작성자 id"),
+                                fieldWithPath("account.nickname").description("댓글 작성자 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("댓글 작성자 프로필 이미지 경로"),
                                 fieldWithPath("post.id").description("post 게시물의 id"),
                                 fieldWithPath("comment").description("댓글"),
                                 fieldWithPath("regDate").description("댓글 추가 시간"),
@@ -397,6 +407,8 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("post.id").exists())
                 .andExpect(jsonPath("comment").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -425,6 +437,8 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("post.id").exists())
                 .andExpect(jsonPath("comment").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -515,6 +529,8 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("post.id").exists())
                 .andExpect(jsonPath("comment").exists())
                 .andExpect(jsonPath("regDate").exists())
@@ -540,6 +556,8 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("댓글의 id"),
                                 fieldWithPath("account.id").description("댓글 작성자 id"),
+                                fieldWithPath("account.nickname").description("댓글 작성자 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("댓글 작성자 프로필 이미지 경로"),
                                 fieldWithPath("post.id").description("post 게시물의 id"),
                                 fieldWithPath("comment").description("댓글"),
                                 fieldWithPath("regDate").description("댓글 추가 시간"),

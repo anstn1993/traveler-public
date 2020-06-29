@@ -81,6 +81,8 @@ class PostControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("article").exists())
                 .andExpect(jsonPath("postTagList[0].id").exists())
                 .andExpect(jsonPath("postTagList[0].post.id").exists())
@@ -125,6 +127,8 @@ class PostControllerTest extends PostBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("post 게시물의 id"),
                                 fieldWithPath("account.id").description("게시물 작성자 id"),
+                                fieldWithPath("account.nickname").description("게시물 작성자 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("게시물 작성자 프로필 이미지 경로"),
                                 fieldWithPath("article").description("게시물의 본문"),
                                 fieldWithPath("postTagList[].id").description("게시물에 붙은 태그의 id"),
                                 fieldWithPath("postTagList[].post.id").description("태그가 붙은 게시물의 id"),
@@ -386,6 +390,8 @@ class PostControllerTest extends PostBaseControllerTest {
                         responsePageFields.and(
                                 fieldWithPath("_embedded.postList[].id").description("post 게시물의 id"),
                                 fieldWithPath("_embedded.postList[].account.id").description("post 게시물 작성자의 id"),
+                                fieldWithPath("_embedded.postList[].account.nickname").description("post 게시물 작성자의 닉네임"),
+                                fieldWithPath("_embedded.postList[].account.profileImageUri").description("post 게시물 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("_embedded.postList[].article").description("post 게시물의 본문"),
                                 fieldWithPath("_embedded.postList[].postTagList[].id").description("post 게시물의 tag id"),
                                 fieldWithPath("_embedded.postList[].postTagList[].post.id").description("해당 tag가 달린 post게시물 id"),
@@ -458,6 +464,8 @@ class PostControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("article").exists())
                 .andExpect(jsonPath("postImageList[0].id").exists())
                 .andExpect(jsonPath("postImageList[0].post.id").exists())
@@ -498,6 +506,8 @@ class PostControllerTest extends PostBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("post 게시물의 id"),
                                 fieldWithPath("account.id").description("게시물 작성자의 id"),
+                                fieldWithPath("account.nickname").description("게시물 작성자의 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("게시물 작성자의 프로필 이미지 경로"),
                                 fieldWithPath("article").description("post 게시물의 본문"),
                                 fieldWithPath("postImageList[].id").description("post 게시물에 등록된 이미지 id"),
                                 fieldWithPath("postImageList[].post.id").description("이미지가 등록된 게시물 id"),
@@ -538,6 +548,8 @@ class PostControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("article").exists())
                 .andExpect(jsonPath("postImageList[0].id").exists())
                 .andExpect(jsonPath("postImageList[0].post.id").exists())
@@ -575,6 +587,8 @@ class PostControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("article").exists())
                 .andExpect(jsonPath("postImageList[0].id").exists())
                 .andExpect(jsonPath("postImageList[0].post.id").exists())
@@ -642,6 +656,8 @@ class PostControllerTest extends PostBaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("account.nickname").exists())
+                .andExpect(jsonPath("account.profileImageUri").doesNotExist())
                 .andExpect(jsonPath("article").exists())
                 .andExpect(jsonPath("postTagList[0].id").exists())
                 .andExpect(jsonPath("postTagList[0].post.id").exists())
@@ -684,6 +700,8 @@ class PostControllerTest extends PostBaseControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("post 게시물의 id"),
                                 fieldWithPath("account.id").description("게시물 작성자 id"),
+                                fieldWithPath("account.nickname").description("게시물 작성자 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("게시물 작성자 프로필 이미지 경로"),
                                 fieldWithPath("article").description("게시물의 본문"),
                                 fieldWithPath("postTagList[].id").description("게시물에 붙은 태그의 id"),
                                 fieldWithPath("postTagList[].post.id").description("태그가 붙은 게시물의 id"),
