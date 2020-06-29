@@ -480,3 +480,43 @@ operation::update-post-comment[snippets='request-fields,curl-request,http-reques
 'DELETE' 요청을 사용해서 특정 post 게시물에 단 자신의 댓글을 삭제할 수 있다.
 
 operation::delete-post-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response']
+
+[[resources-post-child-comment]]
+== post 게시물의 대댓글
+
+post 게시물의 대댓글 리소스는 post 게시물에 달린 댓글에 하위 댓글을 생성, 수정, 삭제, 조회할 때 사용된다.
+
+[[resources-post-child-comment-create]]
+=== post 게시물의 대댓글 생성
+
+`POST` 요청을 사용해서 특정 post 게시물에 달린 댓글에 대댓글을 추가할 수 있다.
+
+operation::create-post-child-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-post-child-comments-get]]
+=== post 게시물의 대댓글 목록 조회
+
+'GET' 요청을 사용해서 특정 post 게시물에 달린 댓글에 달린 대댓글 목록을 조회할 수 있다.
+
+operation::get-post-child-comments[snippets='curl-request,http-request,request-headers,path-parameters,request-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-post-child-comment-get]]
+=== post 게시물의 대댓글 조회
+
+'GET' 요청을 사용해서 특정 post 게시물에 달린 댓글에 달린 대댓글 하나를 조회할 수 있다.
+
+operation::get-post-child-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-post-child-comment-update]]
+=== post 게시물의 대댓글 수정
+
+'PUT' 요청을 사용해서 특정 post 게시물에 달린 댓글에 자신이 단 대댓글을 수정할 수 있다.
+
+operation::update-post-child-comment[snippets='request-fields,curl-request,http-request,request-headers,path-parameters,http-response,response-headers,response-fields,links']
+
+[[resources-post-child-comment-delete]]
+=== post 게시물의 대댓글 삭제
+
+'DELETE' 요청을 사용해서 특정 post 게시물에 달린 댓글에 자신이 단 자신의 대댓글을 삭제할 수 있다.
+
+operation::delete-post-child-comment[snippets='curl-request,http-request,request-headers,path-parameters,http-response']

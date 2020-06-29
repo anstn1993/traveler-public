@@ -5,6 +5,8 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
+import me.moonsoo.travelerrestapi.post.comment.PostComment;
+import me.moonsoo.travelerrestapi.post.comment.PostCommentRepository;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,9 @@ public class PostBaseControllerTest extends BaseControllerTest {
 
     @Autowired
     protected PostTagRepository postTagRepository;
+
+    @Autowired
+    protected PostCommentRepository postCommentRepository;
 
     @Autowired
     protected AmazonS3 amazonS3;
@@ -107,6 +112,17 @@ public class PostBaseControllerTest extends BaseControllerTest {
                 .tag("tag" + index)
                 .build();
         return postTagRepository.save(postTag);
+    }
+
+    protected PostComment createPostComment(int index, Account account, Post post) {
+        PostComment postComment = PostComment.builder()
+                .post(post)
+                .account(account)
+                .comment("comment" + index)
+                .regDate(LocalDateTime.now())
+                .build();
+
+        return postCommentRepository.save(postComment);
     }
 
 }

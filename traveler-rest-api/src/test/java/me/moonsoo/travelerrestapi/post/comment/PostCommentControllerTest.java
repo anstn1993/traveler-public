@@ -29,9 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class PostCommentControllerTest extends PostBaseControllerTest {
 
-    @Autowired
-    private PostCommentRepository postCommentRepository;
-
     @AfterEach
     void tearDown() {
         postCommentRepository.deleteAll();
@@ -861,14 +858,5 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .build();
     }
 
-    private PostComment createPostComment(int index, Account account, Post post) {
-        PostComment postComment = PostComment.builder()
-                .post(post)
-                .account(account)
-                .comment("comment" + index)
-                .regDate(LocalDateTime.now())
-                .build();
 
-        return postCommentRepository.save(postComment);
-    }
 }

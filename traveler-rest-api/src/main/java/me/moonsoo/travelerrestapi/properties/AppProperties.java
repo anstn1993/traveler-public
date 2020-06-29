@@ -90,4 +90,14 @@ public class AppProperties {
     private String getPostCommentAnchor;
 
     private String updatePostCommentAnchor;
+
+    private String createPostChildCommentAnchor;
+
+    private String getPostChildCommentsAnchor;
+
+    private String getPostChildCommentAnchor;
+
+    private String updatePostChildCommentAnchor;
+
+    private String deletePostChildCommentAnchor;
 }
