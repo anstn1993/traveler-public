@@ -20,6 +20,10 @@ import me.moonsoo.travelerrestapi.email.EmailService;
 import me.moonsoo.travelerrestapi.follow.Follow;
 import me.moonsoo.travelerrestapi.follow.FollowRepository;
 import me.moonsoo.travelerrestapi.post.*;
+import me.moonsoo.travelerrestapi.post.childcomment.PostChildComment;
+import me.moonsoo.travelerrestapi.post.childcomment.PostChildCommentRepository;
+import me.moonsoo.travelerrestapi.post.comment.PostComment;
+import me.moonsoo.travelerrestapi.post.comment.PostCommentRepository;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
 import me.moonsoo.travelerrestapi.schedule.*;
 import org.junit.jupiter.api.*;
@@ -80,43 +84,49 @@ class AccountControllerTest extends BaseControllerTest {
     private EmailService emailService;
 
     @Autowired
-    AmazonS3 amazonS3;
+    private AmazonS3 amazonS3;
 
     @Autowired
-    S3Properties s3Properties;
+    private S3Properties s3Properties;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    AccompanyRepository accompanyRepository;
+    private AccompanyRepository accompanyRepository;
 
     @Autowired
-    AccompanyCommentRepository accompanyCommentRepository;
+    private AccompanyCommentRepository accompanyCommentRepository;
 
     @Autowired
-    AccompanyChildCommentRepository accompanyChildCommentRepository;
+    private AccompanyChildCommentRepository accompanyChildCommentRepository;
 
     @Autowired
-    FollowRepository followRepository;
+    private FollowRepository followRepository;
 
     @Autowired
-    PostRepository postRepository;
+    private PostRepository postRepository;
 
     @Autowired
-    PostTagRepository postTagRepository;
+    private PostTagRepository postTagRepository;
 
     @Autowired
-    PostImageRepository postImageRepository;
+    private PostImageRepository postImageRepository;
 
     @Autowired
-    ScheduleRepository scheduleRepository;
+    private PostCommentRepository postCommentRepository;
 
     @Autowired
-    ScheduleLocationRepository scheduleLocationRepository;
+    private PostChildCommentRepository postChildCommentRepository;
 
     @Autowired
-    ScheduleDetailRepository scheduleDetailRepository;
+    private ScheduleRepository scheduleRepository;
+
+    @Autowired
+    private ScheduleLocationRepository scheduleLocationRepository;
+
+    @Autowired
+    private ScheduleDetailRepository scheduleDetailRepository;
 
 
     @BeforeAll
@@ -1096,6 +1106,8 @@ class AccountControllerTest extends BaseControllerTest {
         Optional<AccompanyComment> accompanyCommentOpt = accompanyCommentRepository.findByAccount(account);
         Optional<AccompanyChildComment> accompanyChildCommentOpt = accompanyChildCommentRepository.findByAccount(account);
         Optional<Post> postOpt = postRepository.findByAccount(account);
+        Optional<PostComment> postCommentOpt = postCommentRepository.findByAccount(account);
+        Optional<PostChildComment> postChildCommentOpt = postChildCommentRepository.findByAccount(account);
         Optional<Schedule> scheduleOpt = scheduleRepository.findByAccount(account);
         Optional<Follow> followingOpt = followRepository.findByFollowingAccount(account);
         Optional<Follow> followedOpt = followRepository.findByFollowedAccount(account);
@@ -1105,6 +1117,8 @@ class AccountControllerTest extends BaseControllerTest {
                 () -> assertThat(accompanyCommentOpt.isPresent()).isFalse(),
                 () -> assertThat(accompanyChildCommentOpt.isPresent()).isFalse(),
                 () -> assertThat(postOpt.isPresent()).isFalse(),
+                () -> assertThat(postCommentOpt.isPresent()).isFalse(),
+                () -> assertThat(postChildCommentOpt.isPresent()).isFalse(),
                 () -> assertThat(scheduleOpt.isPresent()).isFalse(),
                 () -> assertThat(followingOpt.isPresent()).isFalse(),
                 () -> assertThat(followedOpt.isPresent()).isFalse()

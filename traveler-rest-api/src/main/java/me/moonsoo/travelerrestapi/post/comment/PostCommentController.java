@@ -37,7 +37,7 @@ public class PostCommentController {
     private ModelMapper modelMapper;
 
     @Autowired
-    AppProperties appProperties;
+    private AppProperties appProperties;
 
     //post 게시물에 댓글 리소스 추가 핸들러
     @PostMapping("/{postId}/comments")

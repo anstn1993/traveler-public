@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Autowired
-    InMemoryTokenStore inMemoryTokenStore;
+    private InMemoryTokenStore inMemoryTokenStore;
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {

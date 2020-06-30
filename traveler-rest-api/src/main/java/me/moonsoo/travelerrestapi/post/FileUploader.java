@@ -24,10 +24,10 @@ import java.util.Set;
 public class FileUploader {
 
     @Autowired
-    AmazonS3 amazonS3;
+    private AmazonS3 amazonS3;
 
     @Autowired
-    S3Properties s3Properties;
+    private S3Properties s3Properties;
 
     public List<String> upload(List<MultipartFile> multipartFileList, Account account, String targetDirectory) throws IOException, IllegalArgumentException {
 

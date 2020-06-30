@@ -12,7 +12,7 @@ import java.util.Optional;
 public class AccompanyFormatter implements Converter<String, Accompany> {
 
     @Autowired
-    AccompanyRepository accompanyRepository;
+    private AccompanyRepository accompanyRepository;
 
     @Override
     public Accompany convert(String accompanyIdStr) {

@@ -9,6 +9,6 @@ import lombok.*;
 @Builder
 public class PostTagDto {
 
-    String tag;
+    private String tag;
 
 }

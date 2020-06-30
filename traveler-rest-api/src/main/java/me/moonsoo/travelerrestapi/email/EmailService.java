@@ -21,10 +21,10 @@ import java.util.ArrayList;
 public class EmailService {
 
     @Autowired
-    JavaMailSender javaMailSender;
+    private JavaMailSender javaMailSender;
 
     @Autowired
-    AppProperties appProperties;
+    private AppProperties appProperties;
 
     public void sendAuthMessage(Account account) throws MessagingException {
         MimeMessage message = javaMailSender.createMimeMessage();

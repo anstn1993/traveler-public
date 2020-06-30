@@ -34,19 +34,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class FollowController {
 
     @Autowired
-    FollowService followService;
+    private FollowService followService;
 
     @Autowired
-    FollowRepository followRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
-    AccountRepository accountRepository;
-
-    @Autowired
-    ModelMapper modelMapper;
-
-    @Autowired
-    AppProperties appProperties;
+    private AppProperties appProperties;
 
     //특정 사용자 follow 핸들러
     @PostMapping("/{accountId}/followings")

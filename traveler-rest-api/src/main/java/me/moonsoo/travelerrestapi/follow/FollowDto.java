@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class FollowDto {
 
     @NotNull
-    @JsonSerialize(using = AccountSerializer.class)
+    @JsonSerialize(using = AccountIdSerializer.class)
     private Account followedAccount;
 
 }

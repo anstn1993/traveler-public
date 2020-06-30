@@ -17,10 +17,10 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Autowired
-    TokenStore tokenStore;
+    private TokenStore tokenStore;
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {

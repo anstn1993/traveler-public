@@ -3,6 +3,8 @@ package me.moonsoo.travelerrestapi.post;
 
 import com.amazonaws.AmazonServiceException;
 import me.moonsoo.commonmodule.account.Account;
+import me.moonsoo.travelerrestapi.post.childcomment.PostChildCommentRepository;
+import me.moonsoo.travelerrestapi.post.comment.PostCommentRepository;
 import me.moonsoo.travelerrestapi.post.like.LikeRepository;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,13 @@ public class PostService {
     private LikeRepository likeRepository;
 
     @Autowired
-    S3Properties s3Properties;
+    private PostCommentRepository postCommentRepository;
+
+    @Autowired
+    private PostChildCommentRepository postChildCommentRepository;
+
+    @Autowired
+    private S3Properties s3Properties;
 
     //post게시물 생성 메소드(이미지 파일을 s3서버에 저장하고 저장에 성공하면 db에 post엔티티 정보들을 저장한다)
     public Post save(List<MultipartFile> multipartFileList, Post post, Account account) throws IOException, IllegalArgumentException {
@@ -145,11 +153,13 @@ public class PostService {
         }
     }
 
+    @Transactional
     public void delete(Post post) throws AmazonServiceException{
-
         try {
             fileUploader.deletePostImage(post.getPostImageList());//s3서버에서 이미지 파일 삭제
             likeRepository.deleteByPost(post);//삭제할 post에 달린 좋아요 리소스 제거
+            postChildCommentRepository.deleteByPost(post);//삭제할 post에 달린 대댓글 제거
+            postCommentRepository.deleteByPost(post);//삭제할 post에 달린 댓글 제거
             postRepository.delete(post);//삭제에 성공하면 post 엔티티 delete
         }
         catch (AmazonServiceException e) {

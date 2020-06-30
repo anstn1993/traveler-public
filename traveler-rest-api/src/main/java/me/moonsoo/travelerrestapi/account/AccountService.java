@@ -10,6 +10,8 @@ import me.moonsoo.travelerrestapi.email.EmailService;
 import me.moonsoo.travelerrestapi.follow.FollowRepository;
 import me.moonsoo.travelerrestapi.post.FileUploader;
 import me.moonsoo.travelerrestapi.post.PostRepository;
+import me.moonsoo.travelerrestapi.post.childcomment.PostChildCommentRepository;
+import me.moonsoo.travelerrestapi.post.comment.PostCommentRepository;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
 import me.moonsoo.travelerrestapi.schedule.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,34 +31,40 @@ import java.util.Set;
 public class AccountService {
 
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
-    AccompanyRepository accompanyRepository;
+    private AccompanyRepository accompanyRepository;
 
     @Autowired
-    AccompanyCommentRepository accompanyCommentRepository;
+    private AccompanyCommentRepository accompanyCommentRepository;
 
     @Autowired
-    AccompanyChildCommentRepository accompanyChildCommentRepository;
+    private AccompanyChildCommentRepository accompanyChildCommentRepository;
 
     @Autowired
-    ScheduleRepository scheduleRepository;
+    private ScheduleRepository scheduleRepository;
 
     @Autowired
-    PostRepository postRepository;
+    private PostRepository postRepository;
 
     @Autowired
-    FollowRepository followRepository;
+    private PostCommentRepository postCommentRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PostChildCommentRepository postChildCommentRepository;
 
     @Autowired
-    S3Properties s3Properties;
+    private FollowRepository followRepository;
 
     @Autowired
-    FileUploader fileUploader;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private S3Properties s3Properties;
+
+    @Autowired
+    private FileUploader fileUploader;
 
 
     //사용자 추가
@@ -143,6 +151,8 @@ public class AccountService {
         accompanyCommentRepository.deleteByAccount(account);
         accompanyRepository.deleteByAccount(account);
         scheduleRepository.deleteByAccount(account);
+        postChildCommentRepository.deleteByAccount(account);
+        postCommentRepository.deleteByAccount(account);
         postRepository.deleteByAccount(account);
         followRepository.deleteByFollowingAccount(account);
         followRepository.deleteByFollowedAccount(account);

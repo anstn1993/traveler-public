@@ -13,10 +13,10 @@ import java.util.Optional;
 public class FollowService {
 
     @Autowired
-    FollowRepository followRepository;
+    private FollowRepository followRepository;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     public Follow save(FollowDto followDto, Account account) {
         Follow follow = modelMapper.map(followDto, Follow.class);

@@ -35,19 +35,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class AccompanyController {
 
     @Autowired
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Autowired
-    AccompanyService accompanyService;
+    private AccompanyService accompanyService;
 
     @Autowired
-    AccompanyValidator accompanyValidator;
+    private AccompanyValidator accompanyValidator;
 
     @Autowired
-    AppProperties appProperties;
+    private AppProperties appProperties;
 
     //게시물 생성 핸들러
     @PostMapping

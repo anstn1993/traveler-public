@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    AccountAuthService accountAuthService;
+    private AccountAuthService accountAuthService;
 
     @Bean
     @Override

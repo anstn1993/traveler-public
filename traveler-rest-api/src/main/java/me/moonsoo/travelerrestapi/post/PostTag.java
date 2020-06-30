@@ -17,12 +17,12 @@ public class PostTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @ManyToOne(targetEntity = Post.class)
     @JsonSerialize(using = PostSerializer.class)
-    Post post;
+    private Post post;
 
     @Column(nullable = false)
-    String tag;
+    private String tag;
 }

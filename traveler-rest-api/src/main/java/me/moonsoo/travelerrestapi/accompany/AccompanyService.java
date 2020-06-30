@@ -18,13 +18,13 @@ import java.util.List;
 public class AccompanyService {
 
     @Autowired
-    AccompanyCommentRepository accompanyCommentRepository;
+    private AccompanyCommentRepository accompanyCommentRepository;
 
     @Autowired
-    AccompanyChildCommentRepository accompanyChildCommentRepository;
+    private AccompanyChildCommentRepository accompanyChildCommentRepository;
 
     @Autowired
-    AccompanyRepository accompanyRepository;
+    private AccompanyRepository accompanyRepository;
 
     //동행 게시물 저장
     public Accompany save(Accompany accompany, Account account) {

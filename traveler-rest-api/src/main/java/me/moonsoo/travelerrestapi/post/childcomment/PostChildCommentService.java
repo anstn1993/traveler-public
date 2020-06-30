@@ -30,4 +30,13 @@ public class PostChildCommentService {
     public Page<PostChildComment> findAllByPostComment(PostComment postComment, Pageable pageable) {
         return postChildCommentRepository.findAllByPostComment(postComment, pageable);
     }
+
+    public PostChildComment update(PostChildComment postChildComment, PostChildCommentDto postChildCommentDto) {
+        postChildComment.setComment(postChildCommentDto.getComment());
+        return postChildCommentRepository.save(postChildComment);
+    }
+
+    public void delete(PostChildComment postChildComment) {
+        postChildCommentRepository.delete(postChildComment);
+    }
 }

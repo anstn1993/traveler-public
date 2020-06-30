@@ -116,7 +116,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물의 대댓글 생성 실패-요청 본문이 없는 경우(400 Bad request)")
-    public void createPostChildComment_No_Request_Body() throws Exception {
+    public void createPostChildCommentFail_No_Request_Body() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -134,8 +134,31 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
     }
 
     @Test
+    @DisplayName("post 게시물의 대댓글 생성 실패-요청 본문에 허용되지 않은 값이 있는 경우(400 Bad request)")
+    public void createPostChildCommentFail_Not_Allowed_Value() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);
+
+        PostChildComment postChildCommentDto = createNotAllowedPostCommentDto();
+
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/comments/{commentId}/child-comments", post.getId(), postComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+
+    @Test
     @DisplayName("post 게시물의 대댓글 생성 실패-값이 유효하지 않은 경우(400 Bad request)")
-    public void createPostChildComment_Wrong_Value() throws Exception {
+    public void createPostChildCommentFail_Wrong_Value() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -157,7 +180,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물의 대댓글 생성 실패-oauth인증을 하지 않은 경우(401 Unauthorized)")
-    public void createPostChildComment_Unauthorized() throws Exception {
+    public void createPostChildCommentFail_Unauthorized() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -178,7 +201,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물의 대댓글 생성 실패-존재하지 않는 post게시물(404 Not found)")
-    public void createPostChildComment_Not_Found_Post() throws Exception {
+    public void createPostChildCommentFail_Not_Found_Post() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -200,7 +223,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물의 대댓글 생성 실패-존재하지 않는 댓글(404 Not found)")
-    public void createPostChildComment_Not_Found_Comment() throws Exception {
+    public void createPostChildCommentFail_Not_Found_Comment() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -221,7 +244,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물의 대댓글 생성 실패-post게시물의 자식 댓글이 아닌 경우(409 Conflict)")
-    public void createPostChildComment_Conflict() throws Exception {
+    public void createPostChildCommentFail_Conflict() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -373,7 +396,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물의 대댓글 목록 조회 실패-존재하지 않는 post 게시물(404 Not found)")
-    public void getPostChildComments_Not_Found_Post() throws Exception {
+    public void getPostChildCommentsFail_Not_Found_Post() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -394,7 +417,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물의 대댓글 목록 조회 실패-존재하지 않는 comment 게시물(404 Not found)")
-    public void getPostChildComments_Not_Found_Comment() throws Exception {
+    public void getPostChildCommentsFail_Not_Found_Comment() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -414,7 +437,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물의 대댓글 목록 조회 실패-post게시물의 자식 댓글이 아닌 경우(409 Conflict)")
-    public void getPostChildComments_Conflict() throws Exception {
+    public void getPostChildCommentsFail_Conflict() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -505,7 +528,6 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
                         )
                 ))
         ;
-
     }
 
     @Test
@@ -539,7 +561,6 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
                 .andExpect(jsonPath("_links.update-post-child-comment").doesNotHaveJsonPath())
                 .andExpect(jsonPath("_links.delete-post-child-comment").doesNotHaveJsonPath())
         ;
-
     }
 
     @Test
@@ -575,7 +596,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물 대댓글 하나 조회 실패-존재하지 않는 post 게시물(404 Not found)")
-    public void getPostChildComment_Not_Found_Post() throws Exception {
+    public void getPostChildCommentFail_Not_Found_Post() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -590,12 +611,11 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
-
     }
 
     @Test
     @DisplayName("post 게시물 대댓글 하나 조회 실패-존재하지 않는 댓글(404 Not found)")
-    public void getPostChildComment_Not_Found_Comment() throws Exception {
+    public void getPostChildCommentFail_Not_Found_Comment() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -614,7 +634,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물 대댓글 하나 조회 실패-존재하지 않는 대댓글(404 Not found)")
-    public void getPostChildComment_Not_Found_Child_Comment() throws Exception {
+    public void getPostChildCommentFail_Not_Found_Child_Comment() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -632,7 +652,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
 
     @Test
     @DisplayName("post 게시물 대댓글 하나 조회 실패-post게시물의 자식 댓글이 아닌 경우(409 Conflict)")
-    public void getPostChildComment_Conflict_Post_And_Comment() throws Exception {
+    public void getPostChildCommentFail_Conflict_Post_And_Comment() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -648,12 +668,11 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isConflict())
         ;
-
     }
 
     @Test
     @DisplayName("post 게시물 대댓글 하나 조회 실패-댓글의 자식 댓글이 아닌 경우(409 Conflict)")
-    public void getPostChildComment_Conflict_Comment_And_Child_Comment() throws Exception {
+    public void getPostChildCommentFail_Conflict_Comment_And_Child_Comment() throws Exception {
         //Given
         String email = "anstn1993@email.com";
         String password = "1111";
@@ -669,7 +688,453 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isConflict())
         ;
+    }
 
+    @Test
+    @DisplayName("post 게시물 대댓글 수정")
+    public void updatePostChildComment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);
+
+        PostChildCommentDto postChildCommentDto = createPostChildCommentDto(0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("account.id").exists())
+                .andExpect(jsonPath("post.id").exists())
+                .andExpect(jsonPath("comment").exists())
+                .andExpect(jsonPath("regDate").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-post-child-comments").exists())
+                .andExpect(jsonPath("_links.delete-post-child-comment").exists())
+                .andDo(document("update-post-child-comment",
+                        links(
+                                linkWithRel("self").description("수정한 대댓글의 리소스 링크"),
+                                linkWithRel("profile").description("api 문서 링크"),
+                                linkWithRel("get-post-child-comments").description("대댓글의 목록을 조회할 수 있는 링크"),
+                                linkWithRel("delete-post-child-comment").description("수정한 대댓글을 삭제할 수 있는 링크")
+                        ),
+                        requestHeaders,
+                        pathParameters(
+                                parameterWithName("postId").description("post 게시물 id"),
+                                parameterWithName("commentId").description("댓글 id"),
+                                parameterWithName("childCommentId").description("대댓글 id")
+                        ),
+                        requestFields(
+                                fieldWithPath("comment").description("대댓글")
+                        ),
+                        responseHeaders,
+                        responseFields(
+                                fieldWithPath("id").description("대댓글 id"),
+                                fieldWithPath("account.id").description("작성자 id"),
+                                fieldWithPath("account.nickname").description("작성자 닉네임"),
+                                fieldWithPath("account.profileImageUri").description("작성자 프로필 이미지"),
+                                fieldWithPath("post.id").description("작성자 id"),
+                                fieldWithPath("postComment.id").description("부모 댓글 id"),
+                                fieldWithPath("comment").description("대댓글"),
+                                fieldWithPath("regDate").description("작성 시간"),
+                                fieldWithPath("_links.self.href").description("추가된 post 게시물 대댓글 리소스 링크"),
+                                fieldWithPath("_links.get-post-child-comments.href").description("post 게시물의 대댓글 목록 조회 링크"),
+                                fieldWithPath("_links.delete-post-child-comment.href").description("post 게시물의 대댓글 삭제 링크"),
+                                fieldWithPath("_links.profile.href").description("api 문서 링크")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 대댓글 수정 실패-요청 본문이 없는 경우(400 Bad request)")
+    public void updatePostChildCommentFail_No_Request_Body() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 대댓글 수정 실패-요청 본문의 값이 유효하지 않은 경우(400 Bad request)")
+    public void updatePostChildCommentFail_Wrong_Value() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);
+
+        PostChildCommentDto postChildCommentDto = createPostChildCommentDtoWithWrongValue();//유효하지 않은 값이 들어간 dto
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 대댓글 수정 실패-요청 본문에 허용되지 않은 값이 있는 경우(400 Bad request)")
+    public void updatePostChildCommentFail_Not_Allowed_Value() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);
+
+        PostChildComment postChildCommentDto = createNotAllowedPostCommentDto();//허용되지 않은 값이 들어간 dto
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 대댓글 수정 실패-oauth인증을 하지 않은 경우(401 Unauthorized)")
+    public void updatePostChildCommentFail_Unauthorized() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);
+
+        PostChildCommentDto postChildCommentDto = createPostChildCommentDto(0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 대댓글 수정 실패-다른 사용자의 댓글을 수정하려고 하는 경우(403 Forbidden)")
+    public void updatePostChildCommentFail_Forbidden() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, otherAccount, 0);//다른 사용자의 대댓글 생성
+
+        PostChildCommentDto postChildCommentDto = createPostChildCommentDto(0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 대댓글 수정 실패-존재하지 않는 post게시물(404 Not found)")
+    public void updatePostChildCommentFail_Not_Found_Post() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);
+
+        PostChildCommentDto postChildCommentDto = createPostChildCommentDto(0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", 404, postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 대댓글 수정 실패-존재하지 않는 댓글(404 Not found)")
+    public void updatePostChildCommentFail_Not_Found_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);
+
+        PostChildCommentDto postChildCommentDto = createPostChildCommentDto(0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), 404, postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 대댓글 수정 실패-존재하지 않는 대댓글(404 Not found)")
+    public void updatePostChildCommentFail_Not_Found_Child_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+
+        PostChildCommentDto postChildCommentDto = createPostChildCommentDto(0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment.getId(), 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 대댓글 수정 실패-post게시물의 자식 댓글이 아닌 경우(409 Conflict)")
+    public void updatePostChildCommentFail_Conflict_Post_And_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post1 = createPost(account, 0, 0, 1);//post1 게시물 생성
+        Post post2 = createPost(account, 1, 0, 1);//post2 게시물 생성
+        PostComment postComment = createPostComment(0, account, post1);//post1에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post1, postComment, account, 0);
+
+        PostChildCommentDto postChildCommentDto = createPostChildCommentDto(0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post2.getId(), postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isConflict())
+        ;
+    }
+
+    @Test
+    @DisplayName("post 게시물 대댓글 수정 실패-댓글의 자식 대댓글이 아닌 경우(409 Conflict)")
+    public void updatePostChildCommentFail_Conflict_Comment_And_Child_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment1 = createPostComment(0, account, post);//post에 댓글 생성
+        PostComment postComment2 = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment1, account, 0);//postComment1에 대댓글 생성
+
+        PostChildCommentDto postChildCommentDto = createPostChildCommentDto(0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment2.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(postChildCommentDto)))
+                .andDo(print())
+                .andExpect(status().isConflict())
+        ;
+    }
+
+    @Test
+    @DisplayName("post게시물 대댓글 삭제")
+    public void deletePostChildComment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);//postComment1에 대댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-post-child-comment",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                        ),
+                        pathParameters(
+                                parameterWithName("postId").description("post 게시물 id"),
+                                parameterWithName("commentId").description("댓글 id"),
+                                parameterWithName("childCommentId").description("대댓글 id")
+                        )
+                ))
+        ;
+    }
+
+    @Test
+    @DisplayName("post게시물 대댓글 삭제 실패-oauth인증을 하지 않은 경우(401 Unauthorized)")
+    public void deletePostChildCommentFail_Unauthorized() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        account = createAccount(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment.getId(), postChildComment.getId()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @Test
+    @DisplayName("post게시물 대댓글 삭제 실패-다른 사용자의 리소스를 삭제하려고 하는 경우(403 Forbidden)")
+    public void deletePostChildCommentFail_Forbidden() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Account otherAccount = createAccount(email, password, 1);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, otherAccount, 0);//다른 사용자의 대댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+        ;
+    }
+
+    @Test
+    @DisplayName("post게시물 대댓글 삭제 실패-존재하지 않는 post 리소스(404 Not found)")
+    public void deletePostChildCommentFail_Not_Found_Post() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);//postComment1에 대댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", 404, postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("post게시물 대댓글 삭제 실패-존재하지 않는 댓글 리소스(404 Not found)")
+    public void deletePostChildCommentFail_Not_Found_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment, account, 0);//postComment1에 대댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), 404, postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("post게시물 대댓글 삭제 실패-존재하지 않는 대댓글 리소스(404 Not found)")
+    public void deletePostChildCommentFail_Not_Found_Child_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", 404, postComment.getId(), 404)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @DisplayName("post게시물 대댓글 삭제 실패-post 게시물의 자식 댓글이 아닌 경우(409 Conflict)")
+    public void deletePostChildCommentFail_Conflict_Post_And_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post1 = createPost(account, 0, 0, 1);//post 게시물 생성
+        Post post2 = createPost(account, 1, 0, 1);//post 게시물 생성
+        PostComment postComment = createPostComment(0, account, post1);//post1에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post1, postComment, account, 0);//postComment1에 대댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post2.getId(), postComment.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isConflict())
+        ;
+    }
+
+    @Test
+    @DisplayName("post게시물 대댓글 삭제 실패-댓글의 자식 대댓글이 아닌 경우(409 Conflict)")
+    public void deletePostChildCommentFail_Conflict_Comment_And_Child_Comment() throws Exception {
+        //Given
+        String email = "anstn1993@email.com";
+        String password = "1111";
+        String accessToken = getAuthToken(email, password, 0);
+        Post post = createPost(account, 0, 0, 1);//post 게시물 생성
+        PostComment postComment1 = createPostComment(0, account, post);//post에 댓글 생성
+        PostComment postComment2 = createPostComment(1, account, post);//post에 댓글 생성
+        PostChildComment postChildComment = createPostChildComment(post, postComment1, account, 0);//postComment1에 대댓글 생성
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}/child-comments/{childCommentId}", post.getId(), postComment2.getId(), postChildComment.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andDo(print())
+                .andExpect(status().isConflict())
+        ;
     }
 
     private PostChildCommentDto createPostChildCommentDto(int index) {
@@ -681,6 +1146,15 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
     private PostChildCommentDto createPostChildCommentDtoWithWrongValue() {
         return PostChildCommentDto.builder()
                 .comment(" ")
+                .build();
+    }
+
+    //허용되지 않은 값이 포함된 요청 본문 생성
+    private PostChildComment createNotAllowedPostCommentDto() {
+        return PostChildComment.builder()
+                .id(100)
+                .comment("댓글")
+                .regDate(LocalDateTime.now())
                 .build();
     }
 

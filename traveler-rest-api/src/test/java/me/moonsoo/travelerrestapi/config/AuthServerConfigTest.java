@@ -31,13 +31,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthServerConfigTest extends BaseControllerTest {
 
     @Autowired
-    AccountAuthService accountAuthService;
+    private AccountAuthService accountAuthService;
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
 
     @AfterEach
     public void tearDown() {

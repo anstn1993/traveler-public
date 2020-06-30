@@ -58,6 +58,12 @@
 
 | `404 Not Found`
 | 요청한 리소스가 없음.
+
+| '409 Conflict'
+| 요청한 api가 리소스의 상태와 모순되는 경우.
+
+| '500 Internal Server Error'
+| 서버쪽에 문제가 생긴 경우.
 |===
 
 [[overview-errors]]

@@ -20,13 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class AccountServiceTest extends BaseControllerTest {
 
     @Autowired
-    AccountAuthService accountAuthService;
+    private AccountAuthService accountAuthService;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
 
     @AfterEach
     public void tearDown() {

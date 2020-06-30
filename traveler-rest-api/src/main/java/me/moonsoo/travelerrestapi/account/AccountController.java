@@ -38,19 +38,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class AccountController {
 
     @Autowired
-    AccountService accountService;
+    private AccountService accountService;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Autowired
-    EmailService emailService;
+    private EmailService emailService;
 
     @Autowired
-    AppProperties appProperties;
+    private AppProperties appProperties;
 
     @Autowired
-    FollowService followService;
+    private FollowService followService;
 
     //사용자 추가 핸들러
     @PostMapping("/api/accounts")

@@ -40,13 +40,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class PostController {
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Autowired
-    AppProperties appProperties;
+    private AppProperties appProperties;
 
     @Autowired
-    PostService postService;
+    private PostService postService;
 
     //post 게시물 생성 핸들러
     @PostMapping

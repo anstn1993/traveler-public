@@ -16,12 +16,12 @@ public class PostImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @ManyToOne(targetEntity = Post.class)
     @JsonSerialize(using = PostSerializer.class)
-    Post post;
+    private Post post;
 
     @Column(nullable = false)
-    String uri;//이미지 uri
+    private String uri;//이미지 uri
 }

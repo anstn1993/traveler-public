@@ -19,14 +19,14 @@ public class Follow {
 
     @Id
     @GeneratedValue
-    Integer id;
+    private Integer id;
 
     @ManyToOne
     @JsonSerialize(using = FollowAccountSerializer.class)
-    Account followingAccount;
+    private Account followingAccount;
 
     @ManyToOne
     @JsonSerialize(using = FollowAccountSerializer.class)
-    Account followedAccount;
+    private Account followedAccount;
 
 }

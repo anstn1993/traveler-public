@@ -18,13 +18,13 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    AccountAuthService accountAuthService;
+    private AccountAuthService accountAuthService;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Bean
     public InMemoryTokenStore inMemoryTokenStore() {

@@ -152,5 +152,83 @@ public class PostChildCommentController {
         return ResponseEntity.ok(postChildCommentModel);
     }
 
+    //post 게시물의 대댓글 수정 핸들러
+    @PutMapping("{postId}/comments/{commentId}/child-comments/{childCommentId}")
+    public ResponseEntity updatePostChildComment(@PathVariable("postId") Post post,
+                                                 @PathVariable("commentId") PostComment postComment,
+                                                 @PathVariable("childCommentId") PostChildComment postChildComment,
+                                                 @RequestBody @Valid PostChildCommentDto postChildCommentDto,
+                                                 Errors errors,
+                                                 @CurrentAccount Account account) {
 
+        if(post == null || postComment == null || postChildComment == null) {//리소스가 없는 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!postComment.getPost().equals(post)) {//댓글이 post 게시물의 자식이 아닌 경우
+            errors.reject("conflict", "The comment resource is not a child of the post resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        if (!postChildComment.getPostComment().equals(postComment)) {//댓글이 post 게시물의 자식이 아닌 경우
+            errors.reject("conflict", "The child comment resource is not a child of the comment resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        if(!postChildComment.getAccount().equals(account)) {//다른 사용자의 대댓글인 경우
+            errors.reject("forbidden", "You can not update other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        if(errors.hasErrors()) {//값이 유효하지 않은 경우
+            return ResponseEntity.badRequest().body(new ErrorsModel(errors));
+        }
+
+        PostChildComment updatedPostChildComment = postChildCommentService.update(postChildComment, postChildCommentDto);//db에 댓글 update
+
+        //hateoas적용
+        PostChildCommentModel postChildCommentModel = new PostChildCommentModel(updatedPostChildComment);
+        WebMvcLinkBuilder linkBuilder = linkTo(PostChildCommentController.class)
+                .slash(post.getId())
+                .slash("comments")
+                .slash(postComment.getId())
+                .slash("child-comments");
+        Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getUpdatePostChildCommentAnchor()).withRel("profile");
+        Link getPostChildCommentsLink = linkBuilder.withRel("get-post-child-comments");
+        Link deletePostChildCommentLink = linkBuilder.slash(updatedPostChildComment.getId()).withRel("delete-post-child-comment");
+        postChildCommentModel.add(profileLink, getPostChildCommentsLink, deletePostChildCommentLink);
+        return ResponseEntity.ok(postChildCommentModel);
+    }
+
+    //post게시물 대댓글 삭제 핸들러
+    @DeleteMapping("{postId}/comments/{commentId}/child-comments/{childCommentId}")
+    public ResponseEntity deletePostChildComment(@PathVariable("postId") Post post,
+                                                 @PathVariable("commentId") PostComment postComment,
+                                                 @PathVariable("childCommentId") PostChildComment postChildComment,
+                                                 @CurrentAccount Account account) {
+        if(post == null || postComment == null || postChildComment == null) {//리소스가 없는 경우
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!postComment.getPost().equals(post)) {//댓글이 post 게시물의 자식이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(postChildComment, "postChildComment");
+            errors.reject("conflict", "The comment resource is not a child of the post resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        if (!postChildComment.getPostComment().equals(postComment)) {//댓글이 post 게시물의 자식이 아닌 경우
+            Errors errors = new DirectFieldBindingResult(postChildComment, "postChildComment");
+            errors.reject("conflict", "The child comment resource is not a child of the comment resource.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorsModel(errors));
+        }
+
+        if(!postChildComment.getAccount().equals(account)) {//다른 사용자의 대댓글인 경우
+            Errors errors = new DirectFieldBindingResult(postChildComment, "postChildComment");
+            errors.reject("forbidden", "You can not update other user's contents.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorsModel(errors));
+        }
+
+        postChildCommentService.delete(postChildComment);//db에서 대댓글 삭제
+        return ResponseEntity.noContent().build();
+    }
 }

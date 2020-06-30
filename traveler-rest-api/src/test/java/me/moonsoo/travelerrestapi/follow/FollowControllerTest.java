@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FollowControllerTest extends BaseControllerTest {
 
     @Autowired
-    FollowRepository followRepository;
+    private FollowRepository followRepository;
 
     @AfterEach
     public void tearDown() {
