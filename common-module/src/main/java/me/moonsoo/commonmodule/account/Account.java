@@ -19,7 +19,7 @@ public class Account implements Serializable {
     @GeneratedValue
     private Integer id;//pk
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -42,7 +42,6 @@ public class Account implements Serializable {
     private boolean emailAuth;//회원가입 시 이메일 인증 여부
 
     @JsonIgnore
-    @Column(nullable = false)
     private String authCode;//이메일 인증에 필요한 인증 코드
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -53,5 +52,4 @@ public class Account implements Serializable {
     @Column(nullable = false)
     @JsonIgnore
     private LocalDateTime regDate;//가입 일자
-
 }

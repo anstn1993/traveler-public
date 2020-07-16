@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/login.css" type="text/css"/>
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<!--header-->
+<section>
+    <nav class="navbar navbar-custom">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="collapsed navbar-toggle" data-toggle="collapse" data-target="#nav-menu"
+                        aria-expanded="false">
+                    <span class="sr-only">Toggle Navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="/" class="navbar-brand">
+                    traveler
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="nav-menu">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">커뮤니티</a></li>
+                    <li><a href="#">일정 만들기</a></li>
+                    <li><a href="#">동행 구하기</a></li>
+                    <li><a href="#">회원가입</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <h1>로그인</h1>
+    <p th:if="${!message.equals('')}" th:text="${message}"></p>
+    <form action="#" th:action="@{/login/traveler}" method="post">
+        <div class="form-group form-inline">
+            <input class="" type="text" name="username" placeholder="아이디" required="required"/>
+        </div>
+        <div class="form-group form-inline">
+            <input class="" type="password" name="password" placeholder="비밀번호" required="required"/>
+        </div>
+        <div class="form-group form-inline">
+            <input type="submit" value="로그인" class="btn btn-primary"/>
+        </div>
+    </form>
+</section>
+</body>
+</html>

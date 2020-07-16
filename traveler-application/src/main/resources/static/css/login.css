@@ -1,0 +1,60 @@
+section {
+    background-image: url("../image/header.jpg");
+    background-size: cover;
+    height: 100vh;
+    position: relative;
+}
+
+.navbar-custom {
+    background-color: transparent;
+}
+
+.navbar-toggle {
+    background-color: white;
+}
+
+#nav-menu {
+    margin-bottom:100px;
+}
+
+nav a {
+    color: #ffffff;
+}
+
+/*로그인 타이틀*/
+section h1 {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 50px;
+    position: absolute;
+    top: 250px;
+}
+
+
+/*로그인 폼 시작*/
+section form {
+    width: 100%;
+    position: absolute;
+    top: 400px;
+}
+
+section form div {
+    text-align: center;
+}
+
+section p {
+    color: white;
+    width: 100%;
+    position: absolute;
+    top: 350px;
+    text-align: center;
+}
+
+section form div input {
+    height: 35px;
+    width: 200px;
+    border-radius: 5px;
+    border-color: transparent;
+}
+/*로그인 폼 종료*/
