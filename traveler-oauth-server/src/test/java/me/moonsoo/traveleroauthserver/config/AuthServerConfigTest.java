@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -36,14 +37,17 @@ class AuthServerConfigTest extends BaseControllerTest {
         //Given
         String email = "anstn1993@gmail.com";
         String password = "1111";
+        String username = "anstn1993";
         Account account = Account.builder()
+                .username(username)
                 .email(email)
                 .password(password)
                 .name("김문수")
                 .nickname("만수")
-                .emailAuth(false)
+                .emailAuth(true)
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))
+                .regDate(LocalDateTime.now())
                 .build();
 
         accountService.saveAccount(account);
@@ -52,7 +56,7 @@ class AuthServerConfigTest extends BaseControllerTest {
         String clientPassword = "pass";
 
         mockMvc.perform(post("/oauth/token").with(httpBasic(clientId, clientPassword))
-                .param("username", email)
+                .param("username", username)
                 .param("password", password)
                 .param("grant_type", "password"))
                 .andDo(print())
@@ -69,7 +73,7 @@ class AuthServerConfigTest extends BaseControllerTest {
         String clientPassword = "pass";
 
         mockMvc.perform(post("/oauth/token").with(httpBasic(clientId, clientPassword))
-                .param("username", "notexist@emial.com")
+                .param("username", "notexist")
                 .param("password", "notexist")
                 .param("grant_type", "password"))
                 .andDo(print())

@@ -30,6 +30,7 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest
@@ -90,9 +91,10 @@ public class BaseControllerTest {
     );
 
     //계정 생성
-    protected Account createAccount(String email, String password, int index) {
+    protected Account createAccount(String username, String email, String password, int index) {
         //Given
         Account account = Account.builder()
+                .username(index + username)
                 .email(index + email)
                 .password(password)
                 .name("user" + index)
@@ -108,14 +110,14 @@ public class BaseControllerTest {
     }
 
     //인자로 들어가는 account는 save된 상태
-    protected String getAuthToken(String email, String password, int index) throws Exception {
+    protected String getAuthToken(String username, String email, String password, int index) throws Exception {
         //Given
         String clientId = "traveler";
         String clientPassword = "pass";
-        account = createAccount(email, password, index);
+        account = createAccount(username, email, password, index);
 
         String contentAsString = mockMvc.perform(post("/oauth/token").with(httpBasic(clientId, clientPassword))
-                .param("username", index + email)
+                .param("username", index + username)
                 .param("password", password)
                 .param("grant_type", "password"))
                 .andReturn().getResponse().getContentAsString();

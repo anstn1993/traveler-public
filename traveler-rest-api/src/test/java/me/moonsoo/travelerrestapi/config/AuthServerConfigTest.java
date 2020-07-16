@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,9 +49,11 @@ class AuthServerConfigTest extends BaseControllerTest {
     @DisplayName("인증 토큰을 발급 받는 테스트")
     public void getAuthToken() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@gmail.com";
         String password = "1111";
         Account account = Account.builder()
+                .username(username)
                 .email(email)
                 .password(password)
                 .name("김문수")
@@ -68,7 +71,7 @@ class AuthServerConfigTest extends BaseControllerTest {
         String clientPassword = "pass";
 
         mockMvc.perform(post("/oauth/token").with(httpBasic(clientId, clientPassword))
-                .param("username", email)
+                .param("username", username)
                 .param("password", password)
                 .param("grant_type", "password"))
                 .andDo(print())
@@ -85,7 +88,7 @@ class AuthServerConfigTest extends BaseControllerTest {
         String clientPassword = "pass";
 
         mockMvc.perform(post("/oauth/token").with(httpBasic(clientId, clientPassword))
-                .param("username", "notexist@emial.com")
+                .param("username", "notexist")
                 .param("password", "notexist")
                 .param("grant_type", "password"))
                 .andDo(print())

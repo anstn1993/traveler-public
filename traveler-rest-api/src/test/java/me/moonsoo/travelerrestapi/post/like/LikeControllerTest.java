@@ -43,9 +43,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 추가")
     public void createLike() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/likes", post.getId())
@@ -98,9 +99,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 추가 실패-oauth인증을 하지 않은 경우(401 Unauthorized)")
     public void createLikeFail_Unauthorized() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         Post post = createPost(account, 0, 1, 1);
 
         mockMvc.perform(post("/api/posts/{postId}/likes", post.getId())
@@ -113,9 +115,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 추가 실패-존재하지 않는 post 리소스인 경우(404 Not found)")
     public void createLikeFail_Not_Found() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         mockMvc.perform(post("/api/posts/{postId}/likes", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -128,9 +131,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 추가 실패-이미 좋아요를 한 게시물인 경우(409 Conflict)")
     public void createLikeFail_Conflict() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);
 
         createLike(post, account);//좋아요 리소스 생성
@@ -145,14 +149,15 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("인증 상태에서 좋아요 리소스 목록 조회")
     public void getLikes_With_Auth() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);
 
         //좋아요 리소스 30개 생성
         IntStream.rangeClosed(1, 30).forEach(i -> {
-            Account account = createAccount(email, password, i);
+            Account account = createAccount(username, email, password, i);
             createLike(post, account);
         });
 
@@ -209,14 +214,15 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("미인증 상태에서 좋아요 리소스 목록 조회")
     public void getLikes_Without_Auth() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        account = createAccount(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        account = createAccount(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);
 
         //좋아요 리소스 30개 생성
         IntStream.rangeClosed(1, 30).forEach(i -> {
-            Account account = createAccount(email, password, i);
+            Account account = createAccount(username, email, password, i);
             createLike(post, account);
         });
 
@@ -243,9 +249,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("인증 상태에서 자신의 좋아요 리소스 하나 조회")
     public void getMyLike_With_Auth() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);//post 리소스 추가
         Like like = createLike(post, account);//post 게시물에 좋아요 리소스 추가
 
@@ -298,10 +305,11 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("인증 상태에서 다른 사용자의 좋아요 리소스 하나 조회")
     public void getOthersLike_With_Auth() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Account otherAccount = createAccount(username, email, password, 1);
         Post post = createPost(account, 0, 1, 1);//post 리소스 추가
         Like like = createLike(post, otherAccount);//post 게시물에 다른 사용자의 좋아요 리소스 추가
 
@@ -356,9 +364,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("미인증 상태에서 좋아요 리소스 하나 조회")
     public void getLike_Without_Auth() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        account = createAccount(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        account = createAccount(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);//post 리소스 추가
         Like like = createLike(post, account);//post 게시물에 다른 사용자의 좋아요 리소스 추가
 
@@ -382,9 +391,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 하나 조회 실패-존재하지 않는 게시물 리소스(404 Not found)")
     public void getLikeFail_Not_Found_Post() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);//post 리소스 추가
         Like like = createLike(post, account);//post 게시물에 좋아요 리소스 추가
 
@@ -399,10 +409,11 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 하나 조회 실패-post게시물의 자식 like 리소스가 아닌 경우(409 Conflict)")
     public void getLikeFail_Conflict() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Account otherAccount = createAccount(username, email, password, 1);
         Post post1 = createPost(account, 0, 1, 1);//post 리소스 추가
         Post post2 = createPost(account, 0, 1, 1);//post 리소스 추가
         Like like = createLike(post1, otherAccount);//post 게시물에 다른 사용자의 좋아요 리소스 추가
@@ -418,9 +429,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 하나 조회 실패-존재하지 않는 좋아요 리소스(404 Not found)")
     public void getLikeFail_Not_Found_Like() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);//post 리소스 추가
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/likes/{likeId}", post.getId(), 404)
@@ -434,9 +446,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 삭제")
     public void deleteLike() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);//post 리소스 추가
         Like like = createLike(post, account);//post 게시물에 좋아요 리소스 추가
 
@@ -459,10 +472,11 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 삭제 실패-다른 사용자의 리소스를 제거하려고 하는 경우(403 Forbidden)")
     public void deleteLikeFail_Forbidden() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Account otherAccount = createAccount(username, email, password, 1);
         Post post = createPost(account, 0, 1, 1);//post 리소스 추가
         Like like = createLike(post, otherAccount);//post 게시물에 다른 사용자의 좋아요 리소스 추가
 
@@ -476,9 +490,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 삭제 실패-존재하지 않는 post 리소스(404 Not found)")
     public void deleteLikeFail_Not_Found_Post() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);//post 리소스 추가
         Like like = createLike(post, account);//post 게시물에 다른 사용자의 좋아요 리소스 추가
 
@@ -492,9 +507,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 삭제 실패-존재하지 않는 like 리소스(404 Not found)")
     public void deleteLikeFail_Not_Found_Like() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post = createPost(account, 0, 1, 1);//post 리소스 추가
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/likes/{likeId}", post.getId(), 404)
@@ -507,9 +523,10 @@ class LikeControllerTest extends PostBaseControllerTest {
     @Test
     @DisplayName("좋아요 리소스 삭제 실패-Post 리소스의 자식 like 리소스가 아닌 경우(409 Conflict)")
     public void deleteLikeFail_Conflict() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
         Post post1 = createPost(account, 0, 1, 1);//post 리소스 추가
         Post post2 = createPost(account, 0, 1, 1);//post 리소스 추가
         Like like = createLike(post2, account);//post2 게시물에 좋아요 리소스 추가

@@ -67,9 +67,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 추가")
     public void createSchedule() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         ScheduleDto scheduleDto = createScheduleDto(0, Scope.ALL);//request 요청 본문 dto
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/schedules")
@@ -161,9 +162,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 추가 실패-요청 본문이 없는 경우(400 Bad request)")
     public void createScheduleFail_Empty_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         mockMvc.perform(post("/api/schedules")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -177,9 +179,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 추가 실패-허용되지 않은 값이 요청 본문에 있는 경우(400 Bad request)")
     public void createScheduleFail_Unknown_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Schedule schedule = createScheduleWithNotAllowedValue(0, Scope.ALL);
 
@@ -196,9 +199,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 추가 실패-요청 본문이 비즈니스 로직에 맞지 않는 경우(400 Bad request)")
     public void createScheduleFail_Wrong_value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         ScheduleDto scheduleDto = createScheduleDtoWithWrongValue(0, Scope.ALL);
 
@@ -215,9 +219,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 추가 실패-요청 헤더에 인증 토큰을 포함하지 않은 경우(401 Unauthorized)")
     public void createScheduleFail_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         ScheduleDto scheduleDto = createScheduleDtoWithWrongValue(0, Scope.ALL);
 
         mockMvc.perform(post("/api/schedules")
@@ -232,10 +237,11 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("인증 상태에서 일정 게시물 목록 조회(자신의 게시물은 scope가 NONE이거나 FOLLOWER더라도 조회, 다른 사용자 게시물은 ALL인 게시물만 조회)-검색어x, 30개의 게시물, 한 페이지에 10개, 2페이지 가져오기")
     public void getSchedules_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         //자신의 일정 게시물 15개, 다른 사용자의 일정 게시물 15 생성
         IntStream.range(0, 15).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.NONE);
@@ -304,10 +310,11 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("인증 상태에서 일정 게시물 목록 조회(자기 게시물 조회: Scope에 무관하게 모두 query)-검색어 조건: 작성자, 30개의 게시물, 한 페이지에 10개, 2페이지 가져오기")
     public void getSchedules_Filtered_By_Writer_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         //자신의 일정 게시물 15개, 다른 사용자의 일정 게시물 15 생성
         IntStream.range(0, 15).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.NONE);
@@ -341,10 +348,11 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("인증 상태에서 일정 게시물 목록 조회(자기 게시물 조회: Scope에 무관하게 모두 query)-검색어 조건: 제목, 30개의 게시물, 한 페이지에 10개, 1페이지 가져오기")
     public void getSchedules_Filtered_By_Title_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         //자신의 일정 게시물 15개, 다른 사용자의 일정 게시물 15 생성
         IntStream.range(0, 15).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.NONE);
@@ -375,10 +383,11 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("인증 상태에서 일정 게시물 목록 조회(자기 게시물 조회: Scope에 무관하게 모두 query)-검색어 조건: 장소, 30개의 게시물, 한 페이지에 10개, 1페이지 가져오기")
     public void getSchedules_Filtered_By_Location_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         //자신의 일정 게시물 15개, 다른 사용자의 일정 게시물 15 생성
         IntStream.range(0, 15).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.NONE);
@@ -412,9 +421,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("미인증 상태에서 일정 게시물 목록 조회-30개의 게시물(공개범위가 ALL인 게시물 query), 검색어x, 한 페이지에 10개, 2페이지 가져오기")
     public void getSchedulesForAll_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         //일정 게시물 30개 생성
         IntStream.range(0, 30).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.ALL);
@@ -446,9 +456,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("미인증 상태에서 일정 게시물 목록 조회-30개의 게시물(공개범위가 ALL인 게시물 query), 검색어 조건: 작성자, 한 페이지에 10개, 2페이지 가져오기")
     public void getSchedulesForAll_Filtered_By_Writer_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         //일정 게시물 30개 생성
         IntStream.range(0, 30).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.ALL);
@@ -482,9 +493,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("미인증 상태에서 일정 게시물 목록 조회-30개의 게시물(공개범위가 ALL인 게시물 query), 검색어 조건: 제목, 한 페이지에 10개, 1페이지 가져오기")
     public void getSchedulesForAll_Filtered_By_Title_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         //일정 게시물 30개 생성
         IntStream.range(0, 30).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.ALL);
@@ -514,9 +526,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("미인증 상태에서 일정 게시물 목록 조회-30개의 게시물(공개범위가 ALL인 게시물 query), 검색어 조건: 장소, 한 페이지에 10개, 1페이지 가져오기")
     public void getSchedulesForAll_Filtered_By_Location_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         //일정 게시물 30개 생성
         IntStream.range(0, 30).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.ALL);
@@ -549,9 +562,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("미인증 상태에서 일정 게시물 목록 조회-30개의 게시물(공개범위가 FOLLWER, NONE인 게시물 query),검색어x, 한 페이지에 10개, 2페이지 가져오기")
     public void getSchedulesForFollower_Or_NONE_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         //공개범위가 FOLLOWER인 게시물 15개, 공개범위가 NONE인 게시물 15개
         IntStream.range(0, 15).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.FOLLOWER);
@@ -582,9 +596,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("미인증 상태에서 일정 게시물 목록 조회-30개의 게시물(공개범위가 FOLLWER, NONE인 게시물 query),검색어 조건: 작성자, 한 페이지에 10개, 2페이지 가져오기")
     public void getSchedulesForFollower_Or_NONE_Filtered_By_Writer_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         //공개범위가 FOLLOWER인 게시물 15개, 공개범위가 NONE인 게시물 15개
         IntStream.range(0, 15).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.FOLLOWER);
@@ -617,9 +632,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("미인증 상태에서 일정 게시물 목록 조회-30개의 게시물(공개범위가 FOLLWER, NONE인 게시물 query),검색어 조건: 제목, 한 페이지에 10개, 2페이지 가져오기")
     public void getSchedulesForFollower_Or_NONE_Filtered_By_Title_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         //공개범위가 FOLLOWER인 게시물 15개, 공개범위가 NONE인 게시물 15개
         IntStream.range(0, 15).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.FOLLOWER);
@@ -652,9 +668,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("미인증 상태에서 일정 게시물 목록 조회-30개의 게시물(공개범위가 FOLLWER, NONE인 게시물 query),검색어 조건: 장소, 한 페이지에 10개, 2페이지 가져오기")
     public void getSchedulesForFollower_Or_NONE_Filtered_By_Location_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         //공개범위가 FOLLOWER인 게시물 15개, 공개범위가 NONE인 게시물 15개
         IntStream.range(0, 15).forEach(i -> {
             createSchedule(account, i, 3, 3, Scope.FOLLOWER);
@@ -687,9 +704,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @MethodSource("scopeProvider")
     public void getMySchedule_With_Auth_Scope(Scope scope) throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Schedule schedule = createSchedule(account, 0, 3, 3, scope);
 
@@ -765,10 +783,11 @@ class ScheduleControllerTest extends BaseControllerTest {
     @MethodSource("scopeAndFollowingStatusProvider")
     public void getOthersSchedule_With_Auth_Scope_ALL(Scope scope, boolean following) throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         Schedule schedule = createSchedule(otherAccount, 0, 3, 3, scope);
 
         if (scope.equals(Scope.FOLLOWER) && following) {
@@ -814,9 +833,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @MethodSource("scopeProvider")
     public void getSchedule_Without_Auth_Scope(Scope scope) throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         Schedule schedule = createSchedule(account, 0, 3, 3, scope);
 
         ResultActions resultActions = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules/{scheduleId}", schedule.getId())
@@ -869,9 +889,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 하나 조회 실패-존재하지 않는 게시물(404 Not found)")
     public void getScheduleFail_Not_Found() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         mockMvc.perform(get("/api/schedules/{scheduleId}", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -887,9 +908,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 추가 메소드 테스트")
     public void createScheduleMethod() {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);
         assertAll(
                 () -> assertNotNull(schedule),
@@ -908,9 +930,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 수정")
     public void updateSchedule() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
 
@@ -1002,9 +1025,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 수정 실패-요청 본문이 없는 경우(400 Bad request)")
     public void updateScheduleFail_Bad_Request_Empty_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
         ScheduleDto scheduleDto = ScheduleDto.builder().build();//빈 요청 본문
@@ -1023,9 +1047,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 수정 실패-요청 본문에 허용되지 않은 값이 존재(400 Bad request)")
     public void updateScheduleFail_Bad_Request_Unknown_Property() throws Exception {
 //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
 
@@ -1043,9 +1068,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 수정 실패-요청 본문이 비즈니스 로직에 맞지 않는 경우(400 Bad request)")
     public void updateScheduleFail_Bad_Request_Wrong_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
         ScheduleDto scheduleDtoWithWrongValue = createScheduleDtoWithWrongValue(0, Scope.FOLLOWER);//비즈니스 로직에 맞지 않는 일정 게시물 dto
@@ -1064,9 +1090,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 수정 실패-oauth인증을 하지 않은 경우(401 Unauthorized)")
     public void updateScheduleFail_Unauthorized() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
 
         Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
 
@@ -1087,10 +1114,11 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 수정 실패-타인의 일정을 수정하려고 하는 경우(403 Forbidden)")
     public void updateScheduleFail_Forbidden() throws Exception {
 //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         Schedule schedule = createSchedule(otherAccount, 0, 3, 3, Scope.ALL);//다른 사용자의 일정 게시물 생성
 
         ScheduleDto scheduleDto = createScheduleDto(0, Scope.FOLLOWER);//수정할 일정 게시물 DTO
@@ -1111,9 +1139,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 수정 실패-존재하지 않는 일정을 수정하려고 하는 경우(404 Not found)")
     public void updateScheduleFail_Not_Found() throws Exception {
 //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);//일정 게시물 생성
 
@@ -1135,9 +1164,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 삭제")
     public void deleteSchedule() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);
 
@@ -1160,9 +1190,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 삭제 실패-oauth 인증을 하지 않은 경우(401 Unauthorized)")
     public void deleteScheduleFail_Unauthorized() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
 
         Schedule schedule = createSchedule(account, 0, 3, 3, Scope.ALL);
 
@@ -1175,10 +1206,11 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 삭제 실패-타인의 일정을 삭제하려고 하는 경우(403 Forbidden)")
     public void deleteScheduleFail_Forbidden() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         Schedule schedule = createSchedule(otherAccount, 0, 3, 3, Scope.ALL);//다른 사용자가 만든 일정 게시물
 
         mockMvc.perform(delete("/api/schedules/{scheduleId}", schedule.getId())
@@ -1191,9 +1223,10 @@ class ScheduleControllerTest extends BaseControllerTest {
     @DisplayName("일정 게시물 삭제 실패-존재하지 않는 일정을 삭제하려고 하는 경우(404 Not found)")
     public void deleteScheduleFail_Not_Found() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         mockMvc.perform(delete("/api/schedules/{scheduleId}", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))

@@ -23,6 +23,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -46,6 +47,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
+    @Autowired
+    private CustomAuthenticationSuccessHandler successHandler;
+
     @Bean
     public OAuth2RestTemplate oAuth2RestTemplate() {
         return new OAuth2RestTemplate(travelerClient(), oAuth2ClientContext);
@@ -67,6 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private Filter oAuth2ClientFilter() throws Exception {
         OAuth2ClientAuthenticationProcessingFilter oauth2ClientFilter = new OAuth2ClientAuthenticationProcessingFilter("/login/traveler");
         oauth2ClientFilter.setAuthenticationFailureHandler(failureHandler());
+        oauth2ClientFilter.setAuthenticationSuccessHandler(successHandler);
         oauth2ClientFilter.setRestTemplate(oAuth2RestTemplate());
         DefaultTokenServices tokenServices = new DefaultTokenServices();
         tokenServices.setTokenStore(tokenStore);
@@ -108,7 +113,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public CustomAuthenticationFailureHandler failureHandler() {
+    public AuthenticationFailureHandler failureHandler() {
         return new CustomAuthenticationFailureHandler();
     }
+
 }

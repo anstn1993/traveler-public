@@ -20,6 +20,8 @@ public class SessionAccount implements Serializable {
 
     private Integer id;
 
+    private String username;
+
     private String email;
 
     private String profileImageUri;

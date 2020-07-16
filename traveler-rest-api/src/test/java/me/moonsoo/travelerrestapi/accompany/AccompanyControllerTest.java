@@ -44,6 +44,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 구하기 게시물 생성 테스트")
     public void createAccompanyDto() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
         AccompanyDto accompanyDto = createAccompanyDto(0);
@@ -51,7 +52,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
         ConstrainedFields fields = new ConstrainedFields(Accompany.class);
 
         mockMvc.perform(post("/api/accompanies")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password, 0))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(username, email, password, 0))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(accompanyDto)))
@@ -126,12 +127,13 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 구하기 게시물 생성 실패 테스트-요청 본문 값이 담기지 않은 경우 400(bad request)")
     public void createAccompanyFail_BadRequest_Empty_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
         AccompanyDto accompanyDto = AccompanyDto.builder().build();//값이 모두 빈 객체
 
         mockMvc.perform(post("/api/accompanies")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password, 0))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(username, email, password, 0))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(accompanyDto)))
@@ -149,6 +151,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 구하기 게시물 생성 실패 테스트-요청 본문에 허용되지 않은 값이 담기는 경우 400(bad request)")
     public void createAccompanyFail_BadRequest_Unknown_Property() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
 
@@ -167,7 +170,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/accompanies")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password, 0))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(username, email, password, 0))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(accompany)))
@@ -180,6 +183,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 구하기 게시물 생성 실패 테스트-요청 본문의 값이 비즈니스 로직에 맞지 않은 경우 400(bad request)")
     public void createAccompanyFail_BadRequest_Wrong_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
 
@@ -195,7 +199,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/accompanies")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(email, password, 0))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAuthToken(username, email, password, 0))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(accompany)))
@@ -227,9 +231,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("미인증 상태에서 동행게시물 목록 요청 테스트-60개의 게시물, 한 페이지에 10개씩 가져온다고 할 때 두 번째 페이지 가져오기")
     public void getAccompanies_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        Account account = createAccount(email, password, 0);
+        Account account = createAccount(username, email, password, 0);
         IntStream.range(0, 60).forEach(i -> {
             createAccompany(account, i);
         });
@@ -260,9 +265,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("인증 상태에서 동행게시물 목록 요청 테스트(작성자 검색어 적용)-60개의 게시물, 한 페이지에 10개씩 가져온다고 할 때 두 번째 페이지 가져오기")
     public void getAccompanies_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         IntStream.range(0, 30).forEach(i -> {
             createAccompany(account, i);
         });
@@ -334,9 +340,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 하나 가져오기(미인증 상태)")
     public void getAccompany_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
 
         mockMvc.perform(get("/api/accompanies/{id}", savedAccompany.getId())
@@ -368,9 +375,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 하나 가져오기(인증 상태에서 자신의 게시물을 조회하는 경우)")
     public void getAccompany_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
 
         //pathParameters를 사용하여 문서화흘 하기 위해서 RestDocumentationRequestBuilders.get을 사용
@@ -457,9 +465,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 수정")
     public void updateAccompany() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
         //수정할 데이터
         String title = "updated title";
@@ -544,9 +553,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 수정 실패-요청 본문을 전달하지 않은 경우(400 bad request)")
     public void updateAccompanyFail_Empty_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
         AccompanyDto accompanyDto = AccompanyDto.builder().build();//빈 요청 본문 Dto
 
@@ -563,9 +573,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 수정 실패-요청 본문의 값이 잘못된 경우(400 bad request)")
     public void updateAccompanyFail_Wrong_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
         //유효하지 않은 데이터 조합(시작 날짜보다 종료 날짜가 빠른 경우)
         LocalDateTime startDate = LocalDateTime.of(2020, 5, 5, 12, 12, 12);
@@ -588,9 +599,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 수정 실패-존재하지 않는 게시물을 수정하는 경우(404 not found)")
     public void updateAccompany_Not_Found() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
 
         //When
@@ -608,11 +620,12 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 수정 실패-다른 사용자의 게시물을 수정하려고 하는 경우(403 forbidden)")
     public void updateAccompany_Forbidden() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
-        Account otherAccount = createAccount(email, password, 1);
+        Account otherAccount = createAccount(username, email, password, 1);
         accountRepository.save(otherAccount);
 
         //수정할 데이터
@@ -636,9 +649,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("게시물 삭제")
     public void deleteAccompany() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{id}", savedAccompany.getId())
@@ -660,9 +674,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("댓글이 달린 게시물 삭제")
     public void deleteAccompany_With_Comment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
         IntStream.range(0, 50).forEach(i -> {
             createComment(account, savedAccompany, i);//게시물에 댓글 추가
@@ -679,9 +694,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("대댓글이 달린 게시물 삭제")
     public void deleteAccompany_With_Child_Comment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
         AccompanyComment comment = createComment(account, savedAccompany, 0);//게시물에 댓글 추가
 
@@ -700,9 +716,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("게시물 삭제 실패-인증하지 않은 경우(401 unauthorized)")
     public void deleteAccompanyFaid_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        createAccount(email, password, 0);
+        createAccount(username, email, password, 0);
         Accompany savedAccompany = createAccompany(account, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/{id}", savedAccompany.getId()))
@@ -715,9 +732,10 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("게시물 삭제 실패-존재하지 않는 게시물(404 not found)")
     public void deleteAccompanyFail_Not_Found() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         createAccompany(account, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accompanies/404")
@@ -731,11 +749,12 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("게시물 삭제 실패-다른 사용자의 게시물 삭제(403 forbidden)")
     public void deleteAccompanyFail_Forbidden() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
-        Account otherAccount = createAccount(email, password, 1);
+        Account otherAccount = createAccount(username, email, password, 1);
         accountRepository.save(otherAccount);
 
         Accompany savedAccompany = createAccompany(otherAccount, 0);

@@ -22,6 +22,7 @@ public class AppRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Account user = Account.builder()
+                .username("user")
                 .email("user@email.com")
                 .password("user")
                 .name("user")
@@ -34,6 +35,7 @@ public class AppRunner implements ApplicationRunner {
                 .build();
 
         Account admin = Account.builder()
+                .username("admin")
                 .email("admin@email.com")
                 .password("admin")
                 .name("admin")

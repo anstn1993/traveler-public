@@ -40,9 +40,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post게시물에 댓글 리소스 추가")
     public void createPostComment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
 
         PostCommentDto postCommentDto = createPostCommentDto(0);//요청 본문
@@ -106,9 +107,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post게시물에 댓글 리소스 추가 실패-요청 본문이 없는 경우(400 Bad request)")
     public void createPostCommentFail_Empty_Request_Body() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/comments", post.getId())
@@ -123,9 +125,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post게시물에 댓글 리소스 추가 실패-요청 본문의 값이 유효하지 않은 경우(400 Bad request)")
     public void createPostCommentFail_WrongValue() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
 
         PostCommentDto postCommentDto = createPostCommentDtoWithWrongValue();//비즈니스 로직에 안 맞는 요청 본문
@@ -144,9 +147,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post게시물에 댓글 리소스 추가 실패-요청 본문에 허용되지 않은 값이 포함된 경우(400 Bad request)")
     public void createPostCommentFail_Not_Allowed_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
 
         PostComment postCommentDto = createNotAllowedPostCommentDto();
@@ -165,9 +169,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post게시물에 댓글 리소스 추가 실패-oauth 인증을 하지 않은 경우(401 Unauthorized)")
     public void createPostCommentFail_Unauthorized() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
 
         PostCommentDto postCommentDto = createPostCommentDto(0);//요청 본문
@@ -185,9 +190,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post게시물에 댓글 리소스 추가 실패-존재하지 않는 post게시물(404 Not found)")
     public void createPostCommentFail_Not_Found() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         PostCommentDto postCommentDto = createPostCommentDto(0);//요청 본문
 
@@ -205,9 +211,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("인증 상태에서 post 게시물의 댓글 목록 조회")
     public void getPostComments_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
 
         //댓글 리소스 30개 생성
@@ -276,9 +283,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("미인증 상태에서 post 게시물의 댓글 목록 조회")
     public void getPostComments_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
 
         //댓글 리소스 30개 생성
@@ -311,9 +319,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물의 댓글 목록 조회 실패-존재하지 않는 post 게시물(404 Not found)")
     public void getPostCommentsFail_Not_Found() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -327,9 +336,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("인증 상태에서 post 게시물의 자신의 댓글 하나 조회")
     public void getMyPostComment_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Post post = createPost(account, 0, 1, 1);
         PostComment postComment = createPostComment(0, account, post);
@@ -393,10 +403,11 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("인증 상태에서 post 게시물의 다른 사용자의 댓글 하나 조회")
     public void getOthersPostComment_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         Post post = createPost(account, 0, 1, 1);
         PostComment postComment = createPostComment(0, otherAccount, post);//다른 사용자가 생성한 댓글 리소스
 
@@ -425,9 +436,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("미인증 상태에서 post 게시물의 댓글 하나 조회")
     public void getPostComment_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 1);
+        account = createAccount(username, email, password, 1);
         Post post = createPost(account, 0, 1, 1);
         PostComment postComment = createPostComment(0, account, post);
 
@@ -455,9 +467,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물의 댓글 하나 조회 실패-존재하지 않는 post게시물(404 Not found)")
     public void getPostCommentFail_Not_Found_Post() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Post post = createPost(account, 0, 1, 1);
         PostComment postComment = createPostComment(0, account, post);
@@ -474,9 +487,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물의 댓글 하나 조회 실패-존재하지 않는 댓글(404 Not found)")
     public void getPostCommentFail_Not_Found_Comment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Post post = createPost(account, 0, 1, 1);
 
@@ -492,9 +506,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물의 댓글 하나 조회 실패-Post게시물의 자식 댓글이 아닌 경우(409 Conflict)")
     public void getPostCommentFail_Conflict() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Post post1 = createPost(account, 0, 1, 1);
         Post post2 = createPost(account, 1, 1, 1);
@@ -512,9 +527,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 수정")
     public void updatePostComment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post);//댓글 생성
 
@@ -574,9 +590,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 수정 실패-요청 본문이 없는 경우(400 Bad request)")
     public void updatePostCommentFail_Empty_Request_Body() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post);//댓글 생성
 
@@ -593,9 +610,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 수정 실패-요청 본문의 값이 유효하지 않은 경우(400 Bad request)")
     public void updatePostCommentFail_Wrong_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post);//댓글 생성
 
@@ -615,9 +633,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 수정 실패-요청 본문에 허용되지 않은 값이 포함된 경우(400 Bad request)")
     public void updatePostCommentFail_Not_Allowed_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post);//댓글 생성
 
@@ -637,9 +656,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 수정 실패-인증을 하지 않은 경우(401 Unauthorized)")
     public void updatePostCommentFail_Unauthorized() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post);//댓글 생성
 
@@ -658,10 +678,11 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 수정 실패-다른 사용자의 댓글을 수정하려고 하는 경우(403 Forbidden)")
     public void updatePostCommentFail_Forbidden() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);//다른 사용자 생성
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);//다른 사용자 생성
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, otherAccount, post);//다른 사용자의 댓글 생성
 
@@ -681,9 +702,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 수정 실패-post리소스가 존재하지 않는 경우(404 Not found)")
     public void updatePostCommentFail_Not_Found_Post() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post);//댓글 생성
 
@@ -703,9 +725,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 수정 실패-댓글 리소스가 존재하지 않는 경우(404 Not found)")
     public void updatePostCommentFail_Not_Found_Comment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
 
         PostCommentDto postCommentDto = createPostCommentDto(0);//요청 본문
@@ -724,9 +747,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 수정 실패-댓글이 post게시물의 자식이 아닌 경우(409 Conflict)")
     public void updatePostCommentFail_Conflict() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post1 = createPost(account, 0, 0, 1);//post 게시물 생성
         Post post2 = createPost(account, 1, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post1);//post1에 댓글 생성
@@ -747,9 +771,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 삭제")
     public void deletePostComment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
 
@@ -773,9 +798,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 삭제 실패-인증을 하지 않은 경우(401 Unauthorized)")
     public void deletePostCommentFail_Unauthorized() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
 
@@ -789,10 +815,11 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 삭제 실패-다른 사용자의 댓글을 수정하는 경우(403 Forbidden)")
     public void deletePostCommentFail_Forbidden() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, otherAccount, post);//다른 사용자의 댓글 생성
 
@@ -807,9 +834,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 삭제 실패-존재하지 않는 post 게시물(404 Not found)")
     public void deletePostCommentFail_Not_Found_Post() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post);//post에 댓글 생성
 
@@ -824,9 +852,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 삭제 실패-존재하지 않는 댓글 게시물(404 Not found)")
     public void deletePostCommentFail_Not_Found_Comment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post = createPost(account, 0, 0, 1);//post 게시물 생성
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}/comments/{commentId}", post.getId(), 404)
@@ -840,9 +869,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 댓글 삭제 실패-post게시물의 자식 댓글이 아닌 경우(409 Conflict)")
     public void deletePostCommentFail_Conflict() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Post post1 = createPost(account, 0, 0, 1);//post 게시물 생성
         Post post2 = createPost(account, 1, 0, 1);//post 게시물 생성
         PostComment postComment = createPostComment(0, account, post1);//post1에 댓글 생성

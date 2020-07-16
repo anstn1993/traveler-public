@@ -17,13 +17,18 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(of = "id")
 public class AccountDto {
 
-    @Email
+
     @NotBlank
-    private String email;
+    @Length(min = 4, max = 16)
+    private String username;
 
     @NotBlank
     @Length(min = 8, max = 16)
     private String password;
+
+    @Email
+    @NotBlank
+    private String email;
 
     @Column(nullable = false)
     @NotBlank

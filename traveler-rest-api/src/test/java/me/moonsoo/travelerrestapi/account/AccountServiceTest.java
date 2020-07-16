@@ -37,10 +37,12 @@ class AccountServiceTest extends BaseControllerTest {
     @DisplayName("사용자 추가 후 정보 가져오기")
     public void findByEmail() {
         //Given
-        String username = "anstn1993@email.com";
+        String username = "anstn1993";
+        String email = "anstn1993@email.com";
         String password = "1111";
         Account account = Account.builder()
-                .email(username)
+                .username(username)
+                .email(email)
                 .password(password)
                 .name("김문수")
                 .nickname("만수")
@@ -64,7 +66,7 @@ class AccountServiceTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 추가 후 정보 가져오기 실패")
    public void findByEmailFail() {
-        String username = "anstn1993@email.com";
+        String username = "anstn1993";
         UsernameNotFoundException usernameNotFoundException = assertThrows(UsernameNotFoundException.class, () -> {
             accountAuthService.loadUserByUsername(username);
         });

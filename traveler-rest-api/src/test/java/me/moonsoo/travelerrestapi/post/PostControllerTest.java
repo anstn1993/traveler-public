@@ -58,9 +58,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 추가 테스트")
     public void createPost() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         //이미지 파일 part
         MockMultipartFile mockFile1 = createMockMultipartFile();
@@ -155,9 +156,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 추가 실패-post part가 없는 경우(400 Bad request)")
     public void createPostFail_Empty_Post_Part() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
 
         MockMultipartFile mockFile1 = createMockMultipartFile();
@@ -176,9 +178,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 추가 실패-post part에 허용되지 않은 값이 담기는 경우(400 bad request)")
     public void createPostFail_Unknown_property() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         //이미지 파일 part
         MockMultipartFile mockFile1 = createMockMultipartFile();
@@ -203,9 +206,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 추가 실패-post part에 비즈니스 로직에 맞지 않은 값이 담기는 경우(400 bad request)")
     public void createPostFail_Wrong_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         //이미지 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -230,9 +234,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 추가 실패-이미지 파일이 하나도 안 넘어온 경우(400 bad request)")
     public void createPostFail_No_Image_File() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         //post part
         PostDto postDto = createPostDto(0, 3);
@@ -253,9 +258,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 추가 실패-이미지 파일이 10개를 초과하는 경우(400 Bad request)")
     public void createPostFail_Exceed_Max_Image_Count() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         //이미지 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -291,9 +297,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 추가 실패-이미지 파일이 아닌 경우 415(Unsupported Media Type)")
     public void createPostFail_Not_Image_File() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         //파일 part
         MockMultipartFile mockFile = new MockMultipartFile("imageFiles", "test.txt", "text/plain", "This is not a image file.".getBytes());
@@ -339,9 +346,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("인증 상태에서 post게시물 목록 조회-30개의 게시물, 한 페이지에 10개씩 조회하고 2페이지 조회")
     public void getPosts_WithAuth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         //게시물 30개 생성
         IntStream.range(0, 30).forEach(i -> {
             createPost(account, i, 2, 2);
@@ -416,9 +424,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("인증하지 않은 상태에서 post게시물 목록 조회-30개의 게시물, 한 페이지에 10개씩 조회하고 2페이지 조회")
     public void getPosts_WithoutAuth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         //게시물 30개 생성
         IntStream.range(0, 30).forEach(i -> {
             createPost(account, i, 2, 2);
@@ -451,9 +460,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("인증 상태에서 자신의 post 게시물 하나 조회")
     public void getMyPost_WithAuth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Post post = createPost(account, 0, 2, 2);//자신의 게시물 하나 생성
 
@@ -535,10 +545,11 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("인증 상태에서 타인의 post 게시물 하나 조회")
     public void getOthersPost_WithAuth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         Post post = createPost(otherAccount, 0, 2, 2);//타인의 게시물 하나 생성
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}", post.getId())
@@ -576,9 +587,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("미인증 상태에서 post 게시물 하나 조회")
     public void getPost_WithoutAuth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        account = createAccount(email, password, 1);
+        account = createAccount(username, email, password, 1);
         Post post = createPost(account, 0, 2, 2);//타인의 게시물 하나 생성
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}", post.getId())
@@ -615,9 +627,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 하나 조회 실패-존재하지 않는 리소스 조회(404 Not found))")
     public void getPostFail_Not_Found() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 1);
         createPost(account, 0, 2, 2);//게시물 하나 생성
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}", 404)
@@ -632,9 +645,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 수정")
     public void updatePost() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 1);
 
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
@@ -733,9 +747,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 수정 실패-post part가 없는 경우(400 Bad request)")
     public void updatePostFail_Empty_Post_Part() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 1);
 
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
@@ -756,9 +771,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 수정 실패-post part에 허용되지 않은 값이 포함된 경우(400 Bad request)")
     public void updatePostFail_Wrong_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 1);
 
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
@@ -785,9 +801,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 수정 실패-post part의 값이 비즈니스 로직에 맞지 않는 경우(400 Bad request)")
     public void updatePostFail_Unknown_property() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 1);
 
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
@@ -814,9 +831,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 수정 실패-이미지 파일이 하나도 안 넘어온 경우(400 Bad request)")
     public void updatePostFail_No_Image_File() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 1);
 
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
@@ -839,9 +857,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 수정 실패-이미지 파일이 10개를 초과한 경우(400 Bad request)")
     public void updatePostFail_Exceed_Max_Image_Count() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 1);
 
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
@@ -878,9 +897,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 수정 실패-이미지 파일이 아닌 경우(415 Unsupported media type)")
     public void updatePostFail_Not_Image_File() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 1);
 
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
@@ -907,9 +927,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 수정 실패-oauth 인증을 하지 않은 경우(401 Unauthorized)")
     public void updatePostFail_Unauthorized() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        account = createAccount(email, password, 1);
+        account = createAccount(username, email, password, 1);
 
         Post post = createPost(account, 0, 2, 2);//게시물 생성
 
@@ -935,10 +956,11 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 수정 실패-타인의 게시물을 수정하려고 하는 경우(403 Forbidden)")
     public void updatePost_Forbidden() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         Post post = createPost(otherAccount, 0, 2, 2);//게시물 생성
 
         //mock image part
@@ -965,9 +987,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 수정 실패-존재하지 않는 게시물을 수정하려고 하는 경우(404 Not found)")
     public void updatePost_Not_Found() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         //mock image part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -992,9 +1015,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 삭제")
     public void deletePost() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         Post post = createPost(account, 0, 2, 2);//post게시물 하나 생성
 
@@ -1017,9 +1041,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 삭제 실패-인증하지 않은 상태에서 삭제(401 Unauthorized)")
     public void deletePostFail_Unauthorized() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
 
         Post post = createPost(account, 0, 2, 2);//post게시물 하나 생성
 
@@ -1033,10 +1058,11 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 삭제-다른 사용자의 게시물을 삭제하려고 하는 경우(403 Forbidden)")
     public void deletePostFail_Forbidden() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         Post post = createPost(otherAccount, 0, 2, 2);//다른 사용자의 post게시물 하나 생성
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}", post.getId())
@@ -1050,9 +1076,10 @@ class PostControllerTest extends PostBaseControllerTest {
     @DisplayName("post 게시물 삭제-존재하지 않는 게시물을 삭제하려고 하는 경우(404 Not found)")
     public void deletePostFail_Not_Found() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/posts/{postId}", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))

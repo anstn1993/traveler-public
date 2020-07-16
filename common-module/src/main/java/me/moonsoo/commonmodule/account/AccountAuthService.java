@@ -27,7 +27,7 @@ public class AccountAuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, EmailAuthException {
-        Optional<Account> accountOpt = accountRepository.findByEmail(username);
+        Optional<Account> accountOpt = accountRepository.findByUsername(username);
         Account account = accountOpt.orElseThrow(() -> new UsernameNotFoundException(username));
         if(!account.isEmailAuth()) {
             throw new EmailAuthException("You need to authenticate your email.");

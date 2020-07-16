@@ -20,11 +20,14 @@ public class Account implements Serializable {
     private Integer id;//pk
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String username;
 
     @Column(nullable = false)
     @JsonIgnore
     private String password;
+
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @Column(unique = true)
     private String profileImageUri;

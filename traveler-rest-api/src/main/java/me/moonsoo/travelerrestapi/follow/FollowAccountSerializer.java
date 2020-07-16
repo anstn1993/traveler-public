@@ -14,6 +14,7 @@ public class FollowAccountSerializer extends JsonSerializer<Account> {
     public void serialize(Account account, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeNumberField("id", account.getId());
+        jsonGenerator.writeStringField("username", account.getUsername());
         jsonGenerator.writeStringField("email", account.getEmail());
         jsonGenerator.writeStringField("name", account.getName());
         jsonGenerator.writeStringField("nickname", account.getNickname());

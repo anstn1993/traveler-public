@@ -69,6 +69,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -179,6 +180,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("username").exists())
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
@@ -203,6 +205,7 @@ class AccountControllerTest extends BaseControllerTest {
                         ),
                         requestPartFields(
                                 "account",
+                                fieldWithPath("username").description("계정 아이디"),
                                 fieldWithPath("email").description("계정 메일(실제 이메일 인증에 사용되는 메일)"),
                                 fieldWithPath("password").description("비밀번호"),
                                 fieldWithPath("name").description("이름"),
@@ -218,6 +221,7 @@ class AccountControllerTest extends BaseControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("id").description("생성된 사용자 id"),
+                                fieldWithPath("username").description("사용자 아이디"),
                                 fieldWithPath("email").description("사용자 이메일"),
                                 fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("name").description("사용자 이름"),
@@ -252,6 +256,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("username").exists())
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
@@ -368,9 +373,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("인증 이메일 전송 테스트")
     public void sendEmail() throws MessagingException {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        Account account = createAccount(email, password, 0);
+        Account account = createAccount(username, email, password, 0);
 
         smtpServerExtension.getGreenMail().setUser("mansoo@localhost", "1111");
         smtpServerExtension.getGreenMail().setUser(account.getEmail(), account.getPassword());
@@ -388,11 +394,12 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("인증 상태에서 사용자 목록 조회(totalElement=30, size=10, page=1)")
     public void getAccounts_With_Auth() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         IntStream.range(1, 31).forEach(i -> {
-            createAccount(email, password, i);
+            createAccount(username, email, password, i);
         });
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
@@ -419,11 +426,12 @@ class AccountControllerTest extends BaseControllerTest {
     @MethodSource("filterAndSearchProvider")
     @DisplayName("인증 상태에서 사용자 목록 조회(totalElement=30, size=10, page=0)")
     public void getAccounts_With_Auth_And_Filter(String filter, String search) throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         IntStream.range(1, 31).forEach(i -> {
-            createAccount(email, password, i);
+            createAccount(username, email, password, i);
         });
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
@@ -451,10 +459,11 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("이메일 인증이 안 된 사용자 제외")
     public void getNotEmailAuthAccounts() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
         IntStream.range(0, 30).forEach(i -> {
-            createAccountWithoutEmailAuth(email, password, i);
+            createAccountWithoutEmailAuth(username, email, password, i);
         });
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
@@ -475,10 +484,11 @@ class AccountControllerTest extends BaseControllerTest {
     @MethodSource("filterAndSearchProvider")
     @DisplayName("미인증 상태에서 사용자 목록 조회(totalElement=30, size=10, page=0)")
     public void getAccounts_Without_Auth(String filter, String search) throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
         IntStream.range(1, 31).forEach(i -> {
-            createAccount(email, password, i);
+            createAccount(username, email, password, i);
         });
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
@@ -520,6 +530,7 @@ class AccountControllerTest extends BaseControllerTest {
                         ),
                         responsePageFields.and(
                                 fieldWithPath("_embedded.accountList[].id").description("사용자 id"),
+                                fieldWithPath("_embedded.accountList[].username").description("사용자 아이디"),
                                 fieldWithPath("_embedded.accountList[].email").description("사용자 email"),
                                 fieldWithPath("_embedded.accountList[].profileImageUri").description("사용자 프로필 이미지 경로"),
                                 fieldWithPath("_embedded.accountList[].name").description("사용자 이름"),
@@ -535,9 +546,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("인증 상태에서 자기 자신 조회")
     public void getMyAccount_With_Auth() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", account.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -545,6 +557,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("username").exists())
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
@@ -576,6 +589,7 @@ class AccountControllerTest extends BaseControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("id").description("조회한 사용자 id"),
+                                fieldWithPath("username").description("사용자 아이디"),
                                 fieldWithPath("email").description("사용자 이메일"),
                                 fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("name").description("사용자 이름"),
@@ -594,10 +608,11 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("인증 상태에서 다른 사용자 조회")
     public void getOtherAccount_With_Auth() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", otherAccount.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -605,6 +620,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("username").exists())
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
@@ -635,6 +651,7 @@ class AccountControllerTest extends BaseControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("id").description("생성된 사용자 id"),
+                                fieldWithPath("username").description("사용자 아이디"),
                                 fieldWithPath("email").description("사용자 이메일"),
                                 fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("name").description("사용자 이름"),
@@ -652,15 +669,17 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("미인증 상태에서 사용자 조회")
     public void getAccount_Without_Auth() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        Account account = createAccount(email, password, 1);
+        Account account = createAccount(username, email, password, 1);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", account.getId())
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("username").exists())
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
@@ -678,9 +697,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("이메일 인증을 하지 않은 사용자 조회")
     public void getNotEmailAuthAccount_Without_Auth() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        Account account = createAccountWithoutEmailAuth(email, password, 1);//이메일 인증을 하지 않은 사용자
+        Account account = createAccountWithoutEmailAuth(username, email, password, 1);//이메일 인증을 하지 않은 사용자
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", account.getId())
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
@@ -702,9 +722,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정(기존 프로필 이미지 o, 새로운 프로필 이미지 o)")
     public void updateAccount_Change_Profile_Image() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthTokenForAccountWithProfileImage(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthTokenForAccountWithProfileImage(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         //프로필 사진 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -723,6 +744,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("username").exists())
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
@@ -757,6 +779,7 @@ class AccountControllerTest extends BaseControllerTest {
                         responseHeaders,
                         responseFields(
                                 fieldWithPath("id").description("생성된 사용자 id"),
+                                fieldWithPath("username").description("사용자 아이디"),
                                 fieldWithPath("email").description("사용자 이메일"),
                                 fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("name").description("사용자 이름"),
@@ -779,9 +802,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정(기존 프로필 이미지 o, 새로운 프로필 이미지 x)")
     public void updateAccount_Remove_Former_Profile_Image() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthTokenForAccountWithProfileImage(email, password, 0);//프로필 이미지가 이미 있는 사용자의 access token
+        String accessToken = getAuthTokenForAccountWithProfileImage(username, email, password, 0);//프로필 이미지가 이미 있는 사용자의 access token
 
         //account part
         AccountDtoForUpdate accountDto = createAccountDtoForUpdate();
@@ -796,6 +820,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("username").exists())
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
@@ -811,9 +836,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정(기존 프로필 이미지 x, 새로운 프로필 이미지 o)")
     public void updateAccount_Enroll_New_Profile_Image() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 없는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 없는 사용자의 access token
 
         //프로필 사진 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -832,6 +858,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("username").exists())
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
@@ -847,9 +874,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정(기존 프로필 이미지 x, 새로운 프로필 이미지 x)")
     public void updateAccount_Without_Profile_Image() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 이미지가 없는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 이미지가 없는 사용자의 access token
 
         //account part
         AccountDtoForUpdate accountDto = createAccountDtoForUpdate();
@@ -864,6 +892,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("username").exists())
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
@@ -879,9 +908,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정 실패-프로필 이미지가 두 개 이상(400 Bad request)")
     public void updateAccount_Exceed_Max_Image_Count() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         //프로필 사진 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -907,9 +937,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정 실패-이미지 파일이 아닌 경우(415 Unsupported media type)")
     public void updateAccount_Not_Image_File() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         //파일 part
         MockMultipartFile mockFile = new MockMultipartFile("imageFile", "test.txt", "text/plain", "This is not a image file.".getBytes());
@@ -933,9 +964,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정 실패-account part가 존재하지 않는 경우(400 Bad request)")
     public void updateAccount_Empty_Account_Part() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         //프로필 사진 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -953,9 +985,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정 실패-account part에 허용되지 않은 값이 포함(400 Bad request)")
     public void updateAccount_Unknown_Value() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         //프로필 사진 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -979,9 +1012,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정 실패-account part의 값이 비즈니스 로직에 맞지 않은 경우(400 Bad request)")
     public void updateAccount_Wrong_Value() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         //프로필 사진 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -1004,9 +1038,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정 실패-oauth인증을 하지 않은 경우(401 Unauthorized)")
     public void updateAccount_Unauthorized() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        Account account = createAccount(email, password, 0);
+        Account account = createAccount(username, email, password, 0);
 
         //프로필 사진 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -1028,10 +1063,11 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정 실패-다른 사용자 리소스를 수정하려고 하는 경우(403 Forbidden)")
     public void updateAccount_Forbidden() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
-        Account otherAccount = createAccount(email, password, 1);//다른 사용자
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Account otherAccount = createAccount(username, email, password, 1);//다른 사용자
         //프로필 사진 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
 
@@ -1054,9 +1090,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 수정 실패-존재하지 않는 사용자 리소스(404 Not found)")
     public void updateAccount_Not_Found() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         //프로필 사진 파일 part
         MockMultipartFile mockFile = createMockMultipartFile();
@@ -1080,9 +1117,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 삭제")
     public void deleteAccount() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         //사용자 리소스가 삭제될 때 그 사용자가 생성한 모든 컨텐츠를 다 삭제해줘야 하기 때문에 사용자가 여러 컨텐츠를 생성했다고 가정한다.
         createContents(account);
@@ -1128,9 +1166,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 삭제 실패-인증하지 않은 상태(401 Unauthorized)")
     public void deleteAccountFail_Unauthorized() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        Account account = createAccount(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Account account = createAccount(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}", account.getId()))
                 .andDo(print())
@@ -1141,10 +1180,11 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 삭제 실패-다른 사용자 리소스를 삭제하려고 하는 경우(403 Forbidden)")
     public void deleteAccountFail_Forbidden() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
-        Account otherAccount = createAccount(email, password, 1);//다른 사용자
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        Account otherAccount = createAccount(username, email, password, 1);//다른 사용자
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}", otherAccount.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
@@ -1156,9 +1196,10 @@ class AccountControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("사용자 리소스 삭제 실패-존재하지 않는 사용자(404 Not found)")
     public void deleteAccountFail_Not_Found() throws Exception {
+        String username = "anstn1993";
         String email = "user@email.com";
         String password = "user";
-        String accessToken = getAuthToken(email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
+        String accessToken = getAuthToken(username, email, password, 0);//프로필 사진이 이미 있는 사용자의 access token
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/accounts/{accountId}", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
@@ -1218,6 +1259,7 @@ class AccountControllerTest extends BaseControllerTest {
     //정상적인 account dto 생성
     private AccountDto createAccountDto() {
         return AccountDto.builder()
+                .username("anstn1993")
                 .email("anstn1993@gmail.com")
                 .name("user")
                 .password("11111111")
@@ -1237,9 +1279,10 @@ class AccountControllerTest extends BaseControllerTest {
     }
 
     //이메일 인증이 이루어지지 않은 계정 생성
-    private Account createAccountWithoutEmailAuth(String email, String password, int index) {
+    private Account createAccountWithoutEmailAuth(String username, String email, String password, int index) {
         //Given
         Account account = Account.builder()
+                .username(index + username)
                 .email(index + email)
                 .password(password)
                 .name("user" + index)
@@ -1270,10 +1313,11 @@ class AccountControllerTest extends BaseControllerTest {
         return amazonS3.getUrl(s3Properties.getBUCKET(), targetDirectory + "/" + tempFile.getName()).toString();
     }
 
-    private Account createAccountWithProfileImage(String email, String password, int index) throws IOException {
+    private Account createAccountWithProfileImage(String username, String email, String password, int index) throws IOException {
 
         //Given
         Account account = Account.builder()
+                .username(index + username)
                 .email(index + email)
                 .password(passwordEncoder.encode(password))
                 .name("user" + index)
@@ -1292,14 +1336,14 @@ class AccountControllerTest extends BaseControllerTest {
     }
 
     //인자로 들어가는 account는 save된 상태
-    protected String getAuthTokenForAccountWithProfileImage(String email, String password, int index) throws Exception {
+    protected String getAuthTokenForAccountWithProfileImage(String username, String email, String password, int index) throws Exception {
         //Given
         String clientId = "traveler";
         String clientPassword = "pass";
-        account = createAccountWithProfileImage(email, password, index);
+        account = createAccountWithProfileImage(username, email, password, index);
 
         String contentAsString = mockMvc.perform(post("/oauth/token").with(httpBasic(clientId, clientPassword))
-                .param("username", index + email)
+                .param("username", index + username)
                 .param("password", password)
                 .param("grant_type", "password"))
                 .andReturn().getResponse().getContentAsString();
@@ -1498,7 +1542,7 @@ class AccountControllerTest extends BaseControllerTest {
         //post게시물 생성
         createPost(account, 0, 1, 1);
         //팔로우 생성
-        Account followedAccount = createAccount("email@email.com", "1111", 1);
+        Account followedAccount = createAccount("email", "email@email.com", "1111", 1);
         createFollow(account, followedAccount);
 
     }

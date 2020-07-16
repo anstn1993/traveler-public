@@ -42,10 +42,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @Test
     @DisplayName("동행 게시판 댓글 추가")
     public void createComment() throws Exception {
-
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
 
         AccompanyCommentDto accompanyCommentDto = createCommentDto(0);
@@ -110,10 +110,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @Test
     @DisplayName("동행 게시판 댓글 추가 실패-요청 본문의 값이 없는 경우(400 Bad Request)")
     public void createCommentFail_Empty_Value() throws Exception {
-
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);
 
 
@@ -128,10 +128,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @Test
     @DisplayName("동행 게시판 댓글 추가 실패-요청 본문에 허용되지 않은 값이 들어있는 경우(400 Bad Request)")
     public void createCommentFail_Unknown_Value() throws Exception {
-
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);
 
         AccompanyComment accompanyComment = AccompanyComment.builder()
@@ -155,10 +155,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @Test
     @DisplayName("동행 게시판 댓글 추가 실패-존재하지 않는 동행 게시물에 댓글을 다려고 하는 경우(404 Bad Request)")
     public void createCommentFail_Not_Existing_Accompany() throws Exception {
-
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         AccompanyCommentDto accompanyCommentDto = createCommentDto(0);
 
         mockMvc.perform(post("/api/accompanies/{accompanyId}/comments", 404)
@@ -174,10 +174,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @Test
     @DisplayName("동행 게시판 댓글 추가 실패-인증하지 않은 경우(401 Unauthorized)")
     public void createCommentFail_Unauthorized() throws Exception {
-
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);
 
         AccompanyCommentDto accompanyCommentDto = createCommentDto(0);
@@ -196,9 +196,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("미인증 상태에서 동행 게시판의 댓글 목록 조회-100개의 게시물, 한 페이지에 10개씩, 두 번째 페이지 오름차순 조회")
     public void getAccompanyComments_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);//계정 생성
+        account = createAccount(username, email, password, 0);//계정 생성
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         //댓글 100개 생성
         IntStream.range(0, 100).forEach(i -> {
@@ -236,9 +237,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("인증 상태에서 동행 게시판의 댓글 목록 조회-100개의 게시물, 한 페이지에 10개씩, 두 번째 페이지 오름차순 조회")
     public void getAccompanyComments_WithAuth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         //댓글 100개 생성
         IntStream.range(0, 100).forEach(i -> {
@@ -327,9 +329,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("인증 상태에서 자신의 동행 게시물 댓글 하나 조회")
     public void getMyAccompanyComment_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -392,10 +395,11 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("인증 상태에서 다른 사용자의 동행 게시물 댓글 하나 조회")
     public void getOthersAccompanyComment_With_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         accountRepository.save(otherAccount);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(otherAccount, accompany, 0);//다른 사용자가 단 댓글
@@ -425,9 +429,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("미인증 상태에서 동행 게시물 댓글 하나 조회")
     public void getAccompanyComment_Without_Auth() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -455,9 +460,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 하나 조회 실패-존재하지 않는 동행 게시물(404 Not found)")
     public void getAccompanyCommentFail_Not_Existing_Accompany() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -474,9 +480,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 하나 조회 실패-존재하지 않는 댓글(404 Not found)")
     public void getAccompanyCommentFail_Not_Existing_Comment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
 
         mockMvc.perform(get("/api/accompanies/{accompanyId}/comments/404", accompany.getId())
@@ -492,9 +499,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 하나 조회 실패-게시물에 존재하지 않는 댓글(409 Conflict)")
     public void getAccompanyCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2 = createAccompany(account, 1);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
@@ -513,9 +521,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 수정")
     public void updateAccompanyComment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -577,9 +586,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 수정 실패-요청 본문이 없는 경우(400 Bad request)")
     public void updateAccompanyCommentFail_Empty_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -596,9 +606,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 수정 실패-허용되지 않은 값이 넘어온 경우(400 Bad request)")
     public void updateAccompanyCommentFail_Wrong_Value() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -616,9 +627,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 수정 실패-요청 본문이 없는 경우(401 Unauthorized)")
     public void updateAccompanyCommentFail_Unauthroized() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -634,10 +646,11 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 수정 실패-다른 사용자의 댓글을 수정하려고 하는 경우(403 Forbidden)")
     public void updateAccompanyCommentFail_Forbidden() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount =createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount =createAccount(username, email, password, 1);
         accountRepository.save(otherAccount);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(otherAccount, accompany, 0);//다른 사용자가 작성한 댓글
@@ -657,9 +670,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 수정 실패-존재하지 않는 동행 게시물(404 Not found)")
     public void updateAccompanyCommentFail_Not_Existing_Accompany() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -680,9 +694,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 수정 실패-존재하지 않는 댓글(404 Not found)")
     public void updateAccompanyCommentFail_Not_Existing_Comment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -702,9 +717,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 수정 실패-게시물에 존재하지 않는 댓글(409 Conflict)")
     public void updateAccompanyCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2= createAccompany(account, 1);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);//accompany1에 달린 댓글
@@ -727,9 +743,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 삭제")
     public void deleteAccompanyComment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -754,9 +771,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("대댓글이 있는 동행 게시물 댓글 삭제")
     public void deleteAccompanyComment_With_Child_Comment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
         createChildComment(account, accompany, accompanyComment, 0);//대댓글 생성
@@ -771,9 +789,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 삭제 실패-인증하지 않은 경우(401 Unauthorized)")
     public void deleteAccompanyCommentFail_Unauthorized() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        account = createAccount(email, password, 0);
+        account = createAccount(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
         mockMvc.perform(delete("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
@@ -788,10 +807,11 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 삭제 실패-타인의 댓글을 삭제하는 경우(403 Forbidden)")
     public void deleteAccompanyCommentFail_Forbidden() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
-        Account otherAccount = createAccount(email, password, 1);
+        String accessToken = getAuthToken(username, email, password, 0);
+        Account otherAccount = createAccount(username, email, password, 1);
         accountRepository.save(otherAccount);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(otherAccount, accompany, 0);//다른 사용자가 만든 댓글
@@ -810,9 +830,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 삭제 실패-존재하지 않는 동행 게시물(404 Not found)")
     public void deleteAccompanyCommentFail_Not_Existing_Accompany() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany, 0);
 
@@ -829,9 +850,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 삭제 실패-존재하지 않는 댓글(404 Not found)")
     public void deleteAccompanyCommentFail_Not_Existing_Comment() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany = createAccompany(account, 0);//댓글이 달릴 동행 게시물
 
         mockMvc.perform(delete("/api/accompanies/{accompanyId}/comments/404", accompany.getId())
@@ -847,9 +869,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
     @DisplayName("동행 게시물 댓글 삭제 실패-게시물에 존재하지 않는 댓글(409 Conflict)")
     public void deleteAccompanyCommentFail_Not_Existing_Comment_In_Accompany() throws Exception {
         //Given
+        String username = "anstn1993";
         String email = "anstn1993@email.com";
         String password = "1111";
-        String accessToken = getAuthToken(email, password, 0);
+        String accessToken = getAuthToken(username, email, password, 0);
         Accompany accompany1 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         Accompany accompany2 = createAccompany(account, 0);//댓글이 달릴 동행 게시물
         AccompanyComment accompanyComment = createComment(account, accompany1, 0);

@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,16 +37,19 @@ class AccountServiceTest extends BaseControllerTest {
     @DisplayName("사용자 추가 후 정보 가져오기")
     public void findByEmail() {
         //Given
-        String username = "anstn1993@email.com";
+        String email = "anstn1993@email.com";
         String password = "1111";
+        String username = "anstn1993";
         Account account = Account.builder()
-                .email(username)
+                .username(username)
+                .email(email)
                 .password(password)
                 .name("김문수")
                 .nickname("만수")
-                .emailAuth(false)
+                .emailAuth(true)
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
+                .regDate(LocalDateTime.now())
                 .build();
 
         accountService.saveAccount(account);
