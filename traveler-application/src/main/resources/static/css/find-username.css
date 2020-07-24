@@ -9,7 +9,7 @@ header h1 {
 }
 
 
-/*로그인 폼 시작*/
+/*아이디 찾기 폼 시작*/
 section form {
     width: 100%;
     position: absolute;
@@ -24,32 +24,26 @@ section p {
     color: white;
     width: 100%;
     position: absolute;
+    top: 150px;
+    text-align: center;
+}
+
+#message {
+    color: white;
+    width: 100%;
+    position: absolute;
     top: 350px;
     text-align: center;
 }
 
-/*아이디, 비밀번호 input box*/
+/*이름, 이메일 input box*/
 section form div input {
     height: 35px;
     width: 200px;
     border-radius: 5px;
     border-color: transparent;
 }
-
-/*아이디 기억 checkbox*/
-#rememeber-chb {
-    width: 15px;
-    height: 15px;
-    border: 1px solid;
-    border-radius: 20px;
-    margin-top: 0px;
-}
-
-#rememeber-label {
-    color: beige;
-}
-
-/*로그인 폼 종료*/
+/*아이디 찾기 폼 종료*/
 
 
 /*아이디 찾기 버튼을 감싸는 박스*/
@@ -73,7 +67,7 @@ section form div input {
     width: 100%;
     text-align: center;
     position: absolute;
-    top: 600px;
+    top: 650px;
 }
 
 /*비밀번호 찾기 버튼*/

@@ -1,26 +1,6 @@
 header {
-    background-image: url("../image/header.jpg");
-    background-size: cover;
     height: 742px;
-    position: relative;
 }
-
-.navbar-custom {
-    background-color: transparent;
-}
-
-.navbar-toggle {
-    background-color: white;
-}
-
-#nav-menu {
-    margin-bottom:100px;
-}
-
-nav ul li a {
-    color: #ffffff;
-}
-
 
 /*웹 사이트 타이틀*/
 header h1 {

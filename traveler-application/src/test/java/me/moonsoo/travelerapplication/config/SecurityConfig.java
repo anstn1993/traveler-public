@@ -1,5 +1,7 @@
-package me.moonsoo.travelerapplication.config;
+package me.moonsoo.travelerapplication.main.config;
 
+import me.moonsoo.travelerapplication.config.CustomAuthenticationFailureHandler;
+import me.moonsoo.travelerapplication.config.CustomAuthenticationSuccessHandler;
 import me.moonsoo.travelerapplication.properties.TravelerOAuth2ClientProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,14 +20,12 @@ import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.servlet.Filter;
@@ -33,15 +33,12 @@ import javax.servlet.Filter;
 @EnableWebSecurity
 @Configuration
 @EnableOAuth2Client
-@Profile("!test")
+@Profile("test")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Qualifier("oauth2ClientContext")
     @Autowired
     private OAuth2ClientContext oAuth2ClientContext;
-
-    @Autowired
-    private TokenStore tokenStore;
 
     @Autowired
     private TravelerOAuth2ClientProperties clientProperties;//oauth2 client details property object
@@ -55,6 +52,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public OAuth2RestTemplate oAuth2RestTemplate() {
         return new OAuth2RestTemplate(travelerClient(), oAuth2ClientContext);
+    }
+
+    @Bean
+    public InMemoryTokenStore inMemoryTokenStore() {
+        return new InMemoryTokenStore();
     }
 
     @Bean
@@ -76,7 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         oauth2ClientFilter.setAuthenticationSuccessHandler(successHandler);
         oauth2ClientFilter.setRestTemplate(oAuth2RestTemplate());
         DefaultTokenServices tokenServices = new DefaultTokenServices();
-        tokenServices.setTokenStore(tokenStore);
+        tokenServices.setTokenStore(inMemoryTokenStore());
         oauth2ClientFilter.setTokenServices(tokenServices);
         oauth2ClientFilter.setAuthenticationManager(authenticationManagerBean());
         oauth2ClientFilter.setApplicationEventPublisher(eventPublisher);
@@ -88,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         OAuth2AuthenticationManager authenticationManager = new OAuth2AuthenticationManager();
         DefaultTokenServices tokenServices = new DefaultTokenServices();
-        tokenServices.setTokenStore(tokenStore);
+        tokenServices.setTokenStore(inMemoryTokenStore());
         authenticationManager.setTokenServices(tokenServices);
         return authenticationManager;
     }
@@ -105,6 +107,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.GET, "/**").permitAll()
                 .mvcMatchers(HttpMethod.POST, "/login/traveler").permitAll()
                 .mvcMatchers(HttpMethod.POST, "/find-username/**").permitAll()
+                .mvcMatchers(HttpMethod.POST, "/find-username").permitAll()
                 .mvcMatchers(HttpMethod.POST, "/find-password/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/find-password/**").permitAll()
                 .mvcMatchers(HttpMethod.POST, "/invalidAuthCode").permitAll()

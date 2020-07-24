@@ -1,0 +1,22 @@
+header {
+    background-image: url("../image/header.jpg");
+    background-size: cover;
+    height: 100vh;
+    position: relative;
+}
+
+.navbar-custom {
+    background-color: transparent;
+}
+
+.navbar-toggle {
+    background-color: white;
+}
+
+#nav-menu {
+    margin-bottom:100px;
+}
+
+nav a {
+    color: #ffffff;
+}

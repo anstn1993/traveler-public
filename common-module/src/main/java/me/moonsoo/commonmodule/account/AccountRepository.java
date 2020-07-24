@@ -14,4 +14,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     Page<Account> findAllByEmailAuthIsTrueAndNicknameContains(Pageable pageable, String nickname);
 
     Optional<Account> findByUsername(String username);
+
+    Optional<Account> findByNameAndEmail(String name, String email);
+    Optional<Account> findByUsernameAndEmail(String username, String email);
 }

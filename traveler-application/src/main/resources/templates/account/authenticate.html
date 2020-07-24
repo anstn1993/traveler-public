@@ -2,15 +2,16 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>로그인</title>
+    <title>아이디 찾기</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/header.css" type="text/css"/>
-    <link rel="stylesheet" href="/css/login.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/header.css"/>
+    <link rel="stylesheet" href="/css/authenticate.css"/>
     <script
             src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="/js/authenticate.js"></script>
 </head>
 <body>
 <!--header-->
@@ -34,41 +35,30 @@
                     <li><a href="#">커뮤니티</a></li>
                     <li><a href="#">일정 만들기</a></li>
                     <li><a href="#">동행 구하기</a></li>
+                    <li><a th:href="@{/login}">로그인</a></li>
                     <li><a th:href="@{/sing-up}">회원가입</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-    <h1>로그인</h1>
+    <h1>아이디 찾기</h1>
 </header>
 <section>
-    <p th:if="${!message.equals('')}" th:text="${message}"></p>
-    <form action="#" th:action="@{/login/traveler}" method="post">
+    <div id="timer-box"></div>
+    <form action="#" th:action="@{/find-username/authenticate}" method="post">
         <div class="form-group form-inline">
-            <input th:if="${username==null}" class="" type="text" name="username" placeholder="아이디"
-                   required="required"/>
-            <input th:unless="${username==null}" class="" type="text" name="username" th:value="${username}"
-                   placeholder="아이디" required="required"/>
+            <input type="number" name="authCode" placeholder="인증번호" required="required"/>
         </div>
+        <p id="message"></p>
+        <p>
+            *이메일로 인증번호가 전송되었습니다. 확인 후 제한시간 안에 인증번호를 입력해주세요.
+            <br>
+            이 페이지를 떠나거나 새로고침시 인증번호를 다시 발급받아야 합니다. 주의하세요.
+        </p>
         <div class="form-group form-inline">
-            <input class="" type="password" name="password" placeholder="비밀번호" required="required"/>
-        </div>
-        <div>
-            <label id="rememeber-label" th:for="rememeber-chb">아이디 기억</label>
-            <input th:if="${username==null}" th:id="rememeber-chb" type="checkbox" name="remember" value="remember"/>
-            <input th:unless="${username==null}" th:id="rememeber-chb" type="checkbox" name="remember" value="remember"
-                   checked/>
-        </div>
-        <div class="form-group form-inline">
-            <input type="submit" value="로그인" class="btn btn-primary"/>
+            <input type="submit" value="본인 인증" class="btn btn-primary"/>
         </div>
     </form>
-    <div id="find-username-btn-box">
-        <a id="find-username-btn" href="/find-username" role="button" class="btn btn-primary">아이디 찾기</a>
-    </div>
-    <div id="find-password-btn-box">
-        <a id="find-password-btn" href="/find-password" role="button" class="btn btn-primary">비밀번호 찾기</a>
-    </div>
 </section>
 </body>
 </html>

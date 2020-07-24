@@ -1,11 +1,9 @@
-package me.moonsoo.travelerapplication.main;
+package me.moonsoo.travelerapplication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import me.moonsoo.commonmodule.account.*;
-import me.moonsoo.travelerapplication.config.SecurityConfig;
-import me.moonsoo.travelerapplication.main.config.AuthServerConfig;
-import me.moonsoo.travelerapplication.main.config.ResourceServerConfig;
+import me.moonsoo.travelerapplication.main.config.SecurityConfig;
 import org.junit.jupiter.api.Disabled;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Slf4j
-@Import({AuthServerConfig.class, SecurityConfig.class, ResourceServerConfig.class})
+@Import({SecurityConfig.class})
 @TestPropertySource({"classpath:/application-test.properties"})
 @Disabled
 public class BaseControllerTest {
@@ -53,9 +50,10 @@ public class BaseControllerTest {
 
 
     //계정 생성
-    protected Account createAccount(String email, String password, int index) {
+    protected Account createAccount(String username, String email, String password, int index) {
         //Given
         Account account = Account.builder()
+                .username(username)
                 .email(index + email)
                 .password(password)
                 .name("user" + index)
@@ -71,11 +69,11 @@ public class BaseControllerTest {
     }
 
     //인자로 들어가는 account는 save된 상태
-    protected String getAuthToken(String email, String password, int index) throws Exception {
+    protected String getAuthToken(String username, String email, String password, int index) throws Exception {
         //Given
         String clientId = "traveler";
         String clientPassword = "pass";
-        account = createAccount(email, password, index);
+        account = createAccount(username, email, password, index);
 
         String contentAsString = mockMvc.perform(post("/oauth/token").with(httpBasic(clientId, clientPassword))
                 .param("username", index + email)

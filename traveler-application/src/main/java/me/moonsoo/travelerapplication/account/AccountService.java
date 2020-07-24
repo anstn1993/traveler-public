@@ -1,4 +1,4 @@
-package me.moonsoo.travelerapplication.main.account;
+package me.moonsoo.travelerapplication.account;
 
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountAdapter;
@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.Null;
 import java.util.Optional;
 
 @Service
@@ -26,5 +27,9 @@ public class AccountService implements UserDetailsService {
             throw new EmailAuthException("You need to authenticate your email.");
         }
         return new AccountAdapter(account);
+    }
+
+    public Optional<Account> findUserByNameAndEmail(String name, String email) {
+        return accountRepository.findByNameAndEmail(name, email);
     }
 }

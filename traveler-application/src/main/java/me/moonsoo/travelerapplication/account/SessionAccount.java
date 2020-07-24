@@ -1,4 +1,4 @@
-package me.moonsoo.travelerapplication.main.account;
+package me.moonsoo.travelerapplication.account;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;

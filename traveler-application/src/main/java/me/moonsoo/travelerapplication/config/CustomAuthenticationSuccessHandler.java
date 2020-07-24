@@ -3,27 +3,18 @@ package me.moonsoo.travelerapplication.config;
 import lombok.extern.slf4j.Slf4j;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountAdapter;
-import me.moonsoo.travelerapplication.main.account.SessionAccount;
+import me.moonsoo.travelerapplication.account.SessionAccount;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.servlet.FlashMap;
-import org.springframework.web.servlet.FlashMapManager;
-import org.springframework.web.servlet.support.SessionFlashMapManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 //oauth2 인증에 성공했을 때 최종적으로 호출되는 핸들러로 로그인 성공 시에 쿠키 데이터 추가 및 세션 데이터를 추가해준다.
 @Component
