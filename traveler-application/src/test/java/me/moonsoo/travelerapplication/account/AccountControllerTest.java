@@ -111,6 +111,38 @@ class AccountControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @DisplayName("미인증 상태에서 비밀번호 찾기 페이지 요청")
+    public void getFindPasswordPage_Without_Auth() throws Exception {
+        mockMvc.perform(get("/find-password"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(view().name("account/find-password"))
+        ;
+    }
+
+    @Test
+    @DisplayName("인증 상태에서 비밀번호 찾기 페이지 요청")
+    public void getFindPasswordPage_With_Auth() throws Exception {
+        //사용자 추가
+        String username = "anstn1993";
+        String email = "anstn1993@email.com";
+        String password = "11111111";
+        Account account = createAccount(username, email, password, 0);
+        SessionAccount sessionAccount = modelMapper.map(account, SessionAccount.class);
+
+        //세션에 사용자 정보를 넣어준다.
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("account", sessionAccount);
+
+        mockMvc.perform(get("/find-password")
+                .session(mockHttpSession))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"))
+        ;
+    }
+
+    @Test
     @DisplayName("인증 이메일 전송 테스트")
     public void sendEmail() throws MessagingException, IOException {
         String username = "anstn1993";
@@ -149,7 +181,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .param("email", account.getEmail()))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/find-username/authenticate"))
+                .andExpect(view().name("redirect:/authenticate"))
                 .andReturn();
 
         HttpSession session = createAuthCodeResult.getRequest().getSession();
@@ -167,16 +199,14 @@ class AccountControllerTest extends BaseControllerTest {
         authCodeMockSession.setAttribute("authCode", authCode);
 
         //이메일로 전송된 인증번호를 담아서 post요청해서 본인 인증을 하는 요청
-        MvcResult authenticateResult = mockMvc.perform(post("/find-username/authenticate")
+        mockMvc.perform(post("/authenticate")
                 .session(authCodeMockSession)
                 .with(csrf())
                 .param("authCode", authCode))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn();
+        ;
 
-        HttpSession afterAuthSession = authenticateResult.getRequest().getSession();
-        assertThat(afterAuthSession.getAttribute("authCode")).isNull();
 
         MockHttpSession usernameMockSession = new MockHttpSession();
         usernameMockSession.setAttribute("username", username);
@@ -190,13 +220,83 @@ class AccountControllerTest extends BaseControllerTest {
                 .andReturn();
 
         HttpSession findUsernameSession = findUsernameResult.getRequest().getSession();
-        assertThat(findUsernameSession.getAttribute("username")).isNull();
+        assertAll("session invalid test", () -> {
+            assertThat(findUsernameSession.getAttribute("authCode")).isNull();
+            assertThat(findUsernameSession.getAttribute("authType")).isNull();
+            assertThat(findUsernameSession.getAttribute("username")).isNull();
+        });
     }
 
     @Test
     @DisplayName("비밀번호 찾기 본인 인증")
-    public void authenticate_Find_Password() {
+    public void authenticate_Find_Password() throws Exception {
+        String username = "anstn1993";
+        String email = "user@email.com";
+        String password = "user";
+        Account account = createAccount(username, email, password, 0);
 
+        smtpServerExtension.getGreenMail().setUser("mansoo@localhost", "1111");
+        smtpServerExtension.getGreenMail().setUser(account.getEmail(), account.getPassword());
+
+        //본인 인증을 위해 사용자 이름과 이메일을 입력한 후 post요청
+        MvcResult createAuthCodeResult = mockMvc.perform(post("/find-password")
+                .with(csrf())
+                .param("username", account.getUsername())
+                .param("email", account.getEmail()))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/authenticate"))
+                .andReturn();
+
+        HttpSession session = createAuthCodeResult.getRequest().getSession();
+        MimeMessage[] receivedMessages = smtpServerExtension.getMessages();
+        String content = (String) receivedMessages[0].getContent();
+        String authCode = content.replace("인증번호: ", "");//인증 번호
+
+        assertAll("email auth test",
+                () -> {
+                    assertThat(session.getAttribute("authCode")).isEqualTo(authCode);
+                    assertThat(session.getAttribute("username")).isEqualTo(account.getUsername());
+                });
+
+        MockHttpSession authCodeMockSession = new MockHttpSession();
+        authCodeMockSession.setAttribute("authCode", authCode);
+
+        //이메일로 전송된 인증번호를 담아서 post요청해서 본인 인증을 하는 요청
+        mockMvc.perform(post("/authenticate")
+                .session(authCodeMockSession)
+                .with(csrf())
+                .param("authCode", authCode))
+                .andDo(print())
+                .andExpect(status().isOk())
+        ;
+
+
+        MockHttpSession passwordMockSession = new MockHttpSession();
+        passwordMockSession.setAttribute("username", username);
+        passwordMockSession.setAttribute("authCode", authCode);
+        //본인 인증 후 아이디를 확인하는 요청
+        MvcResult findPasswordResult = mockMvc.perform(get("/find-password/result")
+                .session(passwordMockSession)
+                .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        HttpSession findPasswordSession = findPasswordResult.getRequest().getSession();
+        assertAll("session invalid after find username auth complete test",
+                () -> {
+                    assertThat(findPasswordSession.getAttribute("authCode")).isNull();
+                    assertThat(findPasswordSession.getAttribute("authType")).isNull();
+                });
+
+        //비밀번호 변경 post요청
+        mockMvc.perform(post("/find-password/result")
+                .session(passwordMockSession)
+                .param("password", account.getPassword())
+                .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
     }
-
 }

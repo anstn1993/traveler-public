@@ -1,3 +1,4 @@
+var authInvalid = true;
 window.addEventListener('load', function () {
 
     var authBtn = document.querySelector("input[type='submit']");
@@ -6,6 +7,8 @@ window.addEventListener('load', function () {
     var time = 600;//총 제한 시간
     var min = "";//분
     var sec = "";//초
+
+
 
     //타이머 실행
     var timer = setInterval(function () {
@@ -36,7 +39,9 @@ window.addEventListener('load', function () {
         event.preventDefault();
         delete event['returnValue'];
         console.log("unload");
-        invalidAuthCode();//인증 코드를 세션에서 삭제
+        if(authInvalid) {
+            invalidAuthCode();//인증 코드를 세션에서 삭제
+        }
     });
 });
 
@@ -45,8 +50,7 @@ function invalidAuthCode() {
     $.ajax(
         {
             url: "/invalidAuthCode",
-            type: "POST",
-            async: false
+            type: "POST"
         }
     ).done(function (res) {
         console.log("success");
@@ -58,13 +62,24 @@ function invalidAuthCode() {
 //사용자가 입력한 인증 코드의 유효성 검사를 하는 요청을 보내는 함수
 function authenticate(authCode, messageBox) {
     $.ajax({
-        url: "/find-username/authenticate",
+        url: "/authenticate",
         type: "POST",
+        async: false,
         data: {
             "authCode": authCode
         }
     }).done(function (res) {
-        location.href="/find-username/result";
+        console.log(res);
+        console.log(res.authType);
+        var authType = res.authType;
+        if(authType == "username") {
+            authInvalid = false;
+            location.href="/find-username/result";
+        }
+        else {//authType == "password"
+            authInvalid = false;
+            location.href="/find-password/result";
+        }
     }).fail(function (res) {
         messageBox.innerHTML = "인증번호가 잘못되었습니다.";
     });
