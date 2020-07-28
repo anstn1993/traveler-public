@@ -33,11 +33,11 @@ public class AccountService implements UserDetailsService {
         return new AccountAdapter(account);
     }
 
-    public Optional<Account> findUserByNameAndEmail(String name, String email) {
+    public Optional<Account> findByNameAndEmail(String name, String email) {
         return accountRepository.findByNameAndEmail(name, email);
     }
 
-    public Optional<Account> findUsernameAndEmail(String username, String email) {
+    public Optional<Account> findByUsernameAndEmail(String username, String email) {
         return accountRepository.findByUsernameAndEmail(username, email);
     }
 
@@ -47,5 +47,13 @@ public class AccountService implements UserDetailsService {
         Account account = accountOpt.get();
         account.setPassword(passwordEncoder.encode(password));
         accountRepository.save(account);
+    }
+
+    public Optional<Account> findByUsername(String username) {
+        return accountRepository.findByUsername(username);
+    }
+
+    public Optional<Account> findByEmail(String email) {
+        return accountRepository.findByEmail(email);
     }
 }

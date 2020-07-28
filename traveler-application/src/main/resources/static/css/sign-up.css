@@ -1,0 +1,70 @@
+/*로그인 타이틀*/
+header h1 {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 50px;
+    position: absolute;
+    top: 250px;
+}
+
+
+/*로그인 폼 시작*/
+section form {
+    width: 100%;
+    position: absolute;
+    top: 350px;
+}
+
+section form div {
+    text-align: center;
+}
+
+section p {
+    color: white;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+}
+
+/*아이디, 비밀번호 input box*/
+section form div input {
+    height: 35px;
+    width: 200px;
+    border-radius: 5px;
+    border-color: transparent;
+}
+
+/*프로필 이미지 라벨*/
+#profile-input-label {
+    background: transparent;
+    border-style: none;
+}
+
+/*프로필 이미지 input*/
+input[type="file"] {
+    width: 0px;
+    height: 0px;
+}
+
+#profile-input-box div {
+    color: white;
+    text-align: center;
+    margin-top: 15px;
+}
+
+/*성별 radio button*/
+input[type="radio"] {
+    width: 15px;
+    height: 15px;
+    border: 1px solid;
+    border-radius: 20px;
+    margin-top: 0px;
+}
+
+.radio-btn-label {
+    color: beige;
+    padding: 5px;
+}
+/*회원가입 폼 종료*/
+

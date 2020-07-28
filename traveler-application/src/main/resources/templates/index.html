@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <title>Traveler</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/header.css" type="text/css"/>
-    <link rel="stylesheet" href="css/index.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/header.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/index.css" type="text/css"/>
     <script
             src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="/js/main.js"></script>
 </head>
 <body>
 <!--문서의 상단부-->
@@ -35,7 +35,7 @@
                     <li th:if="${session.account != null}"><a href="#" th:href="@{'/accounts/' + ${session.account.getId()}}" th:text="마이페이지">마이페이지</a></li>
                     <li th:if="${session.account != null}"><a href="#" th:href="@{/logout}" th:text="로그아웃">로그아웃</a></li>
                     <li th:unless="${session.account != null}"><a href="#" th:href="@{/login}" th:text="로그인">로그인</a></li>
-                    <li th:unless="${session.account != null}"><a href="#" th:href="@{/login}" th:text="회원가입">회원가입</a></li>
+                    <li th:unless="${session.account != null}"><a href="#" th:href="@{/sign-up}" th:text="회원가입">회원가입</a></li>
                 </ul>
             </div>
         </div>

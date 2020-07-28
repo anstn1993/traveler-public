@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, Integer> {
-    Optional<Account> findByEmail(String username);
 
     Page<Account> findAllByEmailAuthIsTrue(Pageable pageable);
     Page<Account> findAllByEmailAuthIsTrueAndNameContains(Pageable pageable, String name);
@@ -17,4 +16,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     Optional<Account> findByNameAndEmail(String name, String email);
     Optional<Account> findByUsernameAndEmail(String username, String email);
+    Optional<Account> findByEmail(String email);
+    Optional<Account> findByNickname(String nickname);
+
 }

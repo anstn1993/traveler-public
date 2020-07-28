@@ -16,4 +16,10 @@ public class AppProperties {
     @NotEmpty
     private String baseUrl;
 
+    @NotEmpty
+    private String restApiUrl;
+
+    @NotEmpty
+    private String createAccountUri;
+
 }

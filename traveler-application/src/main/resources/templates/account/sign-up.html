@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/header.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/sign-up.css" type="text/css"/>
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="/js/sign-up.js"></script>
+</head>
+<body>
+<!--header-->
+<header>
+    <nav class="navbar navbar-custom">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="collapsed navbar-toggle" data-toggle="collapse" data-target="#nav-menu"
+                        aria-expanded="false">
+                    <span class="sr-only">Toggle Navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="/" class="navbar-brand">
+                    traveler
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="nav-menu">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">커뮤니티</a></li>
+                    <li><a href="#">일정 만들기</a></li>
+                    <li><a href="#">동행 구하기</a></li>
+                    <li><a th:href="@{/login}">로그인</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <h1>회원가입</h1>
+</header>
+<section>
+    <form action="#" th:action="@{/sign-up}" method="post" enctype="multipart/form-data">
+        <div id="profile-input-box" class="form-group form-inline">
+            <label id="profile-input-label" class="btn btn-default" for="profile-input">
+                <img id="profile" th:src="@{/image/profile.png}" width="80" height="80" class="img-circle" alt="프로필 이미지 미리보기">
+            </label>
+            <div>프로필 이미지</div>
+            <input id="profile-input" class="" type="file" name="imageFile" accept="image/*"/>
+        </div>
+        <div class="form-group form-inline">
+            <input class="form-input" type="text" name="username" placeholder="아이디" required="required"/>
+        </div>
+        <div class="form-group form-inline">
+            <input class="form-input" type="password" name="password" placeholder="비밀번호" required="required"/>
+        </div>
+        <div class="form-group form-inline">
+            <input class="form-input" type="password" name="password-check" placeholder="비밀번호 확인" required="required"/>
+        </div>
+        <div class="form-group form-inline">
+            <input class="form-input" type="email" name="email" placeholder="이메일" required="required"/>
+        </div>
+        <div class="form-group form-inline">
+            <input class="form-input" type="text" name="name" placeholder="이름" required="required"/>
+        </div>
+        <div class="form-group form-inline">
+            <input class="form-input" type="text" name="nickname" placeholder="닉네임" required="required"/>
+        </div>
+        <div class="form-group form-inline">
+            <label class="radio-btn-label" for="male-radio-btn">남자</label>
+            <input id="male-radio-btn" class="form-input" type="radio" name="sex" value="male" required="required" checked/>
+            <label class="radio-btn-label" for="female-radio-btn">여자</label>
+            <input id="female-radio-btn" class="form-input" type="radio" name="sex" value="female" required="required"/>
+        </div>
+        <div class="form-group form-inline">
+            <input type="submit" value="회원가입" class="btn btn-primary"/>
+        </div>
+        <p>입력하신 이메일로 인증 메일이 전송됩니다. 정확하게 입력해주세요.</p>
+    </form>
+</section>
+</body>
+</html>

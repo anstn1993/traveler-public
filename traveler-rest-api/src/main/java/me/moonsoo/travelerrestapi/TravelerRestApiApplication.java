@@ -29,8 +29,7 @@ public class TravelerRestApiApplication {
                     "classpath:application.properties," +
                     "classpath:datasource.properties," +
                     "classpath:aws.properties," +
-                    "classpath:email.properties"
-            ;
+                    "classpath:email.properties";
 
     //테스트 프로파일 시의 프로퍼티
     public static final String testProperties =
@@ -38,16 +37,14 @@ public class TravelerRestApiApplication {
                     "classpath:application.properties," +
                     "classpath:datasource-test.properties," +
                     "classpath:aws.properties," +
-                    "classpath:email.properties"
-            ;
+                    "classpath:email.properties";
 
     public static void main(String[] args) {
-        String profile = args[0];
+        String profile = (args.length == 0) ? null : args[0];
         SpringApplicationBuilder springApplicationBuilder = new SpringApplicationBuilder(TravelerRestApiApplication.class);
-        if(profile.equals("--spring.profiles.active=test")) {
+        if (profile != null && profile.equals("--spring.profiles.active=test")) {
             springApplicationBuilder.properties(testProperties);
-        }
-        else {
+        } else {
             springApplicationBuilder.properties(properties);
         }
         springApplicationBuilder.run(args);

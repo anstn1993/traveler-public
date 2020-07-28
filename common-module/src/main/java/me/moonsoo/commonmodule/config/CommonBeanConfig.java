@@ -41,7 +41,7 @@ public class CommonBeanConfig {
     @Bean
     public RestTemplate restTemplate() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setReadTimeout(5000);
+        factory.setReadTimeout(60000);
         factory.setConnectTimeout(3000);
 
         HttpClient httpClient = HttpClientBuilder.create()

@@ -1,0 +1,208 @@
+var dataUri;//이미지 데이터 uri
+
+window.addEventListener("load", function () {
+    var profileImg = document.querySelector("#profile");//프로필 이미지 태그
+    var profileInput = document.querySelector("#profile-input");//프로필 이미지 선택 input 태그
+    var profileInputLabel = document.querySelector("#profile-input-label");//프로필 이미지 선택 input label태그
+    var inputList = document.querySelectorAll(".form-input");//회원가입 폼 input node list
+    var submitBtn = document.querySelector("input[type='submit']");//폼 제출 버튼
+    var deleteBtnBox = document.querySelector("#profile-input-box div");//프로필 이미지 삭제 버튼 box
+    //이미지 삭제 버튼 attribute set
+    var deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn btn-danger";
+    deleteBtn.textContent = "이미지 삭제";
+
+    //프로필 이미지 선택 시 콜백되는 이벤트
+    profileInput.onchange = function (event) {
+        console.log(event);
+        var file = event.target.files[0];
+        if (file == null) return;//이미지 선택 창을 취소할 경우를 대비해서 null 체크
+        if (!validImageType(file)) {//이미지 파일인지 검사
+            alert("이미지 파일만 선택 가능합니다.");
+            return;
+        }
+        console.log(file);
+        if (file != null) {
+            loadImage(file, profileImg);
+        }
+        deleteBtnBox.innerHTML = "";
+        deleteBtnBox.append(deleteBtn);
+    }
+
+    //드래그앤 드롭 이벤트
+    //이미지가 드래그앤 드롭 박스로 들어오는 최초에 한 번 호출
+    profileInputLabel.ondragenter = function (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    //드래그앤 드롭 박스에서 이미지를 움직이는 순간 계속 호출
+    profileInputLabel.ondragover = function (event) {
+        event.stopPropagation();
+        event.preventDefault();//기본 동작인 이미지 파일을 새 창으로 로드하는 것을 방지.
+    }
+    //이미지를 drop하는 순간 호출
+    profileInputLabel.ondrop = function (event) {
+        event.stopPropagation();
+        event.preventDefault();//기본 동작인 이미지 파일을 새 창으로 로드하는 것을 방지.
+        console.log(event);
+        var file = event.dataTransfer.files[0];
+        console.log(file);
+        if (!validImageType(file)) {//이미지 파일인지 검사
+            alert("이미지 파일만 선택 가능합니다.");
+            return;
+        }
+        console.log(file);
+        if (file != null) {
+            loadImage(file, profileImg);
+        }
+        deleteBtnBox.innerHTML = "";
+        deleteBtnBox.append(deleteBtn);
+    }
+
+    // 이미지 삭제 버튼 클릭시 콜백되는 이벤트
+    deleteBtn.onclick = function (event) {
+        console.log(event);
+        profileInput.value = "";//file input태그에서 value 초기화
+        dataUri = null;
+        profileImg.src = "/image/profile.png";//이미지 삭제
+        deleteBtnBox.innerHTML = "프로필 이미지";
+    }
+
+    //회원가입 폼 제출 콜백 이벤트
+    submitBtn.onclick = function (event) {
+        event.preventDefault();
+        if (isEmptyOrWhitespace(inputList)) {
+            alert("모든 항목을 채워주세요.");
+            return;
+        }
+        var formData = new FormData();
+        //프로필 이미지 추가
+        if (dataUri != null) {
+            formData.append("imageFile", dataURLToBlob(dataUri));
+        }
+        console.log(inputList);
+        for (var i = 0; i < inputList.length; i++) {
+            var name = inputList[i].name;
+            var value = inputList[i].value;
+            if (name != "sex") {
+                formData.append(name, value);
+            } else {
+                if (inputList[i].checked) {
+                    formData.append(name, value);
+                }
+            }
+        }
+        sendSignUpRequest(formData);
+    }
+});
+
+//선택한 이미지 파일을 썸네일로 만들어서 화면에 출력
+function loadImage(file, profileImg) {
+    var reader = new FileReader();//파일 reader
+    console.log(reader);
+    reader.readAsDataURL(file);//이미지 파일을 읽어들인다. trigger reader onload event
+
+    reader.onload = function () {
+        console.log("reader onload");
+        var tempImage = new Image();//썸네일 이미지 생성를 담을 image 객체
+        tempImage.src = reader.result;//data-uri를 이미지 객체에 주입. trigger image onload
+        tempImage.onload = function () {
+            //이미지 리사이즈를 위한 캔버스 객체 생성
+            var canvas = document.createElement("canvas");
+            var canvasContext = canvas.getContext('2d');
+
+            var maxSize = 720;//리사이징할 이미지 파일의 크기
+
+            //실제 이미지 사이즈
+            var width = tempImage.width;
+            var height = tempImage.height;
+
+            //크기 리사이징
+            if (width > height) {
+                if (width > maxSize) {
+                    height *= maxSize / width;
+                    width = maxSize;
+                }
+            } else {
+                if (height > maxSize) {
+                    width *= maxSize / height;
+                    height = maxSize;
+                }
+            }
+
+            //캔버스 크기 설정
+            canvas.width = width;
+            canvas.height = height;
+
+            //tempImage를 캔버스 위에 그린다.
+            canvasContext.drawImage(this, 0, 0, width, height);
+
+            //이미지 객체를 다시 data-uri형태로 바꿔서 img태그에 로드한다.
+            dataUri = canvas.toDataURL("image/*");
+            console.log(dataUri);
+            profileImg.src = dataUri;
+        }
+    }
+}
+
+//canvas의 data url을 blob 객체로 변환해서 file로 업로드하기 위한 데이터로 변환
+var dataURLToBlob = function (dataURL) {
+    var BASE64_MARKER = ';base64,';
+    //base 64로 인코딩되어있지 않은 경우
+    if (dataURL.indexOf(BASE64_MARKER) == -1) {
+        var parts = dataURL.split(',');
+        var contentType = parts[0].split(':')[1];//mime type(media type)
+        var raw = parts[1];//데이터 그 자체
+        return new Blob([raw], {type: contentType});
+    }
+    var parts = dataURL.split(BASE64_MARKER);
+    var contentType = parts[0].split(':')[1];
+    var raw = window.atob(parts[1]);//window.atob()는 base 64를 디코딩하는 메소드
+    var rawLength = raw.length;
+    var uInt8Array = new Uint8Array(rawLength);
+    for (var i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+    }
+    return new Blob([uInt8Array], {type: contentType});
+};
+
+//서버로 회원가입 요청을 보내는 함수
+function sendSignUpRequest(formData) {
+    $.ajax({
+        type: "POST",
+        url: "/sign-up",
+        async: false,
+        processData: false,
+        contentType: false,
+        data: formData
+    }).done(function (res) {
+        console.log("done");
+        alert("회원가입에 성공했습니다. 이메일 인증 후 로그인해주세요.");
+        location.href="/login";
+    }).fail(function (res) {
+        console.log("fail");
+        console.log(res);
+        var message = res.responseJSON[0].defaultMessage;
+        alert(message);
+    });
+}
+
+//파일이 이미지 파일인지 검사하는 함수
+function validImageType(file) {
+    var type = file.type;
+    if (type.indexOf("image") == -1) {
+        return false;
+    }
+    return true;
+}
+
+//모든 폼 데이터들이 채워졌는지 확인
+//공백이나 빈 공간이 있으면 true, 모두 입력되어 있으면 false
+function isEmptyOrWhitespace(inputList) {
+    for (var i = 0; i < inputList.length; i++) {
+        if (inputList[i].value.trim() == "") {
+            return true;
+        }
+    }
+    return false;
+}

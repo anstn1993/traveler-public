@@ -103,14 +103,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .mvcMatchers(HttpMethod.GET, "/**").permitAll()
-                .mvcMatchers(HttpMethod.POST, "/login/traveler").permitAll()
-                .mvcMatchers(HttpMethod.POST, "/find-username/**").permitAll()
-                .mvcMatchers(HttpMethod.POST, "/find-password/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/authenticate").permitAll()
-                .mvcMatchers(HttpMethod.POST, "/invalidAuthCode").permitAll()
+                .mvcMatchers(HttpMethod.POST, "/login/traveler", "/find-username/**", "/find-password/**", "/authenticate", "/invalidAuthCode", "/sign-up").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .csrf().ignoringAntMatchers("/invalidAuthCode", "/authenticate", "/find-password/result")
+                .csrf().ignoringAntMatchers("/invalidAuthCode", "/authenticate", "/find-password/result", "/sign-up")
         ;
         http.formLogin().loginPage("/login").successForwardUrl("/").permitAll();
         http.logout().logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true);
