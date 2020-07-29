@@ -9,11 +9,21 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.convert.DataSizeUnit;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -22,18 +32,23 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class AccountControllerTest extends BaseControllerTest {
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @Autowired
     private EmailService emailService;
@@ -44,7 +59,7 @@ class AccountControllerTest extends BaseControllerTest {
     }
 
     @RegisterExtension
-    public static SmtpServerExtension smtpServerExtension = new SmtpServerExtension(new GreenMail(ServerSetup.SMTP));
+    public static SmtpServerExtension smtpServerExtension = new SmtpServerExtension(new GreenMail(new ServerSetup(26, null, "smtp")));
 
     @Test
     @DisplayName("미인증 상태에서 로그인 페이지 요청")
@@ -298,5 +313,120 @@ class AccountControllerTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
+    }
+
+    @Test
+    @DisplayName("회원가입(프로필 이미지 o)")
+    public void signUp() throws Exception {
+
+        //profile image file
+        MockMultipartFile imageFile = createMockMultipartFile();
+
+        //request params set
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("username", "anstn1993");
+        params.add("password", "11111111");
+        params.add("password-check", "11111111");
+        params.add("email", "test@localhost.com");
+        params.add("name", "김문수");
+        params.add("nickname", "만수");
+        params.add("sex", "MALE");
+
+
+        mockMvc.perform(multipart("/sign-up")
+                .file(imageFile)
+                .params(params))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("username").exists())
+                .andExpect(jsonPath("email").exists())
+                .andExpect(jsonPath("profileImageUri").exists())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("sex").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.get-accounts").exists())
+                .andExpect(jsonPath("_links.update-account").exists())
+                .andExpect(jsonPath("_links.delete-account").exists())
+        ;
+
+        Optional<Account> accountOpt = accountRepository.findByUsername("anstn1993");
+        assertThat(accountOpt.isPresent()).isTrue();
+    }
+
+    @Test
+    @DisplayName("회원가입 실패-요청 parameter가 다 넘어오지 않은 경우(400 Bad request)")
+    public void signUpFail_Not_Enough_Value() throws Exception {
+        //request params set
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("username", "anstn1993");
+        params.add("password", "11111111");
+        params.add("password-check", "11111111");
+        params.add("email", "test@localhost.com");
+        params.add("name", "김문수");
+        //닉네임과 성별을 request param에서 제외
+//        params.add("nickname", "만수");
+//        params.add("sex", "MALE");
+
+
+        mockMvc.perform(multipart("/sign-up")
+                .params(params))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+
+        Optional<Account> accountOpt = accountRepository.findByUsername("anstn1993");
+        assertThat(accountOpt.isEmpty()).isTrue();
+    }
+
+    @ParameterizedTest(name = "{index} => params = {0}")
+    @MethodSource("invalidRequestParamProvider")
+    @DisplayName("회원가입 실패-유효하지 않은 회원가입 폼 데이터가 request param에 담긴 경우(400 Bad request)")
+    public void signUpFail_Invalid_Request_params(MultiValueMap<String, String> params) throws Exception {
+        mockMvc.perform(multipart("/sign-up")
+                .params(params))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+
+        Optional<Account> accountOpt = accountRepository.findByUsername("anstn1993");
+        assertThat(accountOpt.isEmpty()).isTrue();
+    }
+
+    public static Stream<Arguments> invalidRequestParamProvider() {
+        return Stream.of(
+                Arguments.of(createInvalidParams("ans", "11111111", "11111111", "email@email.com", "김문수", "만수", "MALE")),
+                Arguments.of(createInvalidParams("anstn1993", "1111", "1111", "email@email.com", "김문수", "만수", "MALE")),
+                Arguments.of(createInvalidParams("anstn1993", "11111111", "22222222", "email@email.com", "김문수", "만수", "MALE")),
+                Arguments.of(createInvalidParams("anstn1993", "11111111", "11111111", "notemail", "김문수", "만수", "MALE")),
+                Arguments.of(createInvalidParams("anstn1993", "11111111", "11111111", "email@email.com", "김ㅁㅅ", "만수", "MALE")),
+                Arguments.of(createInvalidParams("anstn1993", "11111111", "11111111", "email@email.com", "김문수", "", "MALE"))
+        );
+    }
+
+    private static MultiValueMap<String, String> createInvalidParams(String username,
+                                                                    String password,
+                                                                    String passwordCheck,
+                                                                    String email,
+                                                                    String name,
+                                                                    String nickname,
+                                                                    String sex) {
+        MultiValueMap<String, String> invalidParams = new LinkedMultiValueMap<>();
+        invalidParams.add("username", username);
+        invalidParams.add("password", password);
+        invalidParams.add("password-check", passwordCheck);
+        invalidParams.add("email", email);
+        invalidParams.add("name", name);
+        invalidParams.add("nickname", nickname);
+        invalidParams.add("sex", sex);
+        return invalidParams;
+    }
+
+    private MockMultipartFile createMockMultipartFile() throws IOException {
+        String imageFileName = "2019_Red_Blue_Abstract_Design_Desktop_1366x768.jpg";
+        Resource imageResource = resourceLoader.getResource("classpath:image/" + imageFileName);
+        return new MockMultipartFile("imageFile", imageResource.getFile().getName(), "image/jpg", imageResource.getInputStream());
     }
 }

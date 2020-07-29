@@ -22,6 +22,7 @@ public class SmtpServerExtension implements BeforeAllCallback, AfterAllCallback,
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception {
+
         greenMail.start();//smtp 서버 시작
     }
 

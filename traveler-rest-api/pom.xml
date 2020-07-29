@@ -25,6 +25,11 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
             <exclusions>
@@ -81,7 +86,6 @@
             <groupId>io.findify</groupId>
             <artifactId>s3mock_2.13</artifactId>
             <version>0.2.6</version>
-            <scope>test</scope>
         </dependency>
 
         <!--spring mail-->
@@ -101,7 +105,6 @@
             <groupId>com.icegreen</groupId>
             <artifactId>greenmail</artifactId>
             <version>1.5.13</version>
-            <scope>test</scope>
         </dependency>
 
 

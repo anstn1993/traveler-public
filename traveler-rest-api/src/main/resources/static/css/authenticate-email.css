@@ -1,0 +1,41 @@
+header {
+    background-image: url("../image/header.jpg");
+    background-size: cover;
+    height: 100vh;
+    position: relative;
+}
+
+/*이메일 인증 타이틀*/
+header h1 {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 50px;
+    position: absolute;
+    top: 250px;
+}
+
+h2 {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 25px;
+    position: absolute;
+    top: 400px;
+}
+
+.navbar-custom {
+    background-color: transparent;
+}
+
+.navbar-toggle {
+    background-color: white;
+}
+
+#nav-menu {
+    margin-bottom:100px;
+}
+
+nav a {
+    color: #ffffff;
+}

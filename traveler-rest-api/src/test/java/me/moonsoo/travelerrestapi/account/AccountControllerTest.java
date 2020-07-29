@@ -129,6 +129,9 @@ class AccountControllerTest extends BaseControllerTest {
     @Autowired
     private ScheduleDetailRepository scheduleDetailRepository;
 
+    @Autowired
+    private GreenMail greenMail;
+
 
     @BeforeAll
     public static void startMockS3Server(@Autowired S3Mock s3Mock) {
@@ -152,8 +155,8 @@ class AccountControllerTest extends BaseControllerTest {
         accountRepository.deleteAll();
     }
 
-    @RegisterExtension
-    public static SmtpServerExtension smtpServerExtension = new SmtpServerExtension(new GreenMail(ServerSetup.SMTP));
+//    @RegisterExtension
+//    public static SmtpServerExtension smtpServerExtension = new SmtpServerExtension(new GreenMail(ServerSetup.SMTP));
 
 
     @Test
@@ -169,8 +172,8 @@ class AccountControllerTest extends BaseControllerTest {
         accountPart.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         //smtp서버 유저 set
-        smtpServerExtension.getGreenMail().setUser("mansoo@localhost", "1111");
-        smtpServerExtension.getGreenMail().setUser(accountDto.getEmail(), "1111");
+        greenMail.setUser("mansoo@localhost", "1111");
+        greenMail.setUser(accountDto.getEmail(), "1111");
 
         mockMvc.perform(multipart("/api/accounts")
                 .file(mockFile)
@@ -246,8 +249,8 @@ class AccountControllerTest extends BaseControllerTest {
         accountPart.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         //smtp서버 유저 set
-        smtpServerExtension.getGreenMail().setUser("mansoo@localhost", "1111");
-        smtpServerExtension.getGreenMail().setUser(accountDto.getEmail(), "1111");
+        greenMail.setUser("mansoo@localhost", "1111");
+        greenMail.setUser(accountDto.getEmail(), "1111");
 
         mockMvc.perform(multipart("/api/accounts")
                 .part(accountPart)
@@ -378,12 +381,12 @@ class AccountControllerTest extends BaseControllerTest {
         String password = "user";
         Account account = createAccount(username, email, password, 0);
 
-        smtpServerExtension.getGreenMail().setUser("mansoo@localhost", "1111");
-        smtpServerExtension.getGreenMail().setUser(account.getEmail(), account.getPassword());
+        greenMail.setUser("mansoo@localhost", "1111");
+        greenMail.setUser(account.getEmail(), account.getPassword());
 
         emailService.sendAuthMessage(account);//인증 메일 전송
 
-        MimeMessage[] receivedMessages = smtpServerExtension.getMessages();
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
         assertAll("email test", () -> {
             assertEquals(receivedMessages.length, 1);
             assertEquals(receivedMessages[0].getSubject(), "traveler 이용을 위한 인증 메일 입니다.");
