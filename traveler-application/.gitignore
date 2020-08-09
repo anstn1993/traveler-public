@@ -30,8 +30,8 @@ build/
 ### VS Code ###
 .vscode/
 
-datasource.properties
-oauth2-client.properties
-email.properties
-aws.properties
+/src/main/resources/datasource.properties
+/src/main/resources/oauth2-client.properties
+/src/main/resources/email.properties
+/src/main/resources/aws.properties
 /src/main/resources/static/image
