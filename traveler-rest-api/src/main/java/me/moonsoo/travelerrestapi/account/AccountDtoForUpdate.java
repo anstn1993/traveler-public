@@ -31,6 +31,9 @@ public class AccountDtoForUpdate {
     @Length(min = 1, max = 20)
     private String nickname;
 
+    @Length(max = 150)
+    private String introduce;
+
     @NotNull
     private Sex sex;
 }

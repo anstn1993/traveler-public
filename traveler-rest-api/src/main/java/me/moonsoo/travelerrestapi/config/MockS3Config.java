@@ -8,10 +8,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import io.findify.s3mock.S3Mock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 
 @Configuration
 @PropertySource(value = "classpath:/aws.properties")
@@ -25,7 +22,7 @@ public class MockS3Config {
     private String REGION;
 
     @Bean
-    @ConditionalOnMissingBean(value = S3Mock.class)
+    @ConditionalOnMissingBean
     public S3Mock s3Mock() {
         return new S3Mock.Builder()
                 .withInMemoryBackend()
@@ -34,7 +31,7 @@ public class MockS3Config {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = AmazonS3.class)
+    @ConditionalOnMissingBean
     public AmazonS3 amazonS3(S3Mock s3Mock) {
         s3Mock.start();
         AwsClientBuilder.EndpointConfiguration endpoint = new AwsClientBuilder.EndpointConfiguration("http://localhost:9999", REGION);

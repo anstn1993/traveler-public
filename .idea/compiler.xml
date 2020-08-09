@@ -7,9 +7,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="traveler-oauth-server" />
         <module name="traveler-rest-api" />
         <module name="traveler-application" />
-        <module name="traveler-oauth-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

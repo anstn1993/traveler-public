@@ -3,6 +3,11 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src!**/src/test/**/main/**
 
+datasource.properties
+oauth2-client.properties
+email.properties
+aws.properties
+/src/main/resources/static/image/
 
 ### STS ###
 .apt_generated
@@ -30,8 +35,3 @@ build/
 ### VS Code ###
 .vscode/
 
-/src/main/resources/datasource.properties
-/src/main/resources/oauth2-client.properties
-/src/main/resources/email.properties
-/src/main/resources/aws.properties
-/src/main/resources/static/image

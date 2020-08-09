@@ -153,6 +153,7 @@ class AccountControllerTest extends BaseControllerTest {
         scheduleRepository.deleteAll();
         followRepository.deleteAll();
         accountRepository.deleteAll();
+        greenMail.reset();
     }
 
 //    @RegisterExtension
@@ -187,6 +188,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("introduce").exists())
                 .andExpect(jsonPath("profileImageUri").exists())
                 .andExpect(jsonPath("sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
@@ -213,6 +215,7 @@ class AccountControllerTest extends BaseControllerTest {
                                 fieldWithPath("password").description("비밀번호"),
                                 fieldWithPath("name").description("이름"),
                                 fieldWithPath("nickname").description("닉네임"),
+                                fieldWithPath("introduce").description("자기 소개"),
                                 fieldWithPath("sex").description("성별")
                         ),
                         requestHeaders(
@@ -229,6 +232,7 @@ class AccountControllerTest extends BaseControllerTest {
                                 fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("name").description("사용자 이름"),
                                 fieldWithPath("nickname").description("사용자 닉네임"),
+                                fieldWithPath("introduce").description("자기 소개"),
                                 fieldWithPath("sex").description("사용자 성별"),
                                 fieldWithPath("_links.self.href").description("생성된 account 리소스 링크"),
                                 fieldWithPath("_links.get-accounts.href").description("account 목록을 조회할 수 있는 링크"),
@@ -538,6 +542,7 @@ class AccountControllerTest extends BaseControllerTest {
                                 fieldWithPath("_embedded.accountList[].profileImageUri").description("사용자 프로필 이미지 경로"),
                                 fieldWithPath("_embedded.accountList[].name").description("사용자 이름"),
                                 fieldWithPath("_embedded.accountList[].nickname").description("사용자 닉네임"),
+                                fieldWithPath("_embedded.accountList[].introduce").description("사용자 소개"),
                                 fieldWithPath("_embedded.accountList[].sex").description("사용자 성별"),
                                 fieldWithPath("_embedded.accountList[]._links.self.href").description("해당 사용자 조회 링크"),
                                 fieldWithPath("_links.create-account.href").description("사용자 추가 링크(미인증 상태에서 요청한 경우 활성화)")
@@ -564,6 +569,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("introduce").exists())
                 .andExpect(jsonPath("profileImageUri").doesNotExist())
                 .andExpect(jsonPath("sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
@@ -597,6 +603,7 @@ class AccountControllerTest extends BaseControllerTest {
                                 fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("name").description("사용자 이름"),
                                 fieldWithPath("nickname").description("사용자 닉네임"),
+                                fieldWithPath("introduce").description("사용자 소개"),
                                 fieldWithPath("sex").description("사용자 성별"),
                                 fieldWithPath("_links.self.href").description("조회한 account 리소스 링크"),
                                 fieldWithPath("_links.get-accounts.href").description("account 목록을 조회할 수 있는 링크"),
@@ -627,6 +634,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("introduce").exists())
                 .andExpect(jsonPath("profileImageUri").doesNotExist())
                 .andExpect(jsonPath("sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
@@ -659,6 +667,7 @@ class AccountControllerTest extends BaseControllerTest {
                                 fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("name").description("사용자 이름"),
                                 fieldWithPath("nickname").description("사용자 닉네임"),
+                                fieldWithPath("introduce").description("사용자 소개"),
                                 fieldWithPath("sex").description("사용자 성별"),
                                 fieldWithPath("_links.self.href").description("생성된 account 리소스 링크"),
                                 fieldWithPath("_links.get-accounts.href").description("account 목록을 조회할 수 있는 링크"),
@@ -751,6 +760,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("introduce").exists())
                 .andExpect(jsonPath("profileImageUri").exists())
                 .andExpect(jsonPath("sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
@@ -773,6 +783,7 @@ class AccountControllerTest extends BaseControllerTest {
                                 fieldWithPath("password").description("비밀번호"),
                                 fieldWithPath("name").description("이름"),
                                 fieldWithPath("nickname").description("닉네임"),
+                                fieldWithPath("introduce").description("자기 소개"),
                                 fieldWithPath("sex").description("성별")
                         ),
                         requestHeaders(
@@ -787,6 +798,7 @@ class AccountControllerTest extends BaseControllerTest {
                                 fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("name").description("사용자 이름"),
                                 fieldWithPath("nickname").description("사용자 닉네임"),
+                                fieldWithPath("introduce").description("사용자 소개"),
                                 fieldWithPath("sex").description("사용자 성별"),
                                 fieldWithPath("_links.self.href").description("수정된 account 리소스 링크"),
                                 fieldWithPath("_links.get-accounts.href").description("account 목록을 조회할 수 있는 링크"),
@@ -1267,6 +1279,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .name("user")
                 .password("11111111")
                 .nickname("user")
+                .introduce("It's me!")
                 .sex(Sex.MALE)
                 .build();
     }
@@ -1278,6 +1291,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .password("11111111")
                 .nickname("user")
                 .sex(Sex.MALE)
+                .introduce("It's me!")
                 .build();
     }
 

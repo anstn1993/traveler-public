@@ -38,6 +38,8 @@ public class Account implements Serializable {
     @Column(nullable = false, unique = true)
     private String nickname;
 
+    private String introduce;//자기 소개 글
+
     @Enumerated(EnumType.STRING)
     private Sex sex;//성별
 

@@ -99,6 +99,7 @@ public class BaseControllerTest {
                 .password(password)
                 .name("user" + index)
                 .nickname("user" + index)
+                .introduce("It's me!")
                 .emailAuth(true)
                 .profileImageUri(null)
                 .regDate(LocalDateTime.now())

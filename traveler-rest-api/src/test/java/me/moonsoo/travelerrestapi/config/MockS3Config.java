@@ -23,7 +23,7 @@ public class MockS3Config {
     private String REGION;
 
     @Bean
-    @ConditionalOnMissingBean(value = S3Mock.class)
+    @ConditionalOnMissingBean
     public S3Mock s3Mock() {
         return new S3Mock.Builder()
                 .withInMemoryBackend()
@@ -32,7 +32,7 @@ public class MockS3Config {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = AmazonS3.class)
+    @ConditionalOnMissingBean
     public AmazonS3 amazonS3(S3Mock s3Mock) {
         s3Mock.start();
         AwsClientBuilder.EndpointConfiguration endpoint = new AwsClientBuilder.EndpointConfiguration("http://localhost:9999", REGION);

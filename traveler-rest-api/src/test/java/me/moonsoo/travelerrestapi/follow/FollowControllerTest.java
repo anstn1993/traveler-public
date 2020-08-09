@@ -305,6 +305,7 @@ class FollowControllerTest extends BaseControllerTest {
                                 fieldWithPath("_embedded.accountList[].username").description("사용자의 계정 아이디"),
                                 fieldWithPath("_embedded.accountList[].email").description("사용자의 email"),
                                 fieldWithPath("_embedded.accountList[].nickname").description("사용자의 닉네임"),
+                                fieldWithPath("_embedded.accountList[].introduce").description("사용자 소개"),
                                 fieldWithPath("_embedded.accountList[].name").description("사용자의 이미지"),
                                 fieldWithPath("_embedded.accountList[].profileImageUri").description("사용자의 프로필 사진 경로"),
                                 fieldWithPath("_embedded.accountList[].sex").description("사용자의 성별"),
@@ -374,6 +375,7 @@ class FollowControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("introduce").exists())
                 .andExpect(jsonPath("profileImageUri").hasJsonPath())
                 .andExpect(jsonPath("sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
@@ -400,6 +402,7 @@ class FollowControllerTest extends BaseControllerTest {
                                 fieldWithPath("email").description("사용자의 email"),
                                 fieldWithPath("name").description("사용자의 이름"),
                                 fieldWithPath("nickname").description("사용자의 닉네임"),
+                                fieldWithPath("introduce").description("사용자 소개"),
                                 fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("sex").description("사용자의 성별"),
                                 fieldWithPath("_links.self.href").description("현재 리소스 조회 링크"),
@@ -531,6 +534,7 @@ class FollowControllerTest extends BaseControllerTest {
                                 fieldWithPath("_embedded.accountList[].username").description("사용자의 계정 아이디"),
                                 fieldWithPath("_embedded.accountList[].email").description("사용자의 email"),
                                 fieldWithPath("_embedded.accountList[].nickname").description("사용자의 닉네임"),
+                                fieldWithPath("_embedded.accountList[].introduce").description("사용자 소개"),
                                 fieldWithPath("_embedded.accountList[].name").description("사용자의 이미지"),
                                 fieldWithPath("_embedded.accountList[].profileImageUri").description("사용자의 프로필 사진 경로"),
                                 fieldWithPath("_embedded.accountList[].sex").description("사용자의 성별"),
@@ -600,6 +604,7 @@ class FollowControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("nickname").exists())
+                .andExpect(jsonPath("introduce").exists())
                 .andExpect(jsonPath("profileImageUri").hasJsonPath())
                 .andExpect(jsonPath("sex").exists())
                 .andExpect(jsonPath("_links.self").exists())
@@ -626,6 +631,7 @@ class FollowControllerTest extends BaseControllerTest {
                                 fieldWithPath("email").description("사용자의 email"),
                                 fieldWithPath("name").description("사용자의 이름"),
                                 fieldWithPath("nickname").description("사용자의 닉네임"),
+                                fieldWithPath("introduce").description("사용자 소개"),
                                 fieldWithPath("profileImageUri").description("사용자의 프로필 이미지 경로"),
                                 fieldWithPath("sex").description("사용자의 성별"),
                                 fieldWithPath("_links.self.href").description("현재 리소스 조회 링크"),
