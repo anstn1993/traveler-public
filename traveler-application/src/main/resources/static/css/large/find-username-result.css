@@ -7,26 +7,23 @@ header h1 {
     position: absolute;
     top: 250px;
 }
-
-section p {
-    color: white;
+section {
     width: 100%;
     position: absolute;
     top: 360px;
     text-align: center;
+}
+section p {
+    color: white;
+    width: 100%;
     font-size: 27px;
 }
-
-section div {
-    position: absolute;
-    top: 450px;
-    width: 100%;
-    text-align: center;
-}
-
-button {
+section button {
     height: 35px;
     width: 200px;
+    margin: 30px auto;
+    display: flex;
+    justify-content: center;
 }
 
 

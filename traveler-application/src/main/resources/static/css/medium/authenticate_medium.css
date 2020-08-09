@@ -1,0 +1,16 @@
+/*LOGIN TITLE*/
+header h1 {
+    top: 350px;
+}
+
+/*TIMER BOX*/
+#timer-box {
+    top: 450px;
+}
+
+/*AUTHENTICATE FORM*/
+#authenticate-form {
+    width: 100%;
+    position: absolute;
+    top: 500PX;
+}

@@ -3,41 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <title>Traveler</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/header.css" type="text/css"/>
-    <link rel="stylesheet" href="/css/index.css" type="text/css"/>
+
+    <meta name="author" content="MoonSooKim">
+    <meta name="description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Traveler">
+    <meta property="og:title" content="당신의 여행을 위한 공간입니다.">
+    <meta property="og:description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+    <meta property="og:url" content="http://localhost">
+
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:site" content="GitHub">
+    <meta property="twitter:title" content="당신의 여행을 위한 공간입니다.">
+    <meta property="twitter:description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+    <meta property="twitter:url" content="https://loclahost">
+
+    <!-- 브라우저 스타일 초기화 reset.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css" integrity="sha512-IJEbgDEF7OeKJRa0MY2PApnyJHRIsgzCveek4ec8VWQ+7KG3ZSKVNYa5xP/Gh0hVP0Mwb+gBsk+GwR3JQGhQNg==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/common.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/header.css" type="text/css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/header_medium.css" type="text/css"/>
+    <style>
+        h1 {
+            width: 100%;
+            text-align: center;
+            color: #ffffff;
+            font-size: 70px;
+            position: absolute;
+            top: 350px;
+        }
+    </style>
     <script
             src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/toggle-control.js"></script>
 </head>
 <body>
 <!--문서의 상단부-->
 <header>
-    <nav class="navbar navbar-custom">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="collapsed navbar-toggle" data-toggle="collapse" data-target="#nav-menu"
-                        aria-expanded="false">
-                    <span class="sr-only">Toggle Navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>
-            <div class="collapse navbar-collapse" id="nav-menu">
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">커뮤니티</a></li>
-                    <li><a href="#">일정 만들기</a></li>
-                    <li><a href="#">동행 구하기</a></li>
-                    <li th:if="${account != null}"><a href="#" th:href="@{/logout}" th:text="로그아웃">로그아웃</a></li>
-                    <li th:unless="${account != null}"><a href="#" th:href="@{/login}" th:text="로그인">로그인</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <h1>error</h1>
+    <div class="body__container">
+        <!--HEADER-->
+        <header>
+            <nav>
+                <div class="clearfix toggle">
+                    <ul class="notification-group float--right">
+                        <li><a href="#">채팅</a></li>
+                        <li><a href="#">알림</a></li>
+                    </ul>
+                </div>
+                <div class="inner">
+                    <div class="menu-group toggle">
+                        <ul class="main-menu">
+                            <li><a href="#">커뮤니티</a></li>
+                            <li><a href="#">일정 만들기</a></li>
+                            <li><a href="#">동행 구하기</a></li>
+                             <li th:if="${session.account != null}"><a href="#" th:href="@{'/users/' + ${session.account.getId()}}" th:text="마이페이지">마이페이지</a></li>
+                             <li th:if="${session.account != null}"><a href="#" th:href="@{/logout}" th:text="로그아웃">로그아웃</a></li>
+                            <li th:unless="${session.account != null}"><a href="#" th:href="@{/login}" th:text="로그인">로그인</a></li>
+                            <li th:unless="${session.account != null}"><a href="#" th:href="@{/sign-up}" th:text="회원가입">회원가입</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="toggle-btn">header menu toggle button</div>
+            </nav>
+        </header>
+        <h1>error</h1>
+    </div>
 </header>
 </body>
 </html>

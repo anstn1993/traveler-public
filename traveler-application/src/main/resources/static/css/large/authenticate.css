@@ -1,4 +1,4 @@
-/*로그인 타이틀*/
+/*AUTHENTICATE TITLE*/
 header h1 {
     width: 100%;
     text-align: center;
@@ -8,7 +8,7 @@ header h1 {
     top: 250px;
 }
 
-/*타이머 박스*/
+/*TIMER*/
 #timer-box {
     width: 100%;
     text-align: center;
@@ -18,25 +18,22 @@ header h1 {
     font-size: 20px;
 }
 
-/*아이디 찾기 폼 시작*/
-section form {
+/*AUTHENTICATE FORM*/
+#authenticate-form {
     width: 100%;
     position: absolute;
     top: 400px;
-}
-
-section form div {
     text-align: center;
 }
-
-section p {
-    color: white;
-    width: 100%;
-    position: absolute;
-    top: 150px;
-    text-align: center;
+#authenticate-form [type="number"] {
+    margin-bottom: 10px;
 }
-
+#authenticate-form p {
+    margin-bottom: 10px;
+}
+#authenticate-form [type="submit"] {
+    margin: 10px auto;
+}
 #message {
     color: red;
     width: 100%;
@@ -44,12 +41,3 @@ section p {
     top: 120px;
     text-align: center;
 }
-
-/*인증번호 input box*/
-section form div input {
-    height: 35px;
-    width: 200px;
-    border-radius: 5px;
-    border-color: transparent;
-}
-/*아이디 찾기 폼 종료*/

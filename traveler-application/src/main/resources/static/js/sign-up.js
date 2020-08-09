@@ -6,11 +6,15 @@ window.addEventListener("load", function () {
     var profileInputLabel = document.querySelector("#profile-input-label");//프로필 이미지 선택 input label태그
     var inputList = document.querySelectorAll(".form-input");//회원가입 폼 input node list
     var submitBtn = document.querySelector("input[type='submit']");//폼 제출 버튼
-    var deleteBtnBox = document.querySelector("#profile-input-box div");//프로필 이미지 삭제 버튼 box
+    var deleteBtnBox = document.querySelector("#sign-up-form .delete-btn-box");//프로필 이미지 삭제 버튼 box
     //이미지 삭제 버튼 attribute set
     var deleteBtn = document.createElement("button");
-    deleteBtn.className = "btn btn-danger";
+    deleteBtn.className = "btn btn--danger";
     deleteBtn.textContent = "이미지 삭제";
+
+    //회원가입 처리 로딩 다이얼로그
+    var loadingBox = document.querySelector(".loading-box");
+
 
     //프로필 이미지 선택 시 콜백되는 이벤트
     profileInput.onchange = function (event) {
@@ -64,8 +68,8 @@ window.addEventListener("load", function () {
         console.log(event);
         profileInput.value = "";//file input태그에서 value 초기화
         dataUri = null;
-        profileImg.src = "/image/profile.png";//이미지 삭제
-        deleteBtnBox.innerHTML = "프로필 이미지";
+        profileImg.src = "/image/profile-setting.png";//이미지 삭제
+        deleteBtnBox.innerHTML="";
     }
 
     //회원가입 폼 제출 콜백 이벤트
@@ -92,7 +96,8 @@ window.addEventListener("load", function () {
                 }
             }
         }
-        sendSignUpRequest(formData);
+        toggleLoadingBox(loadingBox);
+        sendSignUpRequest(formData, loadingBox);
     }
 });
 
@@ -167,22 +172,29 @@ var dataURLToBlob = function (dataURL) {
 };
 
 //서버로 회원가입 요청을 보내는 함수
-function sendSignUpRequest(formData) {
+function sendSignUpRequest(formData, loadingBox) {
     $.ajax({
         type: "POST",
         url: "/sign-up",
-        async: false,
         processData: false,
         contentType: false,
         data: formData
     }).done(function (res) {
         console.log("done");
+        toggleLoadingBox(loadingBox);
         alert("회원가입에 성공했습니다. 이메일 인증 후 로그인해주세요.");
         location.href="/login";
     }).fail(function (res) {
         console.log("fail");
         console.log(res);
-        var message = res.responseJSON[0].defaultMessage;
+        toggleLoadingBox(loadingBox);
+        var message;
+        try {
+            message = res.responseJSON[0].defaultMessage;
+        } catch (error) {
+            alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
+            return;
+        }
         alert(message);
     });
 }
@@ -206,3 +218,10 @@ function isEmptyOrWhitespace(inputList) {
     }
     return false;
 }
+
+//로딩 박스를 on/off하는 함수
+function toggleLoadingBox(loadingBox) {
+    loadingBox.classList.toggle("on");
+}
+
+

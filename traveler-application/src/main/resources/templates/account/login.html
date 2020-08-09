@@ -3,72 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/header.css" type="text/css"/>
-    <link rel="stylesheet" href="/css/login.css" type="text/css"/>
+
+    <meta name="author" content="MoonSooKim">
+    <meta name="description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Traveler">
+    <meta property="og:title" content="당신의 여행을 위한 공간입니다.">
+    <meta property="og:description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+    <meta property="og:url" content="http://localhost">
+
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:site" content="GitHub">
+    <meta property="twitter:title" content="당신의 여행을 위한 공간입니다.">
+    <meta property="twitter:description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+    <meta property="twitter:url" content="https://loclahost">
+
+    <!-- 브라우저 스타일 초기화 reset.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css" integrity="sha512-IJEbgDEF7OeKJRa0MY2PApnyJHRIsgzCveek4ec8VWQ+7KG3ZSKVNYa5xP/Gh0hVP0Mwb+gBsk+GwR3JQGhQNg==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/common.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/header.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/login.css" type="text/css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/header_medium.css" type="text/css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/login_medium.css" type="text/css"/>
     <script
             src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="/js/toggle-control.js"></script>
 </head>
 <body>
-<!--header-->
-<header>
-    <nav class="navbar navbar-custom">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="collapsed navbar-toggle" data-toggle="collapse" data-target="#nav-menu"
-                        aria-expanded="false">
-                    <span class="sr-only">Toggle Navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a href="/" class="navbar-brand">
-                    traveler
-                </a>
-            </div>
-            <div class="collapse navbar-collapse" id="nav-menu">
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">커뮤니티</a></li>
-                    <li><a href="#">일정 만들기</a></li>
-                    <li><a href="#">동행 구하기</a></li>
-                    <li><a th:href="@{/sign-up}">회원가입</a></li>
+<div class="body__container">
+    <!--HEADER-->
+    <header>
+        <nav>
+            <div class="clearfix toggle">
+                <ul class="notification-group float--right">
+                    <li><a href="#">채팅</a></li>
+                    <li><a href="#">알림</a></li>
                 </ul>
             </div>
+            <div class="inner">
+                <div class="menu-group toggle">
+                    <ul class="main-menu">
+                        <li><a href="#">커뮤니티</a></li>
+                        <li><a href="#">일정 만들기</a></li>
+                        <li><a href="#">동행 구하기</a></li>
+                        <li><a th:href="@{/sign-up}">회원가입</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="toggle-btn">header menu toggle button</div>
+        </nav>
+        <h1>로그인</h1>
+    </header>
+    <section class="section">
+        <div class="inner">
+            <form id="login-form" action="#" th:action="@{/login/traveler}" method="post">
+                <p th:if="${!message.equals('')}" th:text="${message}">message from server</p>
+                <input class="input--text" type="text" name="username" th:value="${username} ? ${username} : ''"
+                       placeholder="아이디" required="required"/>
+                <input class="input--text" type="password" name="password" placeholder="비밀번호" required="required"/>
+                <label id="rememeber-label" for="rememeber-chb">아이디 기억</label>
+                <input th:if="${username==null}" id="rememeber-chb" type="checkbox" name="remember" value="remember"/>
+                <input th:unless="${username==null}" th:id="rememeber-chb" type="checkbox" name="remember" value="remember" checked/>
+                <input type="submit" value="로그인" class="btn btn--primary"/>
+            </form>
+            <div class="find-btn-group">
+                <a id="find-username-btn" href="/find-username" role="button" class="btn">아이디 찾기</a>
+                <a id="find-password-btn" href="/find-password" role="button" class="btn">비밀번호 찾기</a>
+            </div>
         </div>
-    </nav>
-    <h1>로그인</h1>
-</header>
-<section>
-    <p th:if="${!message.equals('')}" th:text="${message}"></p>
-    <form action="#" th:action="@{/login/traveler}" method="post">
-        <div class="form-group form-inline">
-            <input th:if="${username==null}" class="" type="text" name="username" placeholder="아이디"
-                   required="required"/>
-            <input th:unless="${username==null}" class="" type="text" name="username" th:value="${username}"
-                   placeholder="아이디" required="required"/>
-        </div>
-        <div class="form-group form-inline">
-            <input class="" type="password" name="password" placeholder="비밀번호" required="required"/>
-        </div>
-        <div>
-            <label id="rememeber-label" th:for="rememeber-chb">아이디 기억</label>
-            <input th:if="${username==null}" th:id="rememeber-chb" type="checkbox" name="remember" value="remember"/>
-            <input th:unless="${username==null}" th:id="rememeber-chb" type="checkbox" name="remember" value="remember"
-                   checked/>
-        </div>
-        <div class="form-group form-inline">
-            <input type="submit" value="로그인" class="btn btn-primary"/>
-        </div>
-    </form>
-    <div id="find-username-btn-box">
-        <a id="find-username-btn" href="/find-username" role="button" class="btn btn-primary">아이디 찾기</a>
-    </div>
-    <div id="find-password-btn-box">
-        <a id="find-password-btn" href="/find-password" role="button" class="btn btn-primary">비밀번호 찾기</a>
-    </div>
-</section>
+    </section>
+</div>
 </body>
 </html>

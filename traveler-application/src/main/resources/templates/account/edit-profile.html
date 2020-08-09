@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>프로필 수정</title>
+
+    <meta name="author" content="MoonSooKim">
+    <meta name="description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Traveler">
+    <meta property="og:title" content="당신의 여행을 위한 공간입니다.">
+    <meta property="og:description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+    <meta property="og:url" content="http://localhost">
+
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:site" content="GitHub">
+    <meta property="twitter:title" content="당신의 여행을 위한 공간입니다.">
+    <meta property="twitter:description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+    <meta property="twitter:url" content="https://loclahost">
+
+    <!-- 브라우저 스타일 초기화 reset.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css" integrity="sha512-IJEbgDEF7OeKJRa0MY2PApnyJHRIsgzCveek4ec8VWQ+7KG3ZSKVNYa5xP/Gh0hVP0Mwb+gBsk+GwR3JQGhQNg==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/common.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/header.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/edit-profile.css" type="text/css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/header_medium.css" type="text/css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/edit-profile_medium.css" type="text/css"/>
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/blob-util/dist/blob-util.min.js"></script>
+    <script src="/js/toggle-control.js"></script>
+    <script src="/js/edit-profile.js"></script>
+</head>
+<body>
+    <div class="body__container">
+        <!--HEADER-->
+        <header>
+            <nav>
+                <a class="nav-brand" href="/">Traveler</a>
+                <div class="clearfix toggle">
+                    <ul class="notification-group float--right">
+                        <li><a href="#">채팅</a></li>
+                        <li><a href="#">알림</a></li>
+                    </ul>
+                </div>
+                <div class="inner">
+                    <div class="menu-group toggle">
+                        <ul class="main-menu">
+                            <li><a href="#">커뮤니티</a></li>
+                            <li><a href="#">일정 만들기</a></li>
+                            <li><a href="#">동행 구하기</a></li>
+                            <li><a th:href="@{/logout}">로그아웃</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="toggle-btn">header menu toggle button</div>
+            </nav>
+        </header>
+        <section class="section edit-profile-section">
+            <div class="inner">
+                <div class="menu-group">
+                    <ul> 
+                        <li class="edit-profile-menu">프로필 수정</li>
+                        <li class="change-password-menu">비밀번호 변경</li>
+                        <li class="withdrawl-menu">회원 탈퇴</li>
+                    </ul>
+                </div>
+                <form id="edit-profile-form" class="profile-form" enctype="multipart/form-data" th:object="${account}">
+                    <label class="form-item" id="profile-input-label" for="profile-input">
+                        <img th:class="${account.profileImageUri}?'user-img':'default-img'" id="profile" th:src="${account.profileImageUri}?: '/image/profile-setting.png'" width="80" height="80" alt="프로필 이미지 미리보기" crossorigin="anonymous">
+                        <div>프로필 이미지</div>
+                    </label>
+                    <div class="delete-btn-box"></div>
+                    <input id="profile-input" type="file" name="imageFile" accept="image/*"/>
+                    <input class="form-input input--text form-item" type="text" name="name" placeholder="이름" required="required" th:field="*{name}"/>
+                    <input class="form-input input--text form-item" type="text" name="nickname" placeholder="닉네임" required="required" th:field="*{nickname}"/>
+                    <textarea class="form-input input--text form-item" name="introduce" placeholder="자기 소개" th:field="*{introduce}"></textarea>
+                    <div class="sex-group form-item">
+                        <label class="radio-btn-label" for="radio-btn--male">남자</label>
+                        <input th:unless="*{sex.name().equals('MALE')}" class="form-input" id="radio-btn--male" type="radio" name="sex" value="male" required="required"/>
+                        <input th:if="*{sex.name().equals('MALE')}" class="form-input" th:id="radio-btn--male" type="radio" name="sex" value="male" required="required" checked/>
+                        <label class="radio-btn-label" for="radio-btn--female">여자</label>
+                        <input th:unless="*{sex.name().equals('FEMALE')}" class="form-input" id="radio-btn--female" type="radio" name="sex" value="female" required="required"/>
+                        <input th:if="*{sex.name().equals('FEMALE')}" class="form-input" th:id="radio-btn--female" type="radio" name="sex" value="female" required="required" checked/>
+                    </div>
+                    <input type="submit" value="프로필 수정" class="btn btn--primary form-item"/>
+                </form>
+                <form id="change-password-form" class="profile-form off">
+                    <div class="delete-btn-box"></div>
+                    <input class="form-input input--text form-item" type="password" name="current-password" placeholder="현재 비밀번호" required="required"/>
+                    <input class="form-input input--text form-item" type="password" name="new-password" placeholder="새로운 비밀번호" required="required"/>
+                    <input class="form-input input--text form-item" type="password" name="new-password-check" placeholder="새로운 비밀번호 확인" required="required"/>
+                    <input type="submit" value="비밀번호 변경" class="btn btn--primary form-item"/>
+                </form>
+                <form id="withdrawl-form" class="profile-form off">
+                    <div class="inner">
+                        <p>회원탈퇴를 하시면 회원님의 모든 정보 및 컨텐츠가 사라집니다. 그래도 탈퇴를 하시겠습니까?</p>
+                        <div class="withdrawl-agree-box">
+                            <label for="withdrawl-chb">네, 탈퇴하겠습니다.</label>
+                            <input type="checkbox" id="withdrawl-chb">
+                        </div>
+                        <input type="submit" value="회원 탈퇴" class="btn btn--danger form-item"/>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+     <!--폼 제출 버튼 클릭 시 서버로부터 응답이 올 때까지 화면에 표시해줄 로딩 창-->
+     <div class="loading-container">
+        <div class="loading-box">
+            <p>프로필 수정 처리 중...</p>
+            <div class="loading-bar"></div>
+        </div>
+    </div>
+</body>
+</html>

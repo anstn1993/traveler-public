@@ -1,0 +1,57 @@
+/* HEADER */
+header {
+    background-image: url("/image/header.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: right top;
+    height: 100vh;
+    position: relative;
+}
+/* BRAND */
+header .nav-brand {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 10px;  
+    font-size: 20px;
+    font-weight: 600;
+}
+/* CHAT & NOTIFICATION */
+header .notification-group {
+    float: right;
+    display: flex;
+}
+header .notification-group {
+    display: flex;
+    margin-right: 20px;
+    padding: 20px 0;
+}
+header .notification-group li {
+    padding: 0 20px;
+}
+/* NAVIGATION MAIN MENU */
+header .inner {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+header .inner .menu-group .main-menu {
+    display: flex;
+    justify-content: space-between;
+}
+header .inner .menu-group .main-menu li {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 30px;
+}
+header .inner .menu-group .main-menu li a {
+    font-size: 19px;
+    font-weight: 500;
+    padding: 10px 0;
+}
+#toggle-btn {
+    display: none;
+}
+
+
+

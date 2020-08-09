@@ -2,63 +2,73 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>본인 인증</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/header.css"/>
-    <link rel="stylesheet" href="/css/authenticate.css"/>
+    <title>비밀번호 찾기</title>
+
+    <meta name="author" content="MoonSooKim">
+    <meta name="description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Traveler">
+    <meta property="og:title" content="당신의 여행을 위한 공간입니다.">
+    <meta property="og:description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+    <meta property="og:url" content="http://localhost">
+
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:site" content="GitHub">
+    <meta property="twitter:title" content="당신의 여행을 위한 공간입니다.">
+    <meta property="twitter:description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+    <meta property="twitter:url" content="https://loclahost">
+
+    <!-- 브라우저 스타일 초기화 reset.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css" integrity="sha512-IJEbgDEF7OeKJRa0MY2PApnyJHRIsgzCveek4ec8VWQ+7KG3ZSKVNYa5xP/Gh0hVP0Mwb+gBsk+GwR3JQGhQNg==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/common.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/header.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/authenticate.css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/authenticate_medium.css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/header_medium.css"/>
     <script
             src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="/js/authenticate.js"></script>
+    <script src="/js/toggle-control.js"></script>
 </head>
 <body>
-<!--header-->
-<header>
-    <nav class="navbar navbar-custom">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="collapsed navbar-toggle" data-toggle="collapse" data-target="#nav-menu"
-                        aria-expanded="false">
-                    <span class="sr-only">Toggle Navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a href="/" class="navbar-brand">
-                    traveler
-                </a>
-            </div>
-            <div class="collapse navbar-collapse" id="nav-menu">
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">커뮤니티</a></li>
-                    <li><a href="#">일정 만들기</a></li>
-                    <li><a href="#">동행 구하기</a></li>
-                    <li><a th:href="@{/login}">로그인</a></li>
-                    <li><a th:href="@{/sing-up}">회원가입</a></li>
+<div class="body__container">
+    <!--HEADER-->
+    <header>
+        <nav>
+            <div class="clearfix toggle">
+                <ul class="notification-group float--right">
+                    <li><a href="#">채팅</a></li>
+                    <li><a href="#">알림</a></li>
                 </ul>
             </div>
-        </div>
-    </nav>
-    <h1>본인 인증</h1>
-</header>
-<section>
-    <div id="timer-box"></div>
-    <form action="#" th:action="@{/authenticate}" method="post">
-        <div class="form-group form-inline">
-            <input type="number" name="authCode" placeholder="인증번호" required="required"/>
-        </div>
-        <p id="message"></p>
-        <p>
-            *이메일로 인증번호가 전송되었습니다. 확인 후 제한시간 안에 인증번호를 입력해주세요.
-            <br>
-            이 페이지를 떠나거나 새로고침시 인증번호를 다시 발급받아야 합니다. 주의하세요.
-        </p>
-        <div class="form-group form-inline">
-            <input type="submit" value="본인 인증" class="btn btn-primary"/>
-        </div>
-    </form>
-</section>
+            <div class="inner">
+                <div class="menu-group toggle">
+                    <ul class="main-menu">
+                        <li><a href="#">커뮤니티</a></li>
+                        <li><a href="#">일정 만들기</a></li>
+                        <li><a href="#">동행 구하기</a></li>
+                        <li><a th:href="@{/login}">로그인</a></li>
+                        <li><a th:href="@{/sing-up}">회원가입</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="toggle-btn">header menu toggle button</div>
+        </nav>
+        <h1>본인 인증</h1>
+    </header>
+    <section>
+        <div id="timer-box"></div>
+        <form id="authenticate-form" action="#" th:action="@{/authenticate}" method="post">
+            <input class="input--text" type="number" name="authCode" placeholder="인증번호" required="required"/>
+            <p id="message"></p>
+            <p>*이메일로 인증번호가 전송되었습니다. 확인 후 제한시간 안에 인증번호를 입력해주세요.</p>
+            <p>이 페이지를 떠나거나 새로고침시 인증번호를 다시 발급받아야 합니다. 주의하세요.</p>
+            <input type="submit" value="본인 인증" class="btn"/>
+        </form>
+    </section>
+</div>
 </body>
 </html>

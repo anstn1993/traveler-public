@@ -1,0 +1,56 @@
+header {
+    background-image: url("/image/header.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: right top;
+    height: 100vh;
+    position: relative;
+}
+nav {
+    padding-top: 30px;
+    box-sizing: border-box;
+}
+/* CHAT & NOTIFICATION */
+header .notification-group {
+    margin: 0 auto;
+    float: none;
+    display: flex;
+    margin-right: 0;
+    padding-bottom: 0;
+}
+header .notification-group li {
+    text-align: center;
+    padding: 10px 20px;
+}
+/* NAVIGATION MAIN MENU */
+header .inner .menu-group .main-menu {
+    display: block;
+}
+header .inner .menu-group .main-menu li {
+    box-shadow: 0 0 .8px #333;
+}
+header .inner .menu-group .main-menu li a {
+    width: 100%;
+    font-size: 15px;
+    display: block;
+    padding: 13px;
+    text-align: center;
+}
+/* TOGGLE BTN */
+#toggle-btn {
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+.toggle {
+    display: none;
+}
+/* TOGGLE CONTROL */
+.on {
+    display: block;
+}
+
+
+

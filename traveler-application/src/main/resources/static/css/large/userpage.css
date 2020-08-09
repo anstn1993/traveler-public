@@ -1,0 +1,88 @@
+header {
+    height: 680px;
+}
+.section-box {
+    position: absolute;
+    top: 300px;
+    width: 100%;
+}
+.section-box .user-info-section .inner {
+    width: 80%;
+    margin: 0 auto;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+}
+.section-box .user-info-section .inner img {
+    width: 300px;
+    border-radius: 50%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.section-box .user-info-section .flex-box {
+    width: 500px;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.section-box .user-info-section .inner .nickname-box {
+    font-size: 20px;
+    font-weight: 600;
+}
+.section-box .user-info-section .inner .introduce-box {
+    width: 500px;
+    height: 150px;
+    background: #FCFBF6;
+    border-radius: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+    box-shadow: 1px 1px 3px #736E59;
+    margin-top: 10px;
+
+}
+.section-box .user-info-section .inner .info-group {
+    display: flex;
+    margin: 10px 0;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 500;
+}
+.section-box .user-info-section .inner .info-group li:nth-child(n+2) {
+    cursor: pointer;
+}
+.section-box .user-info-section .inner .info-group li {
+
+}
+.section-box .user-info-section .inner .introduce-box p {
+    font-size: 17px;
+    font-weight: 600;
+    text-align: left;
+    color: #736E59;
+}
+.section-box .user-info-section .inner .btn-group {
+    display: flex;
+    margin-top: 40px;
+    justify-content: flex-start;
+}
+.section-box .user-info-section .inner .btn-group a {
+    width: 100px;
+    margin-right: 20px;
+    display: flex;
+    justify-content: center;
+}
+#search-form {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+#filter {
+    outline: none;
+    width: 100px;
+    height: 40px;
+    border-radius: 6px;
+    border: none;
+}
+#search-form [type="submit"] {
+    display: none;
+}

@@ -1,0 +1,9 @@
+/*타이틀*/
+h1 {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 50px;
+    position: absolute;
+    top: 350px;
+}

@@ -33,4 +33,5 @@ build/
 datasource.properties
 oauth2-client.properties
 email.properties
+aws.properties
 /src/main/resources/static/image

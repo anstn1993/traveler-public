@@ -29,5 +29,7 @@ public class AccountDto {
 
     private String nickname;
 
+    private String introduce;
+
     private Sex sex;
 }

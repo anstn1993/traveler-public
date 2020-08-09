@@ -137,6 +137,13 @@ public class AccountValidator implements Validator {
             errors.rejectValue("nickname", "nickname length", "이름은 2에서 30자 사이로 설정해주세요.");
             return false;
         }
+
+        //닉네임 중복 검사
+        Optional<Account> accountOpt = accountService.findByNickname(nickname);
+        if (accountOpt.isPresent()) {
+            errors.rejectValue("nickname", "nickname exist", "이미 존재하는 닉네임 입니다.");
+            return false;
+        }
         return true;
     }
 }

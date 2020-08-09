@@ -1,0 +1,57 @@
+.edit-profile-section {
+    position: absolute;
+    top: 250px;
+    width: 100%;
+}
+.edit-profile-section .inner {
+    width: 60%;
+    height: 600px;
+    margin: 0 auto;
+    flex-flow: column;
+    justify-content: flex-start;
+}
+.edit-profile-section .inner .menu-group {
+    width: 100%;
+    height: auto;
+    margin-top: 20px;
+}
+.edit-profile-section .inner .menu-group ul {
+    flex-flow: row;
+    justify-content: space-around;
+    margin: 0;
+}
+.edit-profile-section .inner .menu-group ul li {
+    width: 200px;
+}
+.edit-profile-section .inner .menu-group ul li:first-child {
+    background: #337AB7;
+}
+/* PROFILE COMMON FORM */
+.profile-form {
+    width: 100%;
+    height: 700px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin-left: 0;
+    margin-top: 10px;
+    background: #FAFCFF;
+    border-radius: 10px;
+    box-shadow: 5px 5px 5px #3e3e3e;
+    color: #3e3e3e;
+}
+#edit-profile-form {
+   
+}
+/* CHANGE PASSWORD FORM */
+#change-password-form {
+    height: 300px;
+}
+/* WITHDRAWL FORM */
+#withdrawl-form {
+    height: 300px;
+}
+.off {
+    display: none;
+}

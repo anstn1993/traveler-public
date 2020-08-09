@@ -1,13 +1,10 @@
 package me.moonsoo.travelerapplication.account;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import me.moonsoo.commonmodule.account.AccountRole;
 import me.moonsoo.commonmodule.account.Sex;
 
-import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 //세션에 저장할 사용자 dto class
@@ -29,6 +26,8 @@ public class SessionAccount implements Serializable {
     private String name;
 
     private String nickname;
+
+    private String introduce;
 
     private Sex sex;
 

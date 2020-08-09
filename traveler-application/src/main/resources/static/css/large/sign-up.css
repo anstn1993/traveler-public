@@ -1,0 +1,94 @@
+/*SIGN UP TITLE*/
+header h1 {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 50px;
+    position: absolute;
+    top: 250px;
+}
+/*SIGN UP FORM*/
+#sign-up-form {
+    width: 100%;
+    height: 500px;
+    position: absolute;
+    top: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+/*PROFILE*/
+#profile-input-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+#profile-input-label img {
+    margin-bottom: 10px;
+    border-radius: 50%;
+}
+#sign-up-form [type="file"] {
+    display: none;
+}
+
+/*SEX RADIO BTN GROUP*/
+#sign-up-form .sex-group [type="radio"] {
+    width: 15px;
+    height: 15px;
+    border: 1px solid;
+    border-radius: 20px;
+    margin-top: 0px;
+}
+#sign-up-form .sex-group .radio-btn-label {
+    color: beige;
+    padding: 5px;
+}
+#sign-up-form [type="submit"] {
+    width: 250px;
+    display: flex;
+    justify-content: center;
+}
+/*SIGN UP LOADING BOX*/
+.loading-container {
+    position: fixed;
+    width: 100%;
+    top: 30vh;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+}
+.loading-container .loading-box {
+    display: none;
+    color: white;
+    width: 200px;
+    height: 200px;
+    background: rgba(19, 19, 19, 0.8);
+    border-radius: 7px;
+}
+.loading-container .loading-box p {
+    margin-top: 20px;
+    text-align: center;
+}
+.loading-container .loading-box .loading-bar {
+    position: relative;
+    margin-top: 60px;
+    width: 40px;
+    height: 15px;
+    background: #13B8EB;
+    animation: loading 1s infinite alternate;
+}
+@keyframes loading {
+    0% {
+        left: 0;
+    }
+
+    100% {
+        left: 160px;
+    }
+}
+
+.loading-container .on {
+    display: block;
+}

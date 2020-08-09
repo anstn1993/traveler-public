@@ -1,0 +1,92 @@
+/* HEADER */
+header {
+    height: 650px;
+}
+/*MAIN PAGE TITLE*/
+header h1 {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 70px;
+    position: absolute;
+    top: 250px;
+}
+
+/*SEARCH FORM*/
+#search-form {
+    width: 100%;
+    position: absolute;
+    top: 400px;
+    text-align: center;
+}
+#search-form [type="submit"] {
+    display: none;
+}
+
+/* SECTION */
+.section {
+    height: 700px;
+}
+.section h2 {
+    font-size: 30px;
+    font-weight: 600;
+    margin-top: 0;
+    padding-top: 100px;
+}
+.section p {
+    font-size: 25px;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 40px;
+}
+.section:hover::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,.2);
+}
+
+/*COMMUNITY SECTION*/
+.section--community {
+    position:relative;
+    background-image: url("/image/community.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    height: 700px;
+    color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/*SCHEDULE SECTION*/
+.section--schedule {
+    position:relative;
+    background-image: url("/image/schedule.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: top right;
+    height: 700px;
+    color: #EDEDED;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ACCOMPANY SECTION */
+.section--accompany {
+    position:relative;
+    background-image: url("/image/accompany.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    height: 700px;
+    color: #EDEDED;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

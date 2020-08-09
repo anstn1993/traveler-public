@@ -1,0 +1,26 @@
+/*TITLE*/
+header h1 {
+    font-size: 55px;
+    top: 320px;
+}
+/*SEARCH FORM*/
+#search-form {
+    top: 430px;
+}
+/* SECTION */
+.section {
+    height: 500px;
+}
+.section h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 0px;
+    padding: 100px 20px 0 20px;
+    box-sizing: border-box;
+}
+.section p {
+    font-size: 17px;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 40px;
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>접근권한이 없습니다.</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css" integrity="sha512-IJEbgDEF7OeKJRa0MY2PApnyJHRIsgzCveek4ec8VWQ+7KG3ZSKVNYa5xP/Gh0hVP0Mwb+gBsk+GwR3JQGhQNg==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/common.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/header.css" type="text/css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/header_medium.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/exception.css" type="text/css"/>
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+    <script src="/js/toggle-control.js"></script>
+</head>
+<body>
+<div class="body__container">
+    <!--HEADER-->
+    <header>
+        <nav>
+            <a class="nav-brand" href="/">Traveler</a>
+            <div class="clearfix toggle">
+                <ul class="notification-group float--right">
+                    <li><a href="#">채팅</a></li>
+                    <li><a href="#">알림</a></li>
+                </ul>
+            </div>
+            <div class="inner">
+                <div class="menu-group toggle">
+                    <ul class="main-menu">
+                        <li><a href="#">커뮤니티</a></li>
+                        <li><a href="#">일정 만들기</a></li>
+                        <li><a href="#">동행 구하기</a></li>
+                        <li th:if="${session.account != null}"><a href="#" th:href="@{'/users/' + ${session.account.getId()}}" th:text="마이페이지">마이페이지</a></li>
+                        <li th:if="${session.account != null}"><a href="#" th:href="@{/logout}" th:text="로그아웃">로그아웃</a></li>
+                        <li th:unless="${session.account != null}"><a href="#" th:href="@{/login}" th:text="로그인">로그인</a></li>
+                        <li th:unless="${session.account != null}"><a href="#" th:href="@{/sign-up}" th:text="회원가입">회원가입</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="toggle-btn">header menu toggle button</div>
+        </nav>
+    </header>
+    <h1>403 FORBIDDEN</h1>
+</div>
+</body>
+</html>

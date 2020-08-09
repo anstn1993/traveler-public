@@ -1,0 +1,61 @@
+/*LOGIN TITLE*/
+header h1 {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 50px;
+    font-weight: 500;
+    position: absolute;
+    top: 250px;
+}
+.section {
+    position: absolute;
+    top: 400px;
+    width: 100%;
+}
+.section .inner {
+    max-width: 980px;
+    margin: 0 auto;
+}
+#login-form {
+    text-align: center;
+}
+#login-form p {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+#login-form input {
+    display: block;
+    width: 300px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+/*REMEMBER USERNAME CHECKBOX*/
+#login-form [type="checkbox"] {
+    display: inline-block;
+    width: 20px;
+}
+#rememeber-chb {
+    width: 15px;
+    height: 15px;
+    border: 1px solid;
+    border-radius: 20px;
+    margin-top: 0px;
+}
+#rememeber-label {
+    color: #fff;
+}
+/* FING BTN GROUP */
+.find-btn-group {
+    display: flex;
+    justify-content: center;
+}
+
+.find-btn-group a {
+    display: flex;
+    width: 140px;
+    margin: 0 10px;
+    justify-content: center;
+    align-items: center;
+}
+

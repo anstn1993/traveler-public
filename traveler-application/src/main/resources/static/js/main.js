@@ -1,7 +1,7 @@
 window.addEventListener('load', function () {
-    var communitySection = document.querySelector("#community-section");
-    var scheduleSection = document.querySelector("#schedule-section");
-    var accompanySection = document.querySelector("#accompany-section");
+    var communitySection = document.querySelector(".section--community");
+    var scheduleSection = document.querySelector(".section--schedule");
+    var accompanySection = document.querySelector(".section--accompany");
 
     communitySection.onclick = function (e) {
         console.log("communitySection clicked");

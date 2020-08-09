@@ -2,45 +2,39 @@ package me.moonsoo.travelerapplication.account;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
+import io.findify.s3mock.S3Mock;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.travelerapplication.BaseControllerTest;
 import me.moonsoo.travelerapplication.email.EmailService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -52,6 +46,17 @@ class AccountControllerTest extends BaseControllerTest {
 
     @Autowired
     private EmailService emailService;
+
+    @BeforeAll
+    public static void startMockS3Server(@Autowired S3Mock s3Mock) {
+        s3Mock.stop();
+        s3Mock.start();
+    }
+
+    @AfterAll
+    public static void closeMockS3Server(@Autowired S3Mock s3Mock) {
+        s3Mock.stop();
+    }
 
     @AfterEach
     public void tearDown() {
@@ -382,7 +387,7 @@ class AccountControllerTest extends BaseControllerTest {
     }
 
     @ParameterizedTest(name = "{index} => params = {0}")
-    @MethodSource("invalidRequestParamProvider")
+    @MethodSource("invalidRequestParamProviderForSignUp")
     @DisplayName("회원가입 실패-유효하지 않은 회원가입 폼 데이터가 request param에 담긴 경우(400 Bad request)")
     public void signUpFail_Invalid_Request_params(MultiValueMap<String, String> params) throws Exception {
         mockMvc.perform(multipart("/sign-up")
@@ -395,24 +400,25 @@ class AccountControllerTest extends BaseControllerTest {
         assertThat(accountOpt.isEmpty()).isTrue();
     }
 
-    public static Stream<Arguments> invalidRequestParamProvider() {
+    public static Stream<Arguments> invalidRequestParamProviderForSignUp() {
         return Stream.of(
-                Arguments.of(createInvalidParams("ans", "11111111", "11111111", "email@email.com", "김문수", "만수", "MALE")),
-                Arguments.of(createInvalidParams("anstn1993", "1111", "1111", "email@email.com", "김문수", "만수", "MALE")),
-                Arguments.of(createInvalidParams("anstn1993", "11111111", "22222222", "email@email.com", "김문수", "만수", "MALE")),
-                Arguments.of(createInvalidParams("anstn1993", "11111111", "11111111", "notemail", "김문수", "만수", "MALE")),
-                Arguments.of(createInvalidParams("anstn1993", "11111111", "11111111", "email@email.com", "김ㅁㅅ", "만수", "MALE")),
-                Arguments.of(createInvalidParams("anstn1993", "11111111", "11111111", "email@email.com", "김문수", "", "MALE"))
+                Arguments.of(createInvalidParamsForSignUp("ans", "11111111", "11111111", "email@email.com", "김문수", "만수", "MALE")),
+                Arguments.of(createInvalidParamsForSignUp("anstn1993", "1111", "1111", "email@email.com", "김문수", "만수", "MALE")),
+                Arguments.of(createInvalidParamsForSignUp("anstn1993", "11111111", "22222222", "email@email.com", "김문수", "만수", "MALE")),
+                Arguments.of(createInvalidParamsForSignUp("anstn1993", "11111111", "11111111", "notemail", "김문수", "만수", "MALE")),
+                Arguments.of(createInvalidParamsForSignUp("anstn1993", "11111111", "11111111", "email@email.com", "김ㅁㅅ", "만수", "MALE")),
+                Arguments.of(createInvalidParamsForSignUp("anstn1993", "11111111", "11111111", "email@email.com", "김문수", "", "MALE"))
         );
     }
 
-    private static MultiValueMap<String, String> createInvalidParams(String username,
-                                                                    String password,
-                                                                    String passwordCheck,
-                                                                    String email,
-                                                                    String name,
-                                                                    String nickname,
-                                                                    String sex) {
+
+    private static MultiValueMap<String, String> createInvalidParamsForSignUp(String username,
+                                                                              String password,
+                                                                              String passwordCheck,
+                                                                              String email,
+                                                                              String name,
+                                                                              String nickname,
+                                                                              String sex) {
         MultiValueMap<String, String> invalidParams = new LinkedMultiValueMap<>();
         invalidParams.add("username", username);
         invalidParams.add("password", password);
@@ -420,6 +426,80 @@ class AccountControllerTest extends BaseControllerTest {
         invalidParams.add("email", email);
         invalidParams.add("name", name);
         invalidParams.add("nickname", nickname);
+        invalidParams.add("sex", sex);
+        return invalidParams;
+    }
+
+    @ParameterizedTest(name = "{index} => imageFile = {0}, params = {1}")
+    @MethodSource("validMultipartProviderForUpdateProfile")
+    @DisplayName("프로필 수정 성공 테스트")
+    public void updateProfile(MockMultipartFile imageFile, MultiValueMap<String, String> params) throws Exception {
+        String username = "anstn1993";
+        String email = "user@email.com";
+        String password = "user";
+        Account account = createAccount(username, email, password, 0);
+        MockHttpSession session = new MockHttpSession();
+        SessionAccount sessionAccount = modelMapper.map(account, SessionAccount.class);
+        session.setAttribute("account", sessionAccount);
+        mockMvc.perform(multipart("/users/{userId}/profile", account.getId())
+                .file(imageFile)
+                .with(user(username))
+                .params(params)
+                .session(session))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+
+    private static Stream<Arguments> validMultipartProviderForUpdateProfile() {
+        return Stream.of(
+                Arguments.of(new MockMultipartFile("imageFile", "name", "image/jpg", new byte[1024]),
+                        createParamsForUpdateProfile("김문수", "nickname", "", "MALE")),//image file o, nickname o , name o, introduce ""
+                Arguments.of(new MockMultipartFile("김문수", "nickname", "image/jpg", new byte[1024]),
+                        createParamsForUpdateProfile("김문수", "nickname", "introduce", "MALE")),//image file o, nickname o , name o, introduce "introduce"
+                Arguments.of(new MockMultipartFile("김문수", "nickname", "image/jpg", new byte[1024]),
+                        createParamsForUpdateProfile("김문수", "nickname", "", "MALE")),//image file x, nickname o , name o, introduce ""
+                Arguments.of(new MockMultipartFile("김문수", "nickname", "image/jpg", new byte[1024]),
+                        createParamsForUpdateProfile("김문수", "nickname", "introduce", "MALE"))//image file x, nickname o , name o, introduce "introduce"
+        );
+    }
+
+    @ParameterizedTest(name = "{index} => imageFile = {0}, params = {1}")
+    @MethodSource("invalidMultipartProviderForUpdateProfile")
+    @DisplayName("프로필 수정 실패 테스트")
+    public void updateProfileFail(MockMultipartFile imageFile, MultiValueMap<String, String> params) throws Exception {
+        String username = "anstn1993";
+        String email = "user@email.com";
+        String password = "user";
+        Account account = createAccount(username, email, password, 0);
+        MockHttpSession session = new MockHttpSession();
+        SessionAccount sessionAccount = modelMapper.map(account, SessionAccount.class);
+        session.setAttribute("account", sessionAccount);
+        mockMvc.perform(multipart("/users/{userId}/profile", account.getId())
+                .file(imageFile)
+                .with(user(username))
+                .params(params)
+                .session(session))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    private static Stream<Arguments> invalidMultipartProviderForUpdateProfile() {
+        return Stream.of(
+          Arguments.of(new MockMultipartFile("imageFile", "name", "image/jpg", new byte[1024]),
+                  createParamsForUpdateProfile("englishname", "nickname", "introduce", "MALE")),//invalid name
+          Arguments.of(new MockMultipartFile("imageFile", "name", "image/jpg", new byte[1024]),
+                  createParamsForUpdateProfile("김문수", "too-long-nickname-too-long-nickname", "introduce", "MALE")),//invalid nickname
+          Arguments.of(new MockMultipartFile("imageFile", "name", "image/jpg", new byte[1024]),
+                  createParamsForUpdateProfile("김문수", "nickname", " ", "MALE"))//invalid introduce
+        );
+    }
+
+    private static MultiValueMap<String, String> createParamsForUpdateProfile(String name, String nickname, String introduce, String sex) {
+        MultiValueMap<String, String> invalidParams = new LinkedMultiValueMap<>();
+        invalidParams.add("name", name);
+        invalidParams.add("nickname", nickname);
+        invalidParams.add("introduce", introduce);
         invalidParams.add("sex", sex);
         return invalidParams;
     }

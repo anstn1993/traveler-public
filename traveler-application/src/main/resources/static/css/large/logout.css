@@ -1,0 +1,31 @@
+/*LOGOUT TITLE*/
+header h1 {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 50px;
+    font-weight: 500;
+    position: absolute;
+    top: 250px;
+}
+section {
+    position: absolute;
+    top: 400px;
+    width: 100%;
+}
+section p {
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+#logout-form {
+    display: flex;
+    justify-content: center;
+}
+#logout-form [type="submit"] {
+    font-size: 25px;
+    display: flex;
+    justify-content: center;
+    width: 200px;
+    height: 60px;
+}

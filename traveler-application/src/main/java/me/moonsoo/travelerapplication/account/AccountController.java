@@ -5,13 +5,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.Sex;
 import me.moonsoo.travelerapplication.email.EmailService;
+import me.moonsoo.travelerapplication.error.ForbiddenException;
+import me.moonsoo.travelerapplication.error.PageNotFoundException;
 import me.moonsoo.travelerapplication.properties.AppProperties;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.*;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -44,9 +48,15 @@ public class AccountController {
 
     @Autowired
     private AccountValidator validator;
-    
+
+    @Autowired
+    private AccountValidatorForUpdate validatorForUpdate;
+
     @Autowired
     private AppProperties appProperties;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping("/login")
     public String getLoginPage(Model model, @ModelAttribute("message") String message, @SessionAttribute(required = false) SessionAccount account, @CookieValue(required = false) String username) {
@@ -168,6 +178,7 @@ public class AccountController {
         }
     }
 
+    //인증 페이지 get
     @GetMapping("/authenticate")
     public String getAuthenticatePage(@SessionAttribute(required = false) SessionAccount account,
                                       @SessionAttribute(required = false) String authCode,
@@ -198,6 +209,7 @@ public class AccountController {
         }
     }
 
+    //사용자 아이디 찾기 페이지 get
     @GetMapping("/find-username/result")
     public String returnUsername(@SessionAttribute(required = false) SessionAccount account,
                                  @SessionAttribute(required = false) String username,
@@ -217,6 +229,7 @@ public class AccountController {
         return "account/find-username-result";
     }
 
+    //비밀번호 변경 페이지 get
     @GetMapping("/find-password/result")
     public String returnPassword(@SessionAttribute(required = false) SessionAccount account,
                                  @SessionAttribute(required = false) String authCode,
@@ -235,6 +248,7 @@ public class AccountController {
         return "account/find-password-result";
     }
 
+    //비밀번호 변경 처리
     @PostMapping("/find-password/result")
     public ResponseEntity setUpPassword(@RequestParam String password,
                                         @SessionAttribute(required = false) String username,
@@ -263,10 +277,11 @@ public class AccountController {
         return "account/sign-up";
     }
 
+    //회원가입 처리
     @PostMapping("/sign-up")
     public ResponseEntity signUp(@RequestPart(required = false) MultipartFile imageFile, @RequestParam Map<String, String> params) throws IOException {
         //필요한 request parameter가 모두 넘어오지 않은 경우 bad request response
-        if (!hasAllParams(params)) {
+        if (!hasAllParamsForSignUp(params)) {
             ObjectNode error = objectMapper.createObjectNode();
             error.put("error", "You didn't send all request parameters for sign up!");
             return ResponseEntity.badRequest().body(error);
@@ -281,8 +296,8 @@ public class AccountController {
 
         //multipart formSy
         MultiValueMap<String, Object> multiPart = new LinkedMultiValueMap<>();
-        if(imageFile != null) {
-//            이미지 파일 part
+        if (imageFile != null) {
+            //이미지 파일 part
             HttpHeaders imageFilePartHeader = new HttpHeaders();
             imageFilePartHeader.setContentDispositionFormData("imageFile", imageFile.getOriginalFilename());
             String subType = imageFile.getContentType().split("/")[1];
@@ -310,7 +325,83 @@ public class AccountController {
         return response;
     }
 
-    private AccountDto bindAccountDto(@RequestParam Map<String, String> params) {
+    //사용자 페이지 get
+    @GetMapping("/users/{userId}")
+    public String getUserPage(@PathVariable("userId") Account targetUser,
+                              @SessionAttribute(required = false) SessionAccount account,
+                              Model model) {
+        if (targetUser == null) {
+            throw new PageNotFoundException();
+        }
+        model.addAttribute("user", targetUser);
+        return "account/userpage";
+    }
+
+    //프로필 수정 페이지 get
+    @GetMapping("/users/{userId}/profile")
+    public String getProfilePage(@PathVariable("userId") Account targetUser,
+                                 @SessionAttribute(required = false) SessionAccount account,
+                                 Model model) {
+        if (targetUser == null) {
+            throw new PageNotFoundException();
+        }
+        if (account == null || !account.getId().equals(targetUser.getId())) {
+            throw new ForbiddenException();
+        }
+        model.addAttribute("account", account);
+        return "account/edit-profile";
+    }
+
+    //프로필 수정 처리 핸들러
+    @PostMapping("/users/{userId}/profile")
+    public ResponseEntity updateProfile(@PathVariable("userId") Account targetUser,
+                                        @SessionAttribute(required = false) SessionAccount account,
+                                        MultipartFile imageFile,
+                                        @RequestParam Map<String, String> params) {
+        //로그인하지 않았거나 다른 사용자의 프로필을 수정하려고 하는 경우 403 return
+        if (account == null || !account.getId().equals(targetUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        //필요한 request parameter가 모두 넘어오지 않은 경우 bad request response
+        if (!hasAllParamsForEditProfile(params)) {
+            ObjectNode error = objectMapper.createObjectNode();
+            error.put("error", "You didn't send all request parameters for edit profile!");
+            return ResponseEntity.badRequest().body(error);
+        }
+        AccountDtoForUpdate accountDto = bindAccountDtoForUpdate(params);
+        Errors errors = new BeanPropertyBindingResult(accountDto, "accountDto");
+        validatorForUpdate.setCurrentNickname(account.getNickname());
+        validatorForUpdate.validate(accountDto, errors);
+        //폼 데이터가 유효하지 않은 경우
+        if(errors.hasErrors()) {
+            return ResponseEntity.badRequest().body(errors);
+        }
+        modelMapper.map(accountDto, targetUser);
+        try {
+            accountService.update(targetUser, imageFile);//db에 수정 작업 및 프로필 이미지 s3서버로 업데이트
+            modelMapper.map(targetUser, account);//세션에 저장된 사용자 정보 update
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {//파일 생성 실패
+            e.printStackTrace();
+            errors.reject("imageFile", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
+        } catch (IllegalArgumentException e) {//multipart content type이 image가 아닌 경우
+            e.printStackTrace();
+            errors.reject("imageFile", "You have to send only image file.");
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(errors);
+        }
+    }
+
+    private AccountDtoForUpdate bindAccountDtoForUpdate(Map<String, String> params) {
+        return AccountDtoForUpdate.builder()
+                .name(params.get("name"))
+                .nickname(params.get("nickname"))
+                .introduce(params.get("introduce"))
+                .sex((params.get("sex").equals("male") ? Sex.MALE : Sex.FEMALE))
+                .build();
+    }
+
+    private AccountDto bindAccountDto(Map<String, String> params) {
         return AccountDto.builder()
                 .username(params.get("username"))
                 .email(params.get("email"))
@@ -318,17 +409,27 @@ public class AccountController {
                 .passwordCheck(params.get("password-check"))
                 .name(params.get("name"))
                 .nickname(params.get("nickname"))
+                .introduce(null)
                 .sex((params.get("sex").equals("male") ? Sex.MALE : Sex.FEMALE))
                 .build();
     }
 
     //모든 request parameter가 넘어왔는지 검사하는 메소드
-    private boolean hasAllParams(Map<String, String> params) {
+    private boolean hasAllParamsForSignUp(Map<String, String> params) {
         if (params.get("username") == null ||
                 params.get("password") == null ||
                 params.get("password-check") == null ||
                 params.get("email") == null ||
                 params.get("name") == null ||
+                params.get("nickname") == null ||
+                params.get("sex") == null) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean hasAllParamsForEditProfile(Map<String, String> params) {
+        if (params.get("name") == null ||
                 params.get("nickname") == null ||
                 params.get("sex") == null) {
             return false;

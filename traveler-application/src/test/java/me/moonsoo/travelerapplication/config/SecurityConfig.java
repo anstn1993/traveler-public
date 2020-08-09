@@ -108,7 +108,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.POST, "/login/traveler", "/find-username/**", "/find-password/**", "/authenticate", "/invalidAuthCode", "/sign-up").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .csrf().ignoringAntMatchers("/invalidAuthCode", "/authenticate", "/sign-up")
+                .csrf().ignoringAntMatchers("/invalidAuthCode", "/authenticate", "/sign-up", "/users/*/profile")
         ;
         http.formLogin().loginPage("/login").successForwardUrl("/").permitAll();
         http.logout().logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true);

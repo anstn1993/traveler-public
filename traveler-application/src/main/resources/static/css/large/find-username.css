@@ -1,0 +1,31 @@
+/*FIND USERNAME TITLE*/
+header h1 {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 50px;
+    position: absolute;
+    top: 250px;
+}
+.section {
+    position: absolute;
+    top: 400px;
+    width: 100%;
+}
+.section .inner {
+    max-width: 980px;
+    margin: 0 auto;
+}
+#find-username-form {
+    text-align: center;
+}
+#find-username-form p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+#find-username-form input {
+    display: block;
+    width: 300px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
