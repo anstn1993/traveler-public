@@ -12,14 +12,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.*;
-import org.springframework.lang.Nullable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,6 +57,9 @@ public class AccountController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/login")
     public String getLoginPage(Model model, @ModelAttribute("message") String message, @SessionAttribute(required = false) SessionAccount account, @CookieValue(required = false) String username) {
@@ -373,7 +376,7 @@ public class AccountController {
         validatorForUpdate.setCurrentNickname(account.getNickname());
         validatorForUpdate.validate(accountDto, errors);
         //폼 데이터가 유효하지 않은 경우
-        if(errors.hasErrors()) {
+        if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors);
         }
         modelMapper.map(accountDto, targetUser);
@@ -392,11 +395,37 @@ public class AccountController {
         }
     }
 
+    //비밀번호 수정 핸들러
+    @PutMapping("/users/{userId}/password")
+    public ResponseEntity updatePassword(@PathVariable("userId") Account targetUser,
+                                         @SessionAttribute(required = false) SessionAccount account,
+                                         @RequestParam Map<String, String> params) {
+        //로그인하지 않았거나 다른 사용자의 프로필을 수정하려고 하는 경우 403 return
+        if (account == null || !account.getId().equals(targetUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        //필요한 request parameter가 모두 넘어오지 않은 경우 bad request response
+        if (!hasAllParamsForChangingPassword(params)) {
+            ObjectNode error = objectMapper.createObjectNode();
+            error.put("error", "You didn't send all request parameters for edit profile!");
+            return ResponseEntity.badRequest().body(error);
+        }
+        //요청 parameter들의 유효성 검사
+        Errors errors = new MapBindingResult(params, "password");
+        validateParamsForChangingPassword(params, errors, targetUser.getPassword());
+        if(errors.hasErrors()) {
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        accountService.updatePassword(targetUser.getUsername(), params.get("new-password"));//비밀번호 수정
+        return ResponseEntity.ok().build();
+    }
+
     private AccountDtoForUpdate bindAccountDtoForUpdate(Map<String, String> params) {
         return AccountDtoForUpdate.builder()
                 .name(params.get("name"))
                 .nickname(params.get("nickname"))
-                .introduce(params.get("introduce"))
+                .introduce(params.get("introduce").equals("") ? null : params.get("introduce"))
                 .sex((params.get("sex").equals("male") ? Sex.MALE : Sex.FEMALE))
                 .build();
     }
@@ -427,7 +456,6 @@ public class AccountController {
         }
         return true;
     }
-
     private boolean hasAllParamsForEditProfile(Map<String, String> params) {
         if (params.get("name") == null ||
                 params.get("nickname") == null ||
@@ -435,5 +463,45 @@ public class AccountController {
             return false;
         }
         return true;
+    }
+
+    private boolean hasAllParamsForChangingPassword(Map<String, String> params) {
+        if (params.get("current-password") == null ||
+                params.get("new-password") == null ||
+                params.get("new-password-check") == null) {
+            return false;
+        }
+        return true;
+    }
+    //비밀번호 변경 parameter들의 유효성 검사
+    //param3: 실제 사용자 비밀번호
+    private void validateParamsForChangingPassword(Map<String, String> params, Errors errors, String userPassword) {
+        String currentPassword = params.get("current-password");
+        String newPassword = params.get("new-password");
+        String newPasswordCheck = params.get("new-password-check");
+
+        //공백 검사
+        if (currentPassword.isBlank() || newPassword.isBlank() || newPasswordCheck.isBlank()) {
+            errors.rejectValue("password", "password empty or whitespace", "비밀번호에 공백은 들어갈 수 없습니다.");
+            return;
+        }
+
+        //비밀번호 일치 검사
+        if(!passwordEncoder.matches(currentPassword, userPassword)) {
+            errors.rejectValue("currentPassword", "wrong password", "비밀번호를 다시 확인해주세요.");
+            return;
+        }
+
+        //새로운 비밀번호 길이 검사
+        if (newPassword.length() < 8 || newPassword.length() > 16) {
+            errors.rejectValue("newPassword", "password length", "비밀번호는 8에서 16자 사이로 설정해주세요.");
+            return;
+        }
+
+        //비밀번호, 비밀번호 확인 일치 검사
+        if (!newPassword.equals(newPasswordCheck)) {
+            errors.rejectValue("newPasswordCheck", "password check", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+            return;
+        }
     }
 }

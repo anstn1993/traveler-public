@@ -27,7 +27,7 @@ public class MockS3Config {
     public S3Mock s3Mock() {
         return new S3Mock.Builder()
                 .withInMemoryBackend()
-                .withPort(9999)
+                .withPort(8888)
                 .build();
     }
 
@@ -35,7 +35,7 @@ public class MockS3Config {
     @ConditionalOnMissingBean
     public AmazonS3 amazonS3(S3Mock s3Mock) {
         s3Mock.start();
-        AwsClientBuilder.EndpointConfiguration endpoint = new AwsClientBuilder.EndpointConfiguration("http://localhost:9999", REGION);
+        AwsClientBuilder.EndpointConfiguration endpoint = new AwsClientBuilder.EndpointConfiguration("http://localhost:8888", REGION);
         AmazonS3 client = AmazonS3ClientBuilder
                 .standard()
                 .withPathStyleAccessEnabled(true)

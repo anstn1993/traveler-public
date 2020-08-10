@@ -167,7 +167,7 @@ class AccountControllerTest extends BaseControllerTest {
     public void sendEmail() throws MessagingException, IOException {
         String username = "anstn1993";
         String email = "user@email.com";
-        String password = "user";
+        String password = "11111111";
         Account account = createAccount(username, email, password, 0);
 
         smtpServerExtension.getGreenMail().setUser("mansoo@localhost", "1111");
@@ -188,7 +188,7 @@ class AccountControllerTest extends BaseControllerTest {
     public void authenticate_Find_Username() throws Exception {
         String username = "anstn1993";
         String email = "user@email.com";
-        String password = "user";
+        String password = "11111111";
         Account account = createAccount(username, email, password, 0);
 
         smtpServerExtension.getGreenMail().setUser("mansoo@localhost", "1111");
@@ -252,7 +252,7 @@ class AccountControllerTest extends BaseControllerTest {
     public void authenticate_Find_Password() throws Exception {
         String username = "anstn1993";
         String email = "user@email.com";
-        String password = "user";
+        String password = "11111111";
         Account account = createAccount(username, email, password, 0);
 
         smtpServerExtension.getGreenMail().setUser("mansoo@localhost", "1111");
@@ -436,7 +436,7 @@ class AccountControllerTest extends BaseControllerTest {
     public void updateProfile(MockMultipartFile imageFile, MultiValueMap<String, String> params) throws Exception {
         String username = "anstn1993";
         String email = "user@email.com";
-        String password = "user";
+        String password = "11111111";
         Account account = createAccount(username, email, password, 0);
         MockHttpSession session = new MockHttpSession();
         SessionAccount sessionAccount = modelMapper.map(account, SessionAccount.class);
@@ -470,7 +470,7 @@ class AccountControllerTest extends BaseControllerTest {
     public void updateProfileFail(MockMultipartFile imageFile, MultiValueMap<String, String> params) throws Exception {
         String username = "anstn1993";
         String email = "user@email.com";
-        String password = "user";
+        String password = "11111111";
         Account account = createAccount(username, email, password, 0);
         MockHttpSession session = new MockHttpSession();
         SessionAccount sessionAccount = modelMapper.map(account, SessionAccount.class);
@@ -486,12 +486,12 @@ class AccountControllerTest extends BaseControllerTest {
 
     private static Stream<Arguments> invalidMultipartProviderForUpdateProfile() {
         return Stream.of(
-          Arguments.of(new MockMultipartFile("imageFile", "name", "image/jpg", new byte[1024]),
-                  createParamsForUpdateProfile("englishname", "nickname", "introduce", "MALE")),//invalid name
-          Arguments.of(new MockMultipartFile("imageFile", "name", "image/jpg", new byte[1024]),
-                  createParamsForUpdateProfile("김문수", "too-long-nickname-too-long-nickname", "introduce", "MALE")),//invalid nickname
-          Arguments.of(new MockMultipartFile("imageFile", "name", "image/jpg", new byte[1024]),
-                  createParamsForUpdateProfile("김문수", "nickname", " ", "MALE"))//invalid introduce
+                Arguments.of(new MockMultipartFile("imageFile", "name", "image/jpg", new byte[1024]),
+                        createParamsForUpdateProfile("englishname", "nickname", "introduce", "MALE")),//invalid name
+                Arguments.of(new MockMultipartFile("imageFile", "name", "image/jpg", new byte[1024]),
+                        createParamsForUpdateProfile("김문수", "too-long-nickname-too-long-nickname", "introduce", "MALE")),//invalid nickname
+                Arguments.of(new MockMultipartFile("imageFile", "name", "image/jpg", new byte[1024]),
+                        createParamsForUpdateProfile("김문수", "nickname", " ", "MALE"))//invalid introduce
         );
     }
 
@@ -502,6 +502,54 @@ class AccountControllerTest extends BaseControllerTest {
         invalidParams.add("introduce", introduce);
         invalidParams.add("sex", sex);
         return invalidParams;
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 테스트")
+    public void updatePassword() throws Exception {
+        String username = "anstn1993";
+        String email = "user@email.com";
+        String password = "11111111";
+        Account account = createAccount(username, email, password, 0);
+        MockHttpSession session = new MockHttpSession();
+        SessionAccount sessionAccount = modelMapper.map(account, SessionAccount.class);
+        session.setAttribute("account", sessionAccount);
+        mockMvc.perform(put("/users/{userId}/password", account.getId()).with(user(username))
+                .session(session)
+                .param("current-password", password)
+                .param("new-password", "22222222")
+                .param("new-password-check", "22222222"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @ParameterizedTest(name = "{index} => realPassword = {0}, currentPassword = {1}, newPassword = {2}, newPasswordCheck = {3}")
+    @MethodSource("invalidParameterProviderForChangingPassword")
+    @DisplayName("비밀번호 변경 테스트 실패")
+    public void updatePasswordFail(String realPassword, String currentPassword, String newPassword, String newPasswordCheck) throws Exception {
+        String username = "anstn1993";
+        String email = "user@email.com";
+        String password = realPassword;
+        Account account = createAccount(username, email, password, 0);
+        MockHttpSession session = new MockHttpSession();
+        SessionAccount sessionAccount = modelMapper.map(account, SessionAccount.class);
+        session.setAttribute("account", sessionAccount);
+        mockMvc.perform(put("/users/{userId}/password", account.getId()).with(user(username))
+                .session(session)
+                .param("current-password", currentPassword)
+                .param("new-password", newPassword)
+                .param("new-password-check", newPasswordCheck))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    private static Stream<Arguments> invalidParameterProviderForChangingPassword() {
+        return Stream.of(
+                Arguments.of("11111111", "22222222", "33333333", "33333333"),//실제 비밀번호와 사용자가 입력한 비밀번호의 불일치
+                Arguments.of("11111111", "11111111", "2222", "2222"),//새로운 비밀번호 최소 자리수 미달
+                Arguments.of("11111111", "11111111", "22222222222222222", "22222222222222222"),//새로운 비밀번호 최대 자리수 초과
+                Arguments.of("11111111", "11111111", "22222222", "33333333")//새로운 비밀번호, 새로운 비밀번호 확인 불일치
+        );
     }
 
     private MockMultipartFile createMockMultipartFile() throws IOException {

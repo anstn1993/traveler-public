@@ -1,13 +1,14 @@
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
-!**/src!**/src/test/**/main/**
+!**/src/main/**
+!**/src/test/**
 
 datasource.properties
 oauth2-client.properties
 email.properties
 aws.properties
-/src/main/resources/static/image/
+
 
 ### STS ###
 .apt_generated
@@ -35,3 +36,4 @@ build/
 ### VS Code ###
 .vscode/
 
+/src/main/resources/static/image/

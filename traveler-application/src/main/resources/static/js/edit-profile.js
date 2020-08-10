@@ -31,19 +31,6 @@ window.addEventListener("load", function () {
     //회원가입 처리 로딩 다이얼로그
     var loadingBox = document.querySelector(".loading-box");
 
-
-    // loadXHR(profileImg.src)
-    //     .then(blob => {
-    //         console.log(blob);
-    //         dataBlob = blob;
-    //         console.log(dataBlob.type);
-    //         let reader = new FileReader();
-    //         reader.readAsDataURL(dataBlob);
-    //         reader.onload = function () {
-    //             console.log(reader);
-    //         }
-    //     });
-
     //기존 프로필 이미지가 존재하는 경우 이미지 삭제 버튼 set & 이미지 blob을 서버로부터 받아와서 base64로 변환해준다.
     if (profileImg.classList.contains("user-img")) {
         deleteBtnBox.innerHTML = "";
@@ -51,8 +38,9 @@ window.addEventListener("load", function () {
 
         $.ajax({
             type: "GET",
-            url:profileImg.src,
-            xhrFields:{
+            url: profileImg.src,
+            headers: {'Access-Control-Allow-Origin': '*'},
+            xhrFields: {
                 responseType: 'blob'
             }
         }).done(function (res) {
@@ -181,6 +169,23 @@ window.addEventListener("load", function () {
         toggleLoadingBox(loadingBox);
         sendEditProfileRequest(formData, loadingBox);
     }
+
+    //비밀번호 변경 폼 제출 콜백 이벤트
+    changePasswordSubmitBtn.onclick = function (event) {
+        event.preventDefault();
+        if (isEmptyOrWhitespace(changePasswordInputList)) {
+            alert('모든 항목을 채워주세요.');
+            return;
+        }
+        var formData = new FormData();
+        for (var i = 0; i < changePasswordInputList.length; i++) {
+            var name = changePasswordInputList[i].name;
+            var value = changePasswordInputList[i].value;
+            formData.append(name, value);
+        }
+        toggleLoadingBox(loadingBox);
+        sendChangePasswordRequest(formData, loadingBox);
+    }
 });
 
 //선택한 이미지 파일을 썸네일로 만들어서 화면에 출력
@@ -280,6 +285,37 @@ function sendEditProfileRequest(formData, loadingBox) {
         alert(message);
     });
 }
+
+//서버로 비밀번호 변경 요청을 보내는 함수
+function sendChangePasswordRequest(formData, loadingBox) {
+    var userId = location.href.split("/")[4];
+    console.log(userId);
+    $.ajax({
+        type: "PUT",
+        url: "/users/" + userId + "/password",
+        processData: false,
+        contentType: false,
+        async: true,
+        data: formData
+    }).done(function (res) {
+        console.log("done");
+        toggleLoadingBox(loadingBox);
+        alert("비밀번호 변경을 완료했습니다!");
+    }).fail(function (res) {
+        console.log("fail");
+        console.log(res);
+        toggleLoadingBox(loadingBox);
+        var message;
+        try {
+            message = res.responseJSON[0].defaultMessage;
+        } catch (error) {
+            alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
+            return;
+        }
+        alert(message);
+    });
+}
+
 
 //파일이 이미지 파일인지 검사하는 함수
 function validImageType(file) {
