@@ -1256,6 +1256,7 @@ class AccountControllerTest extends BaseControllerTest {
     //허용되지 않은 값이 포함된 account dto 생성
     private Account createAccountDtoWithUnknownValue() {
         return Account.builder()
+                .username("user")
                 .email("user@email.com")
                 .name("user")
                 .password("user")

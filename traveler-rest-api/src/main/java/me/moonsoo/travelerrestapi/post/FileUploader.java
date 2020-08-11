@@ -63,7 +63,7 @@ public class FileUploader {
         for (int i = 0; i < multipartFileList.size(); i++) {
             String extension = getExtension(multipartFileList.get(i).getContentType());//파일의 확장자
             String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());//파일 이름의 무결성을 위해서 현재 시간 + 파일 번호를 부여
-            String fileName = account.getId() + timeStamp + (i + 1) + "." + extension;//확장자와 time stamp를 합쳐서 파일 이름 생성
+            String fileName = account.getUsername() + timeStamp + (i + 1) + "." + extension;//확장자와 time stamp를 합쳐서 파일 이름 생성
             //파일로 변환
             File tempFile = new File(fileName);
             if (tempFile.createNewFile()) {

@@ -14,4 +14,6 @@ public interface LikeRepository extends JpaRepository<Like, Integer> {
     Page<Like> findAllByPost(Post post, Pageable pageable);
 
     void deleteByPost(Post post);
+
+    void deleteByAccount(Account account);
 }

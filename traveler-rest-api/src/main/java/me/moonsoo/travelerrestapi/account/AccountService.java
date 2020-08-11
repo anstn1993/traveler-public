@@ -12,6 +12,7 @@ import me.moonsoo.travelerrestapi.post.FileUploader;
 import me.moonsoo.travelerrestapi.post.PostRepository;
 import me.moonsoo.travelerrestapi.post.childcomment.PostChildCommentRepository;
 import me.moonsoo.travelerrestapi.post.comment.PostCommentRepository;
+import me.moonsoo.travelerrestapi.post.like.LikeRepository;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
 import me.moonsoo.travelerrestapi.schedule.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,9 @@ public class AccountService {
     private PostCommentRepository postCommentRepository;
 
     @Autowired
+    private LikeRepository likeRepository;
+
+    @Autowired
     private PostChildCommentRepository postChildCommentRepository;
 
     @Autowired
@@ -75,23 +79,19 @@ public class AccountService {
         account.setRegDate(LocalDateTime.now());
         account.setProfileImageUri(null);
         account.setRoles(Set.of(AccountRole.USER));
-        Account savedAccount = accountRepository.save(account);
         if (!imageFile.isEmpty()) {//프로필 이미지가 존재하는 경우 s3서버에 저장
             try {
-                List<String> uploadedProfileImageUri = fileUploader.upload(imageFile, savedAccount, s3Properties.getProfileImageDirectory());
-                savedAccount.setProfileImageUri(uploadedProfileImageUri.get(0));
-                return savedAccount;
+                List<String> uploadedProfileImageUri = fileUploader.upload(imageFile, account, s3Properties.getProfileImageDirectory());
+                account.setProfileImageUri(uploadedProfileImageUri.get(0));
             } catch (IOException e) {
                 e.printStackTrace();
-                accountRepository.delete(savedAccount);
                 throw new IOException(e.getMessage());
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
-                accountRepository.delete(savedAccount);
                 throw new IllegalArgumentException(e.getMessage());
             }
         }
-        return savedAccount;
+        return accountRepository.save(account);
     }
 
     //이메일 인증 상태로 update
@@ -153,6 +153,7 @@ public class AccountService {
         scheduleRepository.deleteByAccount(account);
         postChildCommentRepository.deleteByAccount(account);
         postCommentRepository.deleteByAccount(account);
+        likeRepository.deleteByAccount(account);
         postRepository.deleteByAccount(account);
         followRepository.deleteByFollowingAccount(account);
         followRepository.deleteByFollowedAccount(account);

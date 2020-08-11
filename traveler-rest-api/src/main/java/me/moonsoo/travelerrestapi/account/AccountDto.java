@@ -5,10 +5,7 @@ import me.moonsoo.commonmodule.account.Sex;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 @Builder
 @Getter @Setter
@@ -20,6 +17,7 @@ public class AccountDto {
 
     @NotBlank
     @Length(min = 4, max = 16)
+    @Pattern(regexp = "^[a-zA-Z0-9]*$")
     private String username;
 
     @NotBlank
