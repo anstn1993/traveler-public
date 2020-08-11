@@ -1,5 +1,4 @@
 var dataUri;//이미지 데이터 uri(base 64)
-
 window.addEventListener("load", function () {
     // 프로필 수정 폼 리스트
     const profileFormList = document.querySelectorAll(".profile-form");
@@ -26,10 +25,16 @@ window.addEventListener("load", function () {
 
     //회원 탈퇴 폼
     const withdrawlForm = document.querySelector("#withdrawl-form");
+    const withdrawlCheckBox = document.querySelector("#withdrawl-chb");//회원탈퇴 동의 체크 박스
     const withdrawlSubmitBtn = document.querySelector("#withdrawl-form [type='submit']");//회원탈퇴 폼 제출 버튼
 
-    //회원가입 처리 로딩 다이얼로그
-    var loadingBox = document.querySelector(".loading-box");
+    //프로필 편집, 비밀번호 변경, 회원탈퇴 처리 로딩 다이얼로그
+    const loadingBox = document.querySelector(".loading-box");
+    //로딩 박스 메세지
+    const loadingMessage = document.querySelector(".loading-box p");
+    let editProfileLoadingMessage = "프로필 수정 처리 중...";
+    let changePasswordLoadingMessage = "비밀번호 변경 처리 중...";
+    let withdrawlLoadingMessage = "회원탈퇴 처리 중...";
 
     //기존 프로필 이미지가 존재하는 경우 이미지 삭제 버튼 set & 이미지 blob을 서버로부터 받아와서 base64로 변환해준다.
     if (profileImg.classList.contains("user-img")) {
@@ -166,8 +171,8 @@ window.addEventListener("load", function () {
                 }
             }
         }
-        toggleLoadingBox(loadingBox);
-        sendEditProfileRequest(formData, loadingBox);
+        toggleLoadingBox(loadingBox, loadingMessage, editProfileLoadingMessage);
+        sendEditProfileRequest(formData, loadingBox, loadingMessage, editProfileLoadingMessage);
     }
 
     //비밀번호 변경 폼 제출 콜백 이벤트
@@ -183,8 +188,20 @@ window.addEventListener("load", function () {
             var value = changePasswordInputList[i].value;
             formData.append(name, value);
         }
-        toggleLoadingBox(loadingBox);
-        sendChangePasswordRequest(formData, loadingBox);
+
+        toggleLoadingBox(loadingBox, loadingMessage, changePasswordLoadingMessage);
+        sendChangePasswordRequest(formData, loadingBox, loadingMessage, changePasswordLoadingMessage);
+    }
+
+    //회원 탈퇴 폼 제출 콜백 이벤트
+    withdrawlSubmitBtn.onclick = function (event) {
+        event.preventDefault();
+        if (!withdrawlCheckBox.checked) {
+            alert("회원탈퇴 동의 체크박스를 체크해주세요.");
+            return;
+        }
+        toggleLoadingBox(loadingBox, loadingMessage, withdrawlLoadingMessage);
+        sendWithdrawlRequest(loadingBox, loadingMessage, withdrawlLoadingMessage);
     }
 });
 
@@ -259,7 +276,7 @@ var dataURLToBlob = function (dataURL) {
 };
 
 //서버로 프로필 수정 요청을 보내는 함수
-function sendEditProfileRequest(formData, loadingBox) {
+function sendEditProfileRequest(formData, loadingBox, loadingMessage, editProfileLoadingMessage) {
     $.ajax({
         type: "POST",
         url: location.href,
@@ -269,25 +286,30 @@ function sendEditProfileRequest(formData, loadingBox) {
         data: formData
     }).done(function (res) {
         console.log("done");
-        toggleLoadingBox(loadingBox);
+        toggleLoadingBox(loadingBox, loadingMessage, editProfileLoadingMessage);
         alert("프로필 수정을 완료했습니다!");
     }).fail(function (res) {
         console.log("fail");
         console.log(res);
-        toggleLoadingBox(loadingBox);
-        var message;
-        try {
-            message = res.responseJSON[0].defaultMessage;
-        } catch (error) {
-            alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
-            return;
+        toggleLoadingBox(loadingBox, loadingMessage, editProfileLoadingMessage);
+        if (res.status != 401) {
+            var message;
+            try {
+                message = res.responseJSON[0].defaultMessage;
+            } catch (error) {
+                alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
+                return;
+            }
+            alert(message);
+        } else if (res.status == 401) {
+            alert("인증 토큰이 만료되었습니다. 다시 로그인해주세요.");
+            location.href = "/login";
         }
-        alert(message);
     });
 }
 
 //서버로 비밀번호 변경 요청을 보내는 함수
-function sendChangePasswordRequest(formData, loadingBox) {
+function sendChangePasswordRequest(formData, loadingBox, loadingMessage, changePasswordLoadingMessage) {
     var userId = location.href.split("/")[4];
     console.log(userId);
     $.ajax({
@@ -299,20 +321,57 @@ function sendChangePasswordRequest(formData, loadingBox) {
         data: formData
     }).done(function (res) {
         console.log("done");
-        toggleLoadingBox(loadingBox);
+        toggleLoadingBox(loadingBox, loadingMessage, changePasswordLoadingMessage);
         alert("비밀번호 변경을 완료했습니다!");
     }).fail(function (res) {
         console.log("fail");
         console.log(res);
-        toggleLoadingBox(loadingBox);
-        var message;
-        try {
-            message = res.responseJSON[0].defaultMessage;
-        } catch (error) {
-            alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
-            return;
+        toggleLoadingBox(loadingBox, loadingMessage, changePasswordLoadingMessage);
+        if (res.status != 401) {
+            var message;
+            try {
+                message = res.responseJSON[0].defaultMessage;
+            } catch (error) {
+                alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
+                return;
+            }
+            alert(message);
+        } else if (res.status == 401) {
+            alert("인증 토큰이 만료되었습니다. 다시 로그인해주세요.");
+            location.href = "/login";
         }
-        alert(message);
+    });
+}
+
+function sendWithdrawlRequest(loadingBox, loadingMessage, withdrawlLoadingMessage) {
+    var userId = location.href.split("/")[4];
+    console.log(userId);
+    $.ajax({
+        type: "DELETE",
+        url: "/users/" + userId + "/withdrawl",
+        async: true,
+    }).done(function (res) {
+        console.log("done");
+        toggleLoadingBox(loadingBox, loadingMessage, withdrawlLoadingMessage);
+        alert("회원탈퇴가 완료되었습니다!");
+        location.href = "/";//메인 페이지로 이동
+    }).fail(function (res) {
+        console.log("fail");
+        console.log(res);
+        toggleLoadingBox(loadingBox, loadingMessage, withdrawlLoadingMessage);
+        if (res.status != 401) {
+            var message;
+            try {
+                message = res.responseJSON[0].defaultMessage;
+            } catch (error) {
+                alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
+                return;
+            }
+            alert(message);
+        } else if (res.status == 401) {
+            alert("인증 토큰이 만료되었습니다. 다시 로그인해주세요.");
+            location.href = "/login";
+        }
     });
 }
 
@@ -341,7 +400,8 @@ function isEmptyOrWhitespace(inputList) {
 }
 
 //로딩 박스를 on/off하는 함수
-function toggleLoadingBox(loadingBox) {
+function toggleLoadingBox(loadingBox, loadingMessage, message) {
+    loadingMessage.textContent = message;
     loadingBox.classList.toggle("on");
 }
 

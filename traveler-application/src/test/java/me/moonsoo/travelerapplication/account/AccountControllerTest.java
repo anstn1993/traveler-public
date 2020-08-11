@@ -403,6 +403,7 @@ class AccountControllerTest extends BaseControllerTest {
     public static Stream<Arguments> invalidRequestParamProviderForSignUp() {
         return Stream.of(
                 Arguments.of(createInvalidParamsForSignUp("ans", "11111111", "11111111", "email@email.com", "김문수", "만수", "MALE")),
+                Arguments.of(createInvalidParamsForSignUp("ans@1993", "11111111", "11111111", "email@email.com", "김문수", "만수", "MALE")),
                 Arguments.of(createInvalidParamsForSignUp("anstn1993", "1111", "1111", "email@email.com", "김문수", "만수", "MALE")),
                 Arguments.of(createInvalidParamsForSignUp("anstn1993", "11111111", "22222222", "email@email.com", "김문수", "만수", "MALE")),
                 Arguments.of(createInvalidParamsForSignUp("anstn1993", "11111111", "11111111", "notemail", "김문수", "만수", "MALE")),

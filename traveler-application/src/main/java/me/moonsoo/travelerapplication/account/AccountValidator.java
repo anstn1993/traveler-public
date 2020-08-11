@@ -43,6 +43,14 @@ public class AccountValidator implements Validator {
             return false;
         }
 
+        //양식 검사
+        String regex = "^[a-zA-Z0-9]*$";
+        if(!Pattern.matches(regex, username)) {
+            errors.rejectValue("username", "username regex", "아이디에는 영문자와 숫자만 써주세요.");
+            return false;
+        }
+
+
         //길이 검사
         if (username.length() < 4 || username.length() > 16) {
             errors.rejectValue("username", "username length", "아이디는 4자에서 16자 사이로 설정해주세요.");

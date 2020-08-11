@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
+import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,6 +39,9 @@ public class AccountController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private OAuth2RestTemplate oAuth2RestTemplate;
 
     @Autowired
     private AccountService accountService;
@@ -362,7 +368,7 @@ public class AccountController {
                                         MultipartFile imageFile,
                                         @RequestParam Map<String, String> params) {
         //로그인하지 않았거나 다른 사용자의 프로필을 수정하려고 하는 경우 403 return
-        if (account == null || !account.getId().equals(targetUser.getId())) {
+        if (account == null || targetUser == null || !account.getId().equals(targetUser.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         //필요한 request parameter가 모두 넘어오지 않은 경우 bad request response
@@ -401,7 +407,7 @@ public class AccountController {
                                          @SessionAttribute(required = false) SessionAccount account,
                                          @RequestParam Map<String, String> params) {
         //로그인하지 않았거나 다른 사용자의 프로필을 수정하려고 하는 경우 403 return
-        if (account == null || !account.getId().equals(targetUser.getId())) {
+        if (account == null || targetUser == null || !account.getId().equals(targetUser.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         //필요한 request parameter가 모두 넘어오지 않은 경우 bad request response
@@ -413,12 +419,26 @@ public class AccountController {
         //요청 parameter들의 유효성 검사
         Errors errors = new MapBindingResult(params, "password");
         validateParamsForChangingPassword(params, errors, targetUser.getPassword());
-        if(errors.hasErrors()) {
+        if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors);
         }
 
         accountService.updatePassword(targetUser.getUsername(), params.get("new-password"));//비밀번호 수정
         return ResponseEntity.ok().build();
+    }
+
+    //회원 탈퇴 핸들러
+    @DeleteMapping("/users/{userId}/withdrawl")
+    public ResponseEntity deleteAccount(@PathVariable("userId") Account targetUser,
+                                        @SessionAttribute SessionAccount account,
+                                        HttpSession session) throws OAuth2AccessDeniedException {
+        //로그인하지 않았거나 다른 사용자의 프로필을 수정하려고 하는 경우 403 return
+        if (account == null || targetUser == null || !account.getId().equals(targetUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        oAuth2RestTemplate.delete(appProperties.getRestApiUrl() + appProperties.getDeleteAccountUri() + targetUser.getId());//rest api서버에 사용자 리소스 삭제 request
+        session.invalidate();//세션 만료
+        return ResponseEntity.noContent().build();
     }
 
     private AccountDtoForUpdate bindAccountDtoForUpdate(Map<String, String> params) {
@@ -456,6 +476,7 @@ public class AccountController {
         }
         return true;
     }
+
     private boolean hasAllParamsForEditProfile(Map<String, String> params) {
         if (params.get("name") == null ||
                 params.get("nickname") == null ||
@@ -473,6 +494,7 @@ public class AccountController {
         }
         return true;
     }
+
     //비밀번호 변경 parameter들의 유효성 검사
     //param3: 실제 사용자 비밀번호
     private void validateParamsForChangingPassword(Map<String, String> params, Errors errors, String userPassword) {
@@ -487,7 +509,7 @@ public class AccountController {
         }
 
         //비밀번호 일치 검사
-        if(!passwordEncoder.matches(currentPassword, userPassword)) {
+        if (!passwordEncoder.matches(currentPassword, userPassword)) {
             errors.rejectValue("currentPassword", "wrong password", "비밀번호를 다시 확인해주세요.");
             return;
         }

@@ -4,11 +4,13 @@ import me.moonsoo.travelerapplication.properties.TravelerOAuth2ClientProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -27,8 +29,10 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.client.ResponseErrorHandler;
 
 import javax.servlet.Filter;
+import java.io.IOException;
 
 @EnableWebSecurity
 @Configuration
@@ -51,6 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomAuthenticationSuccessHandler successHandler;
+
 
     @Bean
     public OAuth2RestTemplate oAuth2RestTemplate() {
@@ -106,7 +111,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.POST, "/login/traveler", "/find-username/**", "/find-password/**", "/authenticate", "/invalidAuthCode", "/sign-up").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .csrf().ignoringAntMatchers("/invalidAuthCode", "/authenticate", "/find-password/result", "/sign-up", "/users/*/profile", "/users/*/password")
+                .csrf().ignoringAntMatchers("/invalidAuthCode",
+                "/authenticate",
+                "/find-password/result",
+                "/sign-up",
+                "/users/*/profile",
+                "/users/*/password",
+                "/users/*/withdrawl")
         ;
         http.formLogin().loginPage("/login").successForwardUrl("/").permitAll();
         http.logout().logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true);

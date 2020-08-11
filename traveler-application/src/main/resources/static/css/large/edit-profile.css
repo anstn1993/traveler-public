@@ -9,7 +9,7 @@
     margin: 0 auto;
     display: flex;
     justify-content: flex-start;
-    
+
 }
 .edit-profile-section .inner .menu-group {
     width: 300px;
@@ -57,7 +57,7 @@
 }
 /* Edit PROFILE FORM */
 #edit-profile-form {
-    
+
 }
 #profile-input-label {
     text-align: center;
@@ -85,6 +85,29 @@
 }
 /* WITHDRAWL FORM */
 #withdrawl-form {
+    height: 300px;
+}
+#withdrawl-form .inner {
+    display: flex;
+    flex-flow: column;
+    width: 90%;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+}
+#withdrawl-form .inner p {
+    margin-top: 20px;
+    padding: 10px;
+    background: #F2DEDE;
+    border-radius: 6px;
+    color: #C36642;
+    line-height: 1.5;
+}
+#withdrawl-form .inner .withdrawl-agree-box {
+    margin-top: 20px;
+}
+#withdrawl-form .inner [type="submit"] {
+    margin-top: 20px;
 }
 /*LOADING BOX*/
 .loading-container {

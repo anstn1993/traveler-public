@@ -22,4 +22,7 @@ public class AppProperties {
     @NotEmpty
     private String createAccountUri;
 
+    @NotEmpty
+    private String deleteAccountUri;
+
 }
