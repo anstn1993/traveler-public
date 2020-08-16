@@ -9,7 +9,6 @@ oauth2-client.properties
 email.properties
 aws.properties
 
-
 ### STS ###
 .apt_generated
 .classpath
