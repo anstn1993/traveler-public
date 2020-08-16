@@ -89,7 +89,7 @@ public class LikeController {
                 .followService(followService)
                 .build();
 
-        FollowingAccountInLikeModelAssembler followingAccountInLikeModelAssembler = new FollowingAccountInLikeModelAssembler(followLinkGenerator);
+        FollowingAccountInLikeModelAssembler followingAccountInLikeModelAssembler = new FollowingAccountInLikeModelAssembler(followLinkGenerator, account);
         PagedModel<LikeModel> likeModels = assembler.toModel(likes, followingAccountInLikeModelAssembler);
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetLikesAnchor()).withRel("profile");//profile 링크
         likeModels.add(profileLink);

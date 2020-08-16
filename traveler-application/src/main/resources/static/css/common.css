@@ -9,42 +9,42 @@ a {
     color: #fff;
 }
 a:hover {
-  color: #347682;
+    color: #347682;
 }
 
 /* INPUT */
 .input--text {
     width: 250px;
-    height: 40px;  
+    height: 40px;
     border: transparent;
     border-radius: 6px;
     outline: none;
     box-shadow: inset 0 0 1px rgba(0,0,0,.75);
     padding: 0 10px;
     box-sizing: border-box;
-  }
-  
-  .input--text:focus {
+}
+
+.input--text:focus {
     border-color: #15a7e8;
     box-shadow: inset 0 0 2px rgba(0,0,0,.75),
-                0 0 5px rgba(81, 167, 232, 0.5);
-  }
-  
-  /* CHROME */
-  .input--text::-webkit-input-placeholder {
+    0 0 5px rgba(81, 167, 232, 0.5);
+}
+
+/* CHROME */
+.input--text::-webkit-input-placeholder {
     color: #cacaca;
-  }
-  /* IE, EDGE */
-  .input--text::-ms-input-placeholder {
+}
+/* IE, EDGE */
+.input--text::-ms-input-placeholder {
     color: #cacaca;
-  }
-  /* MOZILLA */
-  .input--text::-moz-input-placeholder {
+}
+/* MOZILLA */
+.input--text::-moz-input-placeholder {
     color: #cacaca;
-  }
-  
-  /* BTN */
-  .btn {
+}
+
+/* BTN */
+.btn {
     display: flex;
     align-items: center;
     height: 40px;
@@ -59,8 +59,8 @@ a:hover {
     position: relative;
     background: #eee;
     color: #333;
-  }
-  .btn:hover::before {
+}
+.btn:hover::before {
     content: "";
     position: absolute;
     top: 0;
@@ -68,24 +68,28 @@ a:hover {
     bottom: 0;
     right: 0;
     background: rgba(0,0,0,.1);
-  }
-  .btn--primary {
+}
+.btn--primary {
     background: #3498DB;
     color: #fff;
-  }
-  .btn--danger {
+}
+.btn--danger {
     background: #FF6670;
     color: #fff;
-  }
-  /* FLOAT & CLEAR */
-  .float--right {
-      float: right;
-  }
+}
+/* FLOAT & CLEAR */
+.float--right {
+    float: right;
+}
+.float--left {
+    float: left;
+}
 
-  .clearfix::after {
-      content: "";
-      display: block;
-      clear: both;
-  }
+.clearfix::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
 
   

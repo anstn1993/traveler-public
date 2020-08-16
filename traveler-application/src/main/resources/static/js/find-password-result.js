@@ -1,17 +1,17 @@
 window.addEventListener('load', function () {
     //비밀번호 변경 버튼
-    var updatePasswordBtn = document.querySelector("input[type='submit']");
+    const updatePasswordBtn = document.querySelector("input[type='submit']");
     //비밀번호 input
-    var passwordInput = document.querySelector("#password-input");
+    const passwordInput = document.querySelector("#password-input");
     //비밀번호 확인 input
-    var passwordCheckInput = document.querySelector("#password-check-input");
+    const passwordCheckInput = document.querySelector("#password-check-input");
     //사용자가 input 태그에 입력한 데이터들에 대한 피드백을 줄 p 태그
-    var messageBox = document.querySelector("#message");
+    const messageBox = document.querySelector("#message");
 
     updatePasswordBtn.onclick = function (event) {
         event.preventDefault();
-        var password = passwordInput.value;
-        var passwordCheck = passwordCheckInput.value;
+        const password = passwordInput.value;
+        const passwordCheck = passwordCheckInput.value;
 
         if(password.trim() == "" || passwordCheck.trim() == "") {
             alert("비밀번호와 비밀번호 확인을 모두 입력해주세요");
@@ -68,7 +68,7 @@ function updatePassword(password, messageBox) {
         alert("비밀번호를 변경했습니다. 새로운 비밀번호로 로그인해주세요.");
         location.href = "/login";
     }).fail(function (res) {
-        var status = res.status;
+        const status = res.status;
         if(status == 500) {
             alert("서버에 문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
         }

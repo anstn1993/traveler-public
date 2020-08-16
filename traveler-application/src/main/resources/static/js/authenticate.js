@@ -1,17 +1,17 @@
-var authInvalid = true;
+let authInvalid = true;
 window.addEventListener('load', function () {
 
-    var authBtn = document.querySelector("input[type='submit']");
-    var timerBox = document.querySelector("#timer-box");
-    var messageBox = document.querySelector("#message");
-    var time = 600;//총 제한 시간
-    var min = "";//분
-    var sec = "";//초
+    const authBtn = document.querySelector("input[type='submit']");
+    const timerBox = document.querySelector("#timer-box");
+    const messageBox = document.querySelector("#message");
+    let time = 600;//총 제한 시간
+    let min = "";//분
+    let sec = "";//초
 
 
 
     //타이머 실행
-    var timer = setInterval(function () {
+    let timer = setInterval(function () {
         min = parseInt(time / 60);
         sec = time % 60;
         timerBox.innerHTML = min + "분 " + sec + "초";
@@ -71,7 +71,7 @@ function authenticate(authCode, messageBox) {
     }).done(function (res) {
         console.log(res);
         console.log(res.authType);
-        var authType = res.authType;
+        const authType = res.authType;
         if(authType == "username") {
             authInvalid = false;
             location.href="/find-username/result";

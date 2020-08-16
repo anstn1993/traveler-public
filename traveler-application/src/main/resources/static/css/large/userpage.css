@@ -71,6 +71,9 @@ header {
     display: flex;
     justify-content: center;
 }
+.section-box .user-info-section .inner .btn-group .off {
+    display: none;
+}
 #search-form {
     width: 80%;
     margin: 0 auto;
@@ -84,5 +87,94 @@ header {
     border: none;
 }
 #search-form [type="submit"] {
+    display: none;
+}
+/* 팔로잉 리스트 모달 */
+.follow-list-modal {
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.3);
+    position: absolute;
+    top: 0;
+    overflow: auto;
+}
+.follow-list-modal .content {
+    width: 500px;
+    height: 700px;
+    margin: 0 auto;
+    position: absolute;
+    top: 200px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 6px;
+    color: #000;
+}
+.follow-list-modal .content .header .title {
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+.follow-list-modal .content .header .close {
+    padding: 20px;
+    margin-top: 10px;
+    background: url("/image/close.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    text-indent: -9999px;
+    cursor: pointer;
+}
+.follow-list-modal .content .border {
+    height: 1px;
+    border-top: 1px solid #736E59;
+}
+.follow-list-modal .content .main {
+    overflow: auto;
+    height: 634px;
+}
+.follow-list-modal .content .main .item-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+.follow-list-modal .content .main .more {
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #D6D6D6;
+    cursor: pointer;
+}
+.follow-list-modal .content .main .more:hover {
+    background: rgba(0,0,0,.3);
+}
+.follow-list-modal .content .main .off {
+    display: none;
+}
+.follow-list-modal .content .main .item-container:hover {
+    background: rgba(0,0,0,.3);
+}
+.follow-list-modal .content .main .item-container .item {
+    width: auto;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+/*PROFILE IMG*/
+.follow-list-modal .content .main .item-container .item:nth-child(2) img {
+    border-radius: 50%;
+}
+/*NICKNAME*/
+.follow-list-modal .content .main .item-container .item:nth-child(3) {
+    grid-column: 2/5;
+    justify-content: flex-start;
+}
+/*FOLLOW BTN*/
+.follow-list-modal .content .main .item-container .item:nth-child(4) {
+    grid-column: 5/6;
+}
+.follow-list-modal .content .main .item-container .item:nth-child(4) .off {
     display: none;
 }

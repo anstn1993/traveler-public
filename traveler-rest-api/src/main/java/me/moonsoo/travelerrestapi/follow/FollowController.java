@@ -15,16 +15,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Links;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.DirectFieldBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -107,7 +111,7 @@ public class FollowController {
                 .followService(followService)
                 .followingOrFollower("following")
                 .build();
-        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(linkGenerator);
+        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(linkGenerator, account);
         PagedModel<FollowAccountModel> accountModels = assembler.toModel(followedAccounts, followAccountModelAssembler);
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowingsAnchor()).withRel("profile");//profile 링크
         accountModels.add(profileLink);
@@ -137,13 +141,14 @@ public class FollowController {
                 .followingOrFollower("following")
                 .build();
 
-        Links links = linkGenerator.makeLinks(followedAccount);//self, create-account-follow or delete-account-follow링크 생성
+        Links links = linkGenerator.makeLinks(followedAccount, account);//self, create-account-follow or delete-account-follow링크 생성
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowingAnchor()).withRel("profile");//profile 링크
         FollowAccountModel followAccountModel = new FollowAccountModel(followedAccount, links);
         followAccountModel.add(profileLink);
         return ResponseEntity.ok(followAccountModel);
     }
 
+    //사용자 팔로워 조회
     @GetMapping("/{accountId}/followers")
     public ResponseEntity getFollowers(Pageable pageable,
                                        @PathVariable("accountId") Account followedAccount,
@@ -160,7 +165,7 @@ public class FollowController {
                 .followingOrFollower("follower")
                 .build();
 
-        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(followLinkGenerator);
+        FollowAccountModelAssembler followAccountModelAssembler = new FollowAccountModelAssembler(followLinkGenerator, account);
 
         PagedModel<FollowAccountModel> accountModels = assembler.toModel(followingAccounts, followAccountModelAssembler);
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowersAnchor()).withRel("profile");//profile 링크
@@ -169,6 +174,7 @@ public class FollowController {
 
     }
 
+    //사용자 팔로워 리소스 하나 조회
     @GetMapping("/{accountId}/followers/{followingId}")
     public ResponseEntity getFollower(@PathVariable("accountId") Account followedAccount,
                                       @PathVariable("followingId") Account followingAccount,
@@ -192,13 +198,13 @@ public class FollowController {
                 .followingOrFollower("follower")
                 .build();
 
-        Links links = linkGenerator.makeLinks(followingAccount);//self, create-account-follow or delete-account-follow링크 생성
+        Links links = linkGenerator.makeLinks(followingAccount, account);//self, create-account-follow or delete-account-follow링크 생성
         Link profileLink = new Link(appProperties.getBaseUrl() + appProperties.getProfileUri() + appProperties.getGetAccountFollowerAnchor()).withRel("profile");//profile 링크
         FollowAccountModel followAccountModel = new FollowAccountModel(followingAccount, links);
         followAccountModel.add(profileLink);
         return ResponseEntity.ok(followAccountModel);
     }
-
+    //사용자 팔로잉 리소스 삭제
     @DeleteMapping("/{accountId}/followings/{followedId}")
     public ResponseEntity unfollowUser(@PathVariable("accountId") Account followingAccount,
                                        @PathVariable("followedId") Account followedAccount,
@@ -234,5 +240,17 @@ public class FollowController {
         Follow follow = followOpt.get();
         followService.delete(follow);//팔로우 데이터 삭제
         return ResponseEntity.noContent().build();
+    }
+
+    //사용자의 팔로잉, 팔로워 수를 반환해주는 핸들러
+    @GetMapping("/{accountId}/follow/count")
+    public ResponseEntity getFollowResourceCount(@PathVariable("accountId") Account targetAccount) {
+        //존재하지 않는 사용자인 경우
+        if(targetAccount == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, Integer> followResourceCount = followService.getFollowResourceCount(targetAccount);
+        return ResponseEntity.ok(followResourceCount);
     }
 }

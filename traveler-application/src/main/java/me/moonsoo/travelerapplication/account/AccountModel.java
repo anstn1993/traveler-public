@@ -1,11 +1,21 @@
 package me.moonsoo.travelerapplication.account;
 
-import me.moonsoo.commonmodule.account.Account;
-import org.springframework.hateoas.EntityModel;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.hateoas.Link;
 
-public class AccountModel extends EntityModel<Account> {
-    public AccountModel(Account account, Link... links) {
-        super(account, links);
-    }
+import java.util.List;
+
+@Getter
+@Setter
+public class AccountModel {
+    public Integer id;
+    public String username;
+    public String email;
+    public String profileImageUri;
+    public String name;
+    public String nickname;
+    public String introduce;
+    public String sex;
+    public List<Link> links;//리소스 링크
 }

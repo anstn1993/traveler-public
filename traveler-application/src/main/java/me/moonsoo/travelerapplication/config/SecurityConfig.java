@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -33,11 +35,12 @@ import org.springframework.web.client.ResponseErrorHandler;
 
 import javax.servlet.Filter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @EnableWebSecurity
 @Configuration
 @EnableOAuth2Client
-@Profile("!test")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Qualifier("oauth2ClientContext")
@@ -59,7 +62,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public OAuth2RestTemplate oAuth2RestTemplate() {
-        return new OAuth2RestTemplate(travelerClient(), oAuth2ClientContext);
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        messageConverters.add(jsonConverter);
+        OAuth2RestTemplate oAuth2RestTemplate = new OAuth2RestTemplate(travelerClient(), oAuth2ClientContext);
+        oAuth2RestTemplate.setMessageConverters(messageConverters);
+        return oAuth2RestTemplate;
     }
 
     @Bean
@@ -117,7 +125,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/sign-up",
                 "/users/*/profile",
                 "/users/*/password",
-                "/users/*/withdrawl")
+                "/users/*/withdrawl",
+                "/users/followings/**")
         ;
         http.formLogin().loginPage("/login").successForwardUrl("/").permitAll();
         http.logout().logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true);

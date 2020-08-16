@@ -3,7 +3,7 @@ package me.moonsoo.travelerapplication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import me.moonsoo.commonmodule.account.*;
-import me.moonsoo.travelerapplication.main.config.SecurityConfig;
+import me.moonsoo.travelerapplication.config.SecurityConfig;
 import org.junit.jupiter.api.Disabled;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

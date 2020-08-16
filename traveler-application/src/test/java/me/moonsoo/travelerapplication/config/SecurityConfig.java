@@ -1,7 +1,5 @@
-package me.moonsoo.travelerapplication.main.config;
+package me.moonsoo.travelerapplication.config;
 
-import me.moonsoo.travelerapplication.config.CustomAuthenticationFailureHandler;
-import me.moonsoo.travelerapplication.config.CustomAuthenticationSuccessHandler;
 import me.moonsoo.travelerapplication.properties.TravelerOAuth2ClientProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -113,7 +111,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/sign-up",
                 "/users/*/profile",
                 "/users/*/password",
-                "/users/*/withdrawl")
+                "/users/*/withdrawl",
+                "/users/followings/**")
         ;
         http.formLogin().loginPage("/login").successForwardUrl("/").permitAll();
         http.logout().logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true);

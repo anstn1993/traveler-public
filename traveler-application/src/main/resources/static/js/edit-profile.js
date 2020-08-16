@@ -32,9 +32,9 @@ window.addEventListener("load", function () {
     const loadingBox = document.querySelector(".loading-box");
     //로딩 박스 메세지
     const loadingMessage = document.querySelector(".loading-box p");
-    let editProfileLoadingMessage = "프로필 수정 처리 중...";
-    let changePasswordLoadingMessage = "비밀번호 변경 처리 중...";
-    let withdrawlLoadingMessage = "회원탈퇴 처리 중...";
+    const editProfileLoadingMessage = "프로필 수정 처리 중...";
+    const changePasswordLoadingMessage = "비밀번호 변경 처리 중...";
+    const withdrawlLoadingMessage = "회원탈퇴 처리 중...";
 
     //기존 프로필 이미지가 존재하는 경우 이미지 삭제 버튼 set & 이미지 blob을 서버로부터 받아와서 base64로 변환해준다.
     if (profileImg.classList.contains("user-img")) {
@@ -52,7 +52,7 @@ window.addEventListener("load", function () {
             //res type: blob
             console.log(res.type);
             //blob to base 64
-            let reader = new FileReader();
+            const reader = new FileReader();
             reader.readAsDataURL(res);
             reader.onload = function () {
                 console.log(reader);
@@ -67,7 +67,7 @@ window.addEventListener("load", function () {
     editProfileMenuBox.onclick = function (event) {
         const target = event.target;//클릭된 메뉴 노드
         const menuList = editProfileMenuBox.children;
-        for (var i = 0; i < menuList.length; i++) {
+        for (let i = 0; i < menuList.length; i++) {
             if (menuList[i] === target) {
                 menuList[i].style.backgroundColor = "#337AB7";
             } else {
@@ -94,7 +94,7 @@ window.addEventListener("load", function () {
     //프로필 이미지 선택 시 콜백되는 이벤트
     profileInput.onchange = function (event) {
         console.log(event);
-        var file = event.target.files[0];
+        const file = event.target.files[0];
         if (file == null) return;//이미지 선택 창을 취소할 경우를 대비해서 null 체크
         if (!validImageType(file)) {//이미지 파일인지 검사
             alert("이미지 파일만 선택 가능합니다.");
@@ -124,7 +124,7 @@ window.addEventListener("load", function () {
         event.stopPropagation();
         event.preventDefault();//기본 동작인 이미지 파일을 새 창으로 로드하는 것을 방지.
         console.log(event);
-        var file = event.dataTransfer.files[0];
+        const file = event.dataTransfer.files[0];
         console.log(file);
         if (!validImageType(file)) {//이미지 파일인지 검사
             alert("이미지 파일만 선택 가능합니다.");
@@ -154,15 +154,15 @@ window.addEventListener("load", function () {
             alert("모든 항목을 채워주세요.");
             return;
         }
-        var formData = new FormData();
+        const formData = new FormData();
         //프로필 이미지 추가
         if (dataUri != null) {
             formData.append("imageFile", dataURLToBlob(dataUri));
         }
         console.log(editProfileInputList);
-        for (var i = 0; i < editProfileInputList.length; i++) {
-            var name = editProfileInputList[i].name;
-            var value = editProfileInputList[i].value;
+        for (let i = 0; i < editProfileInputList.length; i++) {
+            const name = editProfileInputList[i].name;
+            const value = editProfileInputList[i].value;
             if (name != "sex") {
                 formData.append(name, value);
             } else {
@@ -182,10 +182,10 @@ window.addEventListener("load", function () {
             alert('모든 항목을 채워주세요.');
             return;
         }
-        var formData = new FormData();
-        for (var i = 0; i < changePasswordInputList.length; i++) {
-            var name = changePasswordInputList[i].name;
-            var value = changePasswordInputList[i].value;
+        const formData = new FormData();
+        for (let i = 0; i < changePasswordInputList.length; i++) {
+            const name = changePasswordInputList[i].name;
+            const value = changePasswordInputList[i].value;
             formData.append(name, value);
         }
 
@@ -207,24 +207,24 @@ window.addEventListener("load", function () {
 
 //선택한 이미지 파일을 썸네일로 만들어서 화면에 출력
 function loadImage(file, profileImg) {
-    var reader = new FileReader();//파일 reader
+    const reader = new FileReader();//파일 reader
     console.log(reader);
     reader.readAsDataURL(file);//이미지 파일을 읽어들인다. trigger reader onload event
 
     reader.onload = function () {
         console.log("reader onload");
-        var tempImage = new Image();//썸네일 이미지 생성를 담을 image 객체
+        const tempImage = new Image();//썸네일 이미지 생성를 담을 image 객체
         tempImage.src = reader.result;//data-uri를 이미지 객체에 주입. trigger image onload
         tempImage.onload = function () {
             //이미지 리사이즈를 위한 캔버스 객체 생성
-            var canvas = document.createElement("canvas");
-            var canvasContext = canvas.getContext('2d');
+            const canvas = document.createElement("canvas");
+            const canvasContext = canvas.getContext('2d');
 
-            var maxSize = 720;//리사이징할 이미지 파일의 크기
+            const maxSize = 720;//리사이징할 이미지 파일의 크기
 
             //실제 이미지 사이즈
-            var width = tempImage.width;
-            var height = tempImage.height;
+            let width = tempImage.width;
+            let height = tempImage.height;
 
             //크기 리사이징
             if (width > height) {
@@ -256,20 +256,20 @@ function loadImage(file, profileImg) {
 //canvas의 data url을 blob 객체로 변환해서 file로 업로드하기 위한 데이터로 변환
 var dataURLToBlob = function (dataURL) {
     console.log(dataURL);
-    var BASE64_MARKER = ';base64,';
+    const BASE64_MARKER = ';base64,';
     //base 64로 인코딩되어있지 않은 경우
     if (dataURL.indexOf(BASE64_MARKER) == -1) {
-        var parts = dataURL.split(',');
-        var contentType = parts[0].split(':')[1];//mime type(media type)
-        var raw = parts[1];//데이터 그 자체
+        const parts = dataURL.split(',');
+        const contentType = parts[0].split(':')[1];//mime type(media type)
+        const raw = parts[1];//데이터 그 자체
         return new Blob([raw], {type: contentType});
     }
-    var parts = dataURL.split(BASE64_MARKER);
-    var contentType = parts[0].split(':')[1];
-    var raw = window.atob(parts[1]);//window.atob()는 base 64를 디코딩하는 메소드
-    var rawLength = raw.length;
-    var uInt8Array = new Uint8Array(rawLength);
-    for (var i = 0; i < rawLength; ++i) {
+    const parts = dataURL.split(BASE64_MARKER);
+    const contentType = parts[0].split(':')[1];
+    const raw = window.atob(parts[1]);//window.atob()는 base 64를 디코딩하는 메소드
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+    for (let i = 0; i < rawLength; ++i) {
         uInt8Array[i] = raw.charCodeAt(i);
     }
     return new Blob([uInt8Array], {type: contentType});
@@ -293,7 +293,7 @@ function sendEditProfileRequest(formData, loadingBox, loadingMessage, editProfil
         console.log(res);
         toggleLoadingBox(loadingBox, loadingMessage, editProfileLoadingMessage);
         if (res.status != 401) {
-            var message;
+            let message;
             try {
                 message = res.responseJSON[0].defaultMessage;
             } catch (error) {
@@ -310,7 +310,7 @@ function sendEditProfileRequest(formData, loadingBox, loadingMessage, editProfil
 
 //서버로 비밀번호 변경 요청을 보내는 함수
 function sendChangePasswordRequest(formData, loadingBox, loadingMessage, changePasswordLoadingMessage) {
-    var userId = location.href.split("/")[4];
+    const userId = location.href.split("/")[4];
     console.log(userId);
     $.ajax({
         type: "PUT",
@@ -328,7 +328,7 @@ function sendChangePasswordRequest(formData, loadingBox, loadingMessage, changeP
         console.log(res);
         toggleLoadingBox(loadingBox, loadingMessage, changePasswordLoadingMessage);
         if (res.status != 401) {
-            var message;
+            let message;
             try {
                 message = res.responseJSON[0].defaultMessage;
             } catch (error) {
@@ -344,7 +344,7 @@ function sendChangePasswordRequest(formData, loadingBox, loadingMessage, changeP
 }
 
 function sendWithdrawlRequest(loadingBox, loadingMessage, withdrawlLoadingMessage) {
-    var userId = location.href.split("/")[4];
+    const userId = location.href.split("/")[4];
     console.log(userId);
     $.ajax({
         type: "DELETE",
@@ -360,7 +360,7 @@ function sendWithdrawlRequest(loadingBox, loadingMessage, withdrawlLoadingMessag
         console.log(res);
         toggleLoadingBox(loadingBox, loadingMessage, withdrawlLoadingMessage);
         if (res.status != 401) {
-            var message;
+            let message;
             try {
                 message = res.responseJSON[0].defaultMessage;
             } catch (error) {
@@ -378,7 +378,7 @@ function sendWithdrawlRequest(loadingBox, loadingMessage, withdrawlLoadingMessag
 
 //파일이 이미지 파일인지 검사하는 함수
 function validImageType(file) {
-    var type = file.type;
+    const type = file.type;
     if (type.indexOf("image") == -1) {
         return false;
     }
@@ -388,7 +388,7 @@ function validImageType(file) {
 //자기 소개를 제외한 모든 폼 데이터들이 채워졌는지 확인
 //공백이나 빈 공간이 있으면 true, 모두 입력되어 있으면 false
 function isEmptyOrWhitespace(inputList) {
-    for (var i = 0; i < inputList.length; i++) {
+    for (let i = 0; i < inputList.length; i++) {
         if (inputList[i].name == "introduce") {
             continue;
         }

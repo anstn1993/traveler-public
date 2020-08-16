@@ -13,15 +13,17 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 public class FollowAccountModelAssembler implements RepresentationModelAssembler<Account, FollowAccountModel> {
 
     private AbstFollowLinkGenerator abstFollowLinkGenerator;
+    private Account currentUser;//서비스 사용자
 
 
-    public FollowAccountModelAssembler(AbstFollowLinkGenerator abstFollowLinkGenerator) {
+    public FollowAccountModelAssembler(AbstFollowLinkGenerator abstFollowLinkGenerator, Account currentUser) {
         this.abstFollowLinkGenerator = abstFollowLinkGenerator;
+        this.currentUser = currentUser;
     }
 
     @Override
     public FollowAccountModel toModel(Account targetAccount) {
-        Links links = abstFollowLinkGenerator.makeLinks(targetAccount);//self link, follow link(조건에 따라 follow링크가 될 수도 있고, unfollow링크가 될 수도 있다.)
+        Links links = abstFollowLinkGenerator.makeLinks(targetAccount, currentUser);//self link, follow link(조건에 따라 follow링크가 될 수도 있고, unfollow링크가 될 수도 있다.)
         return new FollowAccountModel(targetAccount, links);
     }
 

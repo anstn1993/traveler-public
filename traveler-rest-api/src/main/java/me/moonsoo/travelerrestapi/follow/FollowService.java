@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -42,5 +44,14 @@ public class FollowService {
 
     public void delete(Follow follow) {
         followRepository.delete(follow);
+    }
+
+    public Map<String, Integer> getFollowResourceCount(Account targetAccount) {
+        Map<String, Integer> followResourceCount = new HashMap<>();
+        Integer followingCount = followRepository.countFollowByFollowingAccount(targetAccount);
+        Integer followerCount = followRepository.countFollowByFollowedAccount(targetAccount);
+        followResourceCount.put("followingCount", followingCount);
+        followResourceCount.put("followerCount", followerCount);
+        return followResourceCount;
     }
 }

@@ -7,6 +7,8 @@ import me.moonsoo.commonmodule.account.Sex;
 import me.moonsoo.travelerapplication.email.EmailService;
 import me.moonsoo.travelerapplication.error.ForbiddenException;
 import me.moonsoo.travelerapplication.error.PageNotFoundException;
+import me.moonsoo.travelerapplication.deserialize.CustomDeserializer;
+import me.moonsoo.travelerapplication.deserialize.CustomPagedModel;
 import me.moonsoo.travelerapplication.properties.AppProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
-import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
@@ -24,15 +25,16 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 @Controller
 public class AccountController {
@@ -303,27 +305,8 @@ public class AccountController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        //multipart formSy
-        MultiValueMap<String, Object> multiPart = new LinkedMultiValueMap<>();
-        if (imageFile != null) {
-            //이미지 파일 part
-            HttpHeaders imageFilePartHeader = new HttpHeaders();
-            imageFilePartHeader.setContentDispositionFormData("imageFile", imageFile.getOriginalFilename());
-            String subType = imageFile.getContentType().split("/")[1];
-            MediaType imageType = new MediaType("image", subType);
-            imageFilePartHeader.setContentType(imageType);
-            HttpEntity<Object> imageFilePart = new HttpEntity<>(imageFile.getBytes(), imageFilePartHeader);
-            multiPart.add("imageFile", imageFilePart);
-        }
-
-        //사용자 form data part
-        HttpHeaders accountPartHeader = new HttpHeaders();
-        accountPartHeader.setContentType(MediaType.APPLICATION_JSON);
-        accountPartHeader.setContentDispositionFormData("account", "account");
-        HttpEntity<AccountDto> accountPart = new HttpEntity<>(accountDto, accountPartHeader);
-        multiPart.add("account", accountPart);
-
-
+        //multipart form
+        MultiValueMap<String, Object> multiPart = createSignUpMultipart(imageFile, accountDto);
         HttpHeaders requestHeader = new HttpHeaders();
         requestHeader.setAccept(List.of(MediaTypes.HAL_JSON));
         requestHeader.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -334,6 +317,8 @@ public class AccountController {
         return response;
     }
 
+
+
     //사용자 페이지 get
     @GetMapping("/users/{userId}")
     public String getUserPage(@PathVariable("userId") Account targetUser,
@@ -342,7 +327,25 @@ public class AccountController {
         if (targetUser == null) {
             throw new PageNotFoundException();
         }
-        model.addAttribute("user", targetUser);
+        boolean following = false;//사용자 팔로잉 여부
+        if (account != null && !targetUser.getId().equals(account.getId())) {
+            //targetUser를 팔로잉하고 있는지 조회
+            try {
+                ResponseEntity<Object> followingRequest = oAuth2RestTemplate.getForEntity(appProperties.getRestApiUrl() + "/accounts/" + account.getId() + "/followings/" + targetUser.getId(), Object.class);
+                if (followingRequest.getStatusCode().equals(HttpStatus.OK)) {
+                    following = true;
+                }
+            } catch (HttpClientErrorException e) {
+                e.printStackTrace();
+            }
+            model.addAttribute("following", following);
+        }
+        //사용자의 팔로잉, 팔로워 수를 조회하는 요청이다.
+        ResponseEntity<Object> followResourceCountRequest = oAuth2RestTemplate.getForEntity(appProperties.getRestApiUrl() + "/accounts/" + targetUser.getId() + "/follow/count", Object.class);
+        LinkedHashMap<String, Integer> followResourceCount = (LinkedHashMap<String, Integer>) followResourceCountRequest.getBody();
+        model.addAttribute("followingCount", followResourceCount.get("followingCount"));
+        model.addAttribute("followerCount", followResourceCount.get("followerCount"));
+        model.addAttribute("user", targetUser);//사용자 정보
         return "account/userpage";
     }
 
@@ -525,5 +528,28 @@ public class AccountController {
             errors.rejectValue("newPasswordCheck", "password check", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
             return;
         }
+    }
+
+    //회원가입을 위한 multipart form생성
+    private MultiValueMap<String, Object> createSignUpMultipart(MultipartFile imageFile, AccountDto accountDto) throws IOException {
+        MultiValueMap<String, Object> multiPart = new LinkedMultiValueMap<>();
+        if (imageFile != null) {
+            //이미지 파일 part
+            HttpHeaders imageFilePartHeader = new HttpHeaders();
+            imageFilePartHeader.setContentDispositionFormData("imageFile", imageFile.getOriginalFilename());
+            String subType = imageFile.getContentType().split("/")[1];
+            MediaType imageType = new MediaType("image", subType);
+            imageFilePartHeader.setContentType(imageType);
+            HttpEntity<Object> imageFilePart = new HttpEntity<>(imageFile.getBytes(), imageFilePartHeader);
+            multiPart.add("imageFile", imageFilePart);
+        }
+
+        //사용자 form data part
+        HttpHeaders accountPartHeader = new HttpHeaders();
+        accountPartHeader.setContentType(MediaType.APPLICATION_JSON);
+        accountPartHeader.setContentDispositionFormData("account", "account");
+        HttpEntity<AccountDto> accountPart = new HttpEntity<>(accountDto, accountPartHeader);
+        multiPart.add("account", accountPart);
+        return multiPart;
     }
 }
