@@ -29,8 +29,10 @@
             src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
-    <script src="/js/toggle-control.js"></script>
-    <script src="/js/userpage.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYh4bvHSiM73-OsppOKfs7JAhxVPQXwWM&callback=initMap&libraries=&v=weekly" defer></script>
+    <script src="/js/google-map.js"></script>
+    <script src="/js/upload-accompany.js"></script>
 </head>
 <body>
 <div class="body__container">
@@ -63,9 +65,41 @@
         <h2>당신과 함께 할 여행자를 구하세요!</h2>
     </header>
     <div class="section-box">
-    <main class="section content-section">
-
-    </main>
+        <main class="section content-section">
+            <div class="inner">
+                <form action="#">
+                    <div class="flex-area">
+                        <div class="left-side">
+                            <div class="content-area title-area">
+                                <label for="title-input">제목</label>
+                                <input id="title-input" class="input--text" type="text" name="title" placeholder="게시물 제목" required>
+                            </div>
+                            <div class="content-area article-area">
+                                <label for="article-textarea">게시글</label>
+                                <textarea id="article-textarea" class="input--text" type="text" name="article" placeholder="게시물 제목" required></textarea>
+                            </div>
+                            <div class="content-area start-date-area">
+                                <label for="start-date-input">시작 날짜</label>
+                                <input id="start-date-input" class="input--text" type="datetime-local" name="start-date" required>
+                            </div>
+                            <div class="content-area end-date-area">
+                                <label for="end-date-input">종료 날짜</label>
+                                <input id="end-date-input" class="input--text" type="datetime-local" name="end-date" required>
+                            </div>
+                        </div>
+                        <div class="right-side">
+                            <div class="map-box">
+                                <input type="text" class="input--text" placeholder="장소 검색">
+                                <div id="map"></div>
+                            </div>
+                            <p>*검색이나 지도 클릭을 통해서 여행 장소를 지정해주세요!</p>
+                        </div>
+                    </div>
+                    <input class="btn btn--primary" type="button" value="업로드"/>
+                </form>
+                <a href="/accompanies" class="btn cancel-btn">취소</a>
+            </div>
+        </main>
     </div>
 </div>
 </body>

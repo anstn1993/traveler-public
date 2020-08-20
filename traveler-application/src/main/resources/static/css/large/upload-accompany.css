@@ -2,17 +2,87 @@ header {
     height: 300px;
     background-position: left bottom;
 }
-.section-box {
-    position: absolute;
-    top: 300px;
-    width: 100%;
-}
-/* ACCOMPANY BOARD TITLE */
+/* UPLOAD ACCOMPANY PAGE TITLE */
 h2 {
     font-size: 20px;
     font-weight: 600;
     position: absolute;
     width: 100%;
     text-align: center;
-    top: 150px;
+    top: 170px;
+}
+.section-box {
+    position: absolute;
+    top: 300px;
+    width: 100%;
+    color: #000;
+}
+.section-box .content-section .inner {
+    width: 80%;
+    margin: 50px auto;
+}
+.section-box .content-section .inner .flex-area {
+    display: flex;
+    justify-content: space-evenly;
+}
+/* LEFT CONTENT AREA */
+.section-box .content-section .inner .flex-area .left-side {
+    width: 400px;
+}
+.section-box .content-section .inner .flex-area .content-area {
+    margin-bottom: 30px;
+}
+.section-box .content-section .inner .flex-area .content-area label {
+    display: block;
+    margin-bottom: 10px;
+}
+.section-box .content-section .inner .flex-area .content-area textarea {
+    width: 100%;
+    height: 300px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+/* RIGHT CONTENT AREA(MAP) */
+.section-box .content-section .inner .right-side {
+    margin-left: 40px;
+    width: 900px;
+}
+.section-box .content-section .inner .map-box {
+    height: 100%;
+    width: 100%;
+    box-shadow: 1px 1px 9px #000;
+    position: relative;
+    border-radius: 5px;
+}
+.section-box .content-section .inner .map-box [type="text"] {
+    width: 200px;
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    z-index: 1;
+    box-shadow: 2px 2px 3px #000;
+}
+#map {
+    height: 100%;
+    border-radius: 5px;
+}
+.section-box .content-section .inner .right-side p {
+    margin-top: 10px;
+    color: #afa7a7;
+}
+/* UPLOAD BTN */
+[type='button'] {
+    width: 300px;
+    display: flex;
+    justify-content: center;
+    margin: 50px auto 10px;
+}
+/* CANCEL BTN */
+.section-box .content-section .inner .cancel-btn {
+    width: 300px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
 }
