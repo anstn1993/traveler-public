@@ -1,0 +1,18 @@
+header {
+    height: 300px;
+    background-position: left bottom;
+}
+.section-box {
+    position: absolute;
+    top: 300px;
+    width: 100%;
+}
+/* ACCOMPANY BOARD TITLE */
+h2 {
+    font-size: 20px;
+    font-weight: 600;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 150px;
+}

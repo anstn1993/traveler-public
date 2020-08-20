@@ -97,131 +97,134 @@ window.addEventListener("load", function () {
             }
         }
         toggleLoadingBox(loadingBox);
-        sendSignUpRequest(formData, loadingBox);
+        sendSignUpRequest(formData);
+    }
+    //선택한 이미지 파일을 썸네일로 만들어서 화면에 출력
+    function loadImage(file, profileImg) {
+        const reader = new FileReader();//파일 reader
+        console.log(reader);
+        reader.readAsDataURL(file);//이미지 파일을 읽어들인다. trigger reader onload event
+
+        reader.onload = function () {
+            console.log("reader onload");
+            const tempImage = new Image();//썸네일 이미지 생성를 담을 image 객체
+            tempImage.src = reader.result;//data-uri를 이미지 객체에 주입. trigger image onload
+            tempImage.onload = function () {
+                //이미지 리사이즈를 위한 캔버스 객체 생성
+                const canvas = document.createElement("canvas");
+                const canvasContext = canvas.getContext('2d');
+
+                const maxSize = 720;//리사이징할 이미지 파일의 크기
+
+                //실제 이미지 사이즈
+                let width = tempImage.width;
+                let height = tempImage.height;
+
+                //크기 리사이징
+                if (width > height) {
+                    if (width > maxSize) {
+                        height *= maxSize / width;
+                        width = maxSize;
+                    }
+                } else {
+                    if (height > maxSize) {
+                        width *= maxSize / height;
+                        height = maxSize;
+                    }
+                }
+
+                //캔버스 크기 설정
+                canvas.width = width;
+                canvas.height = height;
+
+                //tempImage를 캔버스 위에 그린다.
+                canvasContext.drawImage(this, 0, 0, width, height);
+
+                //이미지 객체를 다시 data-uri형태로 바꿔서 img태그에 로드한다.
+                dataUri = canvas.toDataURL("image/*");
+                console.log(dataUri);
+                profileImg.src = dataUri;
+            }
+        }
+    }
+
+//canvas의 data url을 blob 객체로 변환해서 file로 업로드하기 위한 데이터로 변환
+    var dataURLToBlob = function (dataURL) {
+        const BASE64_MARKER = ';base64,';
+        //base 64로 인코딩되어있지 않은 경우
+        if (dataURL.indexOf(BASE64_MARKER) == -1) {
+            const parts = dataURL.split(',');
+            const contentType = parts[0].split(':')[1];//mime type(media type)
+            const raw = parts[1];//데이터 그 자체
+            return new Blob([raw], {type: contentType});
+        }
+        const parts = dataURL.split(BASE64_MARKER);
+        const contentType = parts[0].split(':')[1];
+        const raw = window.atob(parts[1]);//window.atob()는 base 64를 디코딩하는 메소드
+        const rawLength = raw.length;
+        const uInt8Array = new Uint8Array(rawLength);
+        for (let i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+        return new Blob([uInt8Array], {type: contentType});
+    };
+
+    //서버로 회원가입 요청을 보내는 함수
+    async function sendSignUpRequest(formData) {
+        try {
+            const response = await fetch("/sign-up", {
+                method: "POST",
+                body: formData
+            });
+            toggleLoadingBox(loadingBox);
+            if(response.ok) {
+                console.log("done");
+                alert("회원가입에 성공했습니다. 이메일 인증 후 로그인해주세요.");
+                location.href="/login";
+            }
+            else {
+                const responseBody = await response.json();
+                let message;
+                try {
+                    message = responseBody.responseJSON[0].defaultMessage;
+                } catch (err) {
+                    alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
+                    return;
+                }
+                alert(message);
+            }
+        } catch (err) {
+            console.log("fail");
+            console.log(err);
+        }
+    }
+
+    //파일이 이미지 파일인지 검사하는 함수
+    function validImageType(file) {
+        const type = file.type;
+        if (type.indexOf("image") == -1) {
+            return false;
+        }
+        return true;
+    }
+
+    //모든 폼 데이터들이 채워졌는지 확인
+    //공백이나 빈 공간이 있으면 true, 모두 입력되어 있으면 false
+    function isEmptyOrWhitespace(inputList) {
+        for (let i = 0; i < inputList.length; i++) {
+            if (inputList[i].value.trim() == "") {
+                return true;
+            }
+        }
+        return false;
+    }
+
+//로딩 박스를 on/off하는 함수
+    function toggleLoadingBox(loadingBox) {
+        loadingBox.classList.toggle("on");
     }
 });
 
-//선택한 이미지 파일을 썸네일로 만들어서 화면에 출력
-function loadImage(file, profileImg) {
-    const reader = new FileReader();//파일 reader
-    console.log(reader);
-    reader.readAsDataURL(file);//이미지 파일을 읽어들인다. trigger reader onload event
 
-    reader.onload = function () {
-        console.log("reader onload");
-        const tempImage = new Image();//썸네일 이미지 생성를 담을 image 객체
-        tempImage.src = reader.result;//data-uri를 이미지 객체에 주입. trigger image onload
-        tempImage.onload = function () {
-            //이미지 리사이즈를 위한 캔버스 객체 생성
-            const canvas = document.createElement("canvas");
-            const canvasContext = canvas.getContext('2d');
-
-            const maxSize = 720;//리사이징할 이미지 파일의 크기
-
-            //실제 이미지 사이즈
-            let width = tempImage.width;
-            let height = tempImage.height;
-
-            //크기 리사이징
-            if (width > height) {
-                if (width > maxSize) {
-                    height *= maxSize / width;
-                    width = maxSize;
-                }
-            } else {
-                if (height > maxSize) {
-                    width *= maxSize / height;
-                    height = maxSize;
-                }
-            }
-
-            //캔버스 크기 설정
-            canvas.width = width;
-            canvas.height = height;
-
-            //tempImage를 캔버스 위에 그린다.
-            canvasContext.drawImage(this, 0, 0, width, height);
-
-            //이미지 객체를 다시 data-uri형태로 바꿔서 img태그에 로드한다.
-            dataUri = canvas.toDataURL("image/*");
-            console.log(dataUri);
-            profileImg.src = dataUri;
-        }
-    }
-}
-
-//canvas의 data url을 blob 객체로 변환해서 file로 업로드하기 위한 데이터로 변환
-var dataURLToBlob = function (dataURL) {
-    const BASE64_MARKER = ';base64,';
-    //base 64로 인코딩되어있지 않은 경우
-    if (dataURL.indexOf(BASE64_MARKER) == -1) {
-        const parts = dataURL.split(',');
-        const contentType = parts[0].split(':')[1];//mime type(media type)
-        const raw = parts[1];//데이터 그 자체
-        return new Blob([raw], {type: contentType});
-    }
-    const parts = dataURL.split(BASE64_MARKER);
-    const contentType = parts[0].split(':')[1];
-    const raw = window.atob(parts[1]);//window.atob()는 base 64를 디코딩하는 메소드
-    const rawLength = raw.length;
-    const uInt8Array = new Uint8Array(rawLength);
-    for (let i = 0; i < rawLength; ++i) {
-        uInt8Array[i] = raw.charCodeAt(i);
-    }
-    return new Blob([uInt8Array], {type: contentType});
-};
-
-//서버로 회원가입 요청을 보내는 함수
-function sendSignUpRequest(formData, loadingBox) {
-    $.ajax({
-        type: "POST",
-        url: "/sign-up",
-        processData: false,
-        contentType: false,
-        data: formData
-    }).done(function (res) {
-        console.log("done");
-        toggleLoadingBox(loadingBox);
-        alert("회원가입에 성공했습니다. 이메일 인증 후 로그인해주세요.");
-        location.href="/login";
-    }).fail(function (res) {
-        console.log("fail");
-        console.log(res);
-        toggleLoadingBox(loadingBox);
-        let message;
-        try {
-            message = res.responseJSON[0].defaultMessage;
-        } catch (error) {
-            alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
-            return;
-        }
-        alert(message);
-    });
-}
-
-//파일이 이미지 파일인지 검사하는 함수
-function validImageType(file) {
-    const type = file.type;
-    if (type.indexOf("image") == -1) {
-        return false;
-    }
-    return true;
-}
-
-//모든 폼 데이터들이 채워졌는지 확인
-//공백이나 빈 공간이 있으면 true, 모두 입력되어 있으면 false
-function isEmptyOrWhitespace(inputList) {
-    for (let i = 0; i < inputList.length; i++) {
-        if (inputList[i].value.trim() == "") {
-            return true;
-        }
-    }
-    return false;
-}
-
-//로딩 박스를 on/off하는 함수
-function toggleLoadingBox(loadingBox) {
-    loadingBox.classList.toggle("on");
-}
 
 

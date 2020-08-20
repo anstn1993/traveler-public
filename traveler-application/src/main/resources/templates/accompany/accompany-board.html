@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${user.getNickname()} + '의 페이지'"></title>
+    <title>동행 구하기 게시판</title>
     <meta name="author" content="MoonSooKim">
     <meta name="description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
 
@@ -22,9 +22,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css" integrity="sha512-IJEbgDEF7OeKJRa0MY2PApnyJHRIsgzCveek4ec8VWQ+7KG3ZSKVNYa5xP/Gh0hVP0Mwb+gBsk+GwR3JQGhQNg==" crossorigin="anonymous" />
     <link rel="stylesheet" href="/css/common.css" type="text/css"/>
     <link rel="stylesheet" href="/css/large/header.css" type="text/css"/>
-    <link rel="stylesheet" href="/css/large/userpage.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/accompany-board.css" type="text/css"/>
     <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/header_medium.css" type="text/css"/>
-    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/userpage_medium.css" type="text/css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/accompany-board_medium.css" type="text/css"/>
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
     <script src="/js/toggle-control.js"></script>
     <script src="/js/userpage.js"></script>
 </head>
@@ -56,27 +60,11 @@
             </div>
             <div id="toggle-btn">header menu toggle button</div>
         </nav>
+        <h2>당신과 함께 할 여행자를 구하세요!</h2>
     </header>
     <div class="section-box">
         <section class="section user-info-section">
-            <div class="inner">
-                <img class="profile-img" th:src="${user.getProfileImageUri()} ? ${user.getProfileImageUri()} : '/image/profile.png'" alt="프로필 이미지">
-                <div class="flex-box">
-                    <span class="nickname-box" th:text="${user.getNickname()}+'(' + ${user.getName()}+')'">nickname</span>
-                    <ul class="info-group">
-                        <li>게시물 0</li>
-                        <li id="following-count" th:text="'팔로잉 ' + ${followingCount}">팔로잉 0</li>
-                        <li id="follower-count" th:text="'팔로워 ' + ${followerCount}">팔로워 0</li>
-                    </ul>
-                    <div class="introduce-box"><p th:text="${user.getIntroduce()}?: '아직 자기소개가 없습니다. 다른 사람들에게 자신을 소개해주세요!'"></p></div>
-                    <ul class="btn-group">
-                        <li><a th:if="${session.account != null && user.getId() != session.account.getId()}" href="#" th:href="@{/}" th:class="${following}? 'btn btn--primary follow off': 'btn btn--primary follow'">팔로우</a></li>
-                        <li><a th:if="${session.account != null && user.getId() != session.account.getId()}" href="#" th:href="@{/}" th:class="${following}? 'btn unfollow' : 'btn unfollow off'">팔로잉</a></li>
-                        <li><a th:if="${session.account != null && user.getId() != session.account.getId()}" href="#" class="btn chat">채팅</a></li>
-                        <li><a th:if="${session.account != null && user.getId() == session.account.getId()}" href="#" th:href="'/users/' + ${user.getId()} + '/profile'" class="btn edit-profile">프로필 수정</a></li>
-                    </ul>
-                </div>
-            </div>
+
         </section>
         <section class="section search-section">
             <form id="search-form" action="#" method="get">
@@ -91,34 +79,61 @@
         </section>
     </div>
     <main class="section content-section">
-
+        <div class="upload-accompany-btn-box clearfix">
+            <a th:if="${session.account != null}" href="/accompanies/upload" class="btn float--right">동행 모집</a>
+        </div>
+        <!--동행 구하기 게시물 게시판 영역-->
+        <div class="board-box">
+            <table>
+                <thead>
+                <tr>
+                    <td>NO.</td>
+                    <td>제목</td>
+                    <td>작성자</td>
+                    <td>게시일</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
+                    <td>만수</td>
+                    <td>2019.01.01</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
+                    <td>만수</td>
+                    <td>2019.01.01</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
+                    <td>만수</td>
+                    <td>2019.01.01</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
+                    <td>만수</td>
+                    <td>2019.01.01</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
+                    <td>만수만수만수만수만수만수만수만수</td>
+                    <td>2019.01.01</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
+                    <td>만수</td>
+                    <td>2019.01.01</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </main>
 </div>
-<!-- FOLLOWING & FOLLOWER LIST MODAL TEMPLATE -->
-<template id="follow-list-modal-template">
-    <div class="modal follow-list-modal">
-        <div class="content">
-            <div class="header clearfix">
-                <div class="float--left title"><!--팔로잉 of 팔로워--></div>
-                <div class="float--right close">exit button image</div>
-            </div>
-            <div class="border"></div>
-            <div class="main">
-                <!--add user item here-->
-            </div>
-        </div>
-    </div>
-</template>
-<template id="follow-list-item-template">
-    <div class="item-container">
-        <input type="hidden">
-        <div class="item img--item"><img src="/image/profile.png" alt="프로필 이미지" width="70px" height="70px"></div>
-        <div class="item nickname--item">닉네임</div>
-        <div class="item btn--item">
-            <div class="btn unfollow">팔로잉</div>
-            <div class="btn btn--primary follow">팔로우</div>
-        </div>
-    </div>
-</template>
 </body>
 </html>

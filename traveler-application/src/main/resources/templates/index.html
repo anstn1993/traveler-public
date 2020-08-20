@@ -27,10 +27,6 @@
     <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/header_medium.css" type="text/css"/>
     <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/index_medium.css" type="text/css"/>
     <link rel="stylesheet" media="all and (max-width:768px)" href="/css/small/index_small.css" type="text/css"/>
-    <script
-            src="https://code.jquery.com/jquery-3.4.1.min.js"
-            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"></script>
     <script src="/js/main.js"></script>
     <script src="/js/toggle-control.js"></script>
 </head>
@@ -50,7 +46,7 @@
                     <ul class="main-menu">
                         <li><a href="#">커뮤니티</a></li>
                         <li><a href="#">일정 만들기</a></li>
-                        <li><a href="#">동행 구하기</a></li>
+                        <li><a href="/accompanies?page=0&size=10&sort=id,DESC">동행 구하기</a></li>
                          <li th:if="${session.account != null}"><a href="#" th:href="'/users/' + ${session.account.getId()}" th:text="마이페이지">마이페이지</a></li>
                          <li th:if="${session.account != null}"><a href="#" th:href="@{/logout}" th:text="로그아웃">로그아웃</a></li>
                         <li th:unless="${session.account != null}"><a href="#" th:href="@{/login}" th:text="로그인">로그인</a></li>

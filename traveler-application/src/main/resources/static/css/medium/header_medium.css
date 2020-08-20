@@ -6,9 +6,12 @@ header {
     height: 100vh;
     position: relative;
 }
-nav {
+header nav {
+    position: relative;
     padding-top: 30px;
     box-sizing: border-box;
+    z-index: 1;
+
 }
 /* CHAT & NOTIFICATION */
 header .notification-group {
@@ -50,6 +53,9 @@ header .inner .menu-group .main-menu li a {
 /* TOGGLE CONTROL */
 .on {
     display: block;
+}
+nav.on {
+    background: rgba(0,0,0,.5);
 }
 
 

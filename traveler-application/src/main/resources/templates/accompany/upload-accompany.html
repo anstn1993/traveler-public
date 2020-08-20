@@ -2,8 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>로그인</title>
-
+    <title>동행 구하기 게시판</title>
     <meta name="author" content="MoonSooKim">
     <meta name="description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
 
@@ -23,10 +22,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css" integrity="sha512-IJEbgDEF7OeKJRa0MY2PApnyJHRIsgzCveek4ec8VWQ+7KG3ZSKVNYa5xP/Gh0hVP0Mwb+gBsk+GwR3JQGhQNg==" crossorigin="anonymous" />
     <link rel="stylesheet" href="/css/common.css" type="text/css"/>
     <link rel="stylesheet" href="/css/large/header.css" type="text/css"/>
-    <link rel="stylesheet" href="/css/large/login.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/upload-accompany.css" type="text/css"/>
     <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/header_medium.css" type="text/css"/>
-    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/login_medium.css" type="text/css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/upload-accompany_medium.css" type="text/css"/>
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
     <script src="/js/toggle-control.js"></script>
+    <script src="/js/userpage.js"></script>
 </head>
 <body>
 <div class="body__container">
@@ -35,6 +39,7 @@
         <nav>
             <a class="nav-brand" href="/">Traveler</a>
             <div class="clearfix toggle">
+                <a class="nav-brand" href="/">Traveler</a>
                 <ul class="notification-group float--right">
                     <li><a href="#">채팅</a></li>
                     <li><a href="#">알림</a></li>
@@ -46,32 +51,22 @@
                         <li><a href="#">커뮤니티</a></li>
                         <li><a href="#">일정 만들기</a></li>
                         <li><a href="#">동행 구하기</a></li>
-                        <li><a th:href="@{/sign-up}">회원가입</a></li>
+                        <li>
+                            <a th:if="${session.account == null}" th:href="@{/login}">로그인</a>
+                            <a th:if="${session.account != null}" th:href="@{/logout}">로그아웃</a>
+                        </li>
                     </ul>
                 </div>
             </div>
             <div id="toggle-btn">header menu toggle button</div>
         </nav>
-        <h1>로그인</h1>
+        <h2>당신과 함께 할 여행자를 구하세요!</h2>
     </header>
-    <section class="section">
-        <div class="inner">
-            <form id="login-form" action="#" th:action="@{/login/traveler}" method="post">
-                <p th:if="${!message.equals('')}" th:text="${message}">message from server</p>
-                <input class="input--text" type="text" name="username" th:value="${username} ? ${username} : ''"
-                       placeholder="아이디" required="required"/>
-                <input class="input--text" type="password" name="password" placeholder="비밀번호" required="required"/>
-                <label id="rememeber-label" for="rememeber-chb">아이디 기억</label>
-                <input th:if="${username==null}" id="rememeber-chb" type="checkbox" name="remember" value="remember"/>
-                <input th:unless="${username==null}" th:id="rememeber-chb" type="checkbox" name="remember" value="remember" checked/>
-                <input type="submit" value="로그인" class="btn btn--primary"/>
-            </form>
-            <div class="find-btn-group">
-                <a id="find-username-btn" href="/find-username" role="button" class="btn">아이디 찾기</a>
-                <a id="find-password-btn" href="/find-password" role="button" class="btn">비밀번호 찾기</a>
-            </div>
-        </div>
-    </section>
+    <div class="section-box">
+    <main class="section content-section">
+
+    </main>
+    </div>
 </div>
 </body>
 </html>

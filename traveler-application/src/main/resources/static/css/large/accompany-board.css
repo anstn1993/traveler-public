@@ -1,0 +1,141 @@
+header {
+    height: 400px;
+}
+.section-box {
+    position: absolute;
+    top: 300px;
+    width: 100%;
+}
+/* ACCOMPANY BOARD TITLE */
+h2 {
+    font-size: 20px;
+    font-weight: 600;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 200px;
+}
+#search-form {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+#filter {
+    outline: none;
+    width: 100px;
+    height: 40px;
+    border-radius: 6px;
+    border: none;
+}
+#search-form [type="submit"] {
+    display: none;
+}
+/* UPLOAD ACCOMPANY BTN */
+.content-section .upload-accompany-btn-box {
+    margin-top: 30px;
+}
+.content-section .upload-accompany-btn-box a {
+    margin-right: 30px;
+}
+/* ACCOMPANY BOARD */
+.content-section .board-box {
+    margin-top: 30px;
+}
+.content-section .board-box table {
+    width: 80%;
+    display: block;
+    margin: 0 auto;
+    border-radius: 7px;
+}
+.content-section .board-box table tr{
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+.content-section .board-box table thead td{
+    border-right: 1px solid #dbd6d6;
+}
+.content-section .board-box table td {
+    color: #000;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1  0px;
+    height: 100%;
+    box-sizing: border-box;
+}
+/* HEADER */
+.content-section .board-box table thead {
+    background: #EAEAEA;
+    display: block;
+    width: 100%;
+    height: 60px;
+    border-radius: 6px;
+}
+/* article number */
+.content-section .board-box table thead td:nth-child(1) {
+    width: 5%;
+}
+/* article title */
+.content-section .board-box table thead td:nth-child(2) {
+    width: 60%;
+}
+/* article writer */
+.content-section .board-box table thead td:nth-child(3) {
+    width: 20%;
+}
+/* article reg date */
+.content-section .board-box table thead td:nth-child(4) {
+    width: 20%;
+    border: none;
+}
+
+/* BODY */
+.content-section .board-box table tbody {
+    display: block;
+    width: 100%;
+    border-radius: 6px;
+
+}
+.content-section .board-box table tbody tr {
+    display: flex;
+    width: 100%;
+    height: 50px;
+    cursor: pointer;
+}
+.content-section .board-box table tbody tr:hover {
+    background: rgba(0,0,0,.3);
+}
+.content-section .board-box table tbody tr td{
+    font-size: 15px;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+.content-section .board-box table tbody td:nth-child(1) {
+    width: 5%;
+}
+.content-section .board-box table tbody td:nth-child(2) {
+    width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    padding-top: 19px;
+    text-align: center;
+}
+.content-section .board-box table tbody td:nth-child(3) {
+    width: 20%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    padding-top: 19px;
+    text-align: center;
+}
+.content-section .board-box table tbody td:nth-child(4) {
+    width: 20%;
+}
+

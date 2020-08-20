@@ -38,43 +38,39 @@ window.addEventListener('load', function () {
             invalidAuthCode();//인증 코드를 세션에서 삭제
         }
     });
+
+
+    //인증 코드를 세션에서 지우는 요청을 보내는 함수
+    async function invalidAuthCode() {
+        try {
+            await fetch("/invalidAuthCode", {
+                method: "POST"
+            });
+            console.log("invalidated auth code")
+        } catch (err) {
+            console.log("failed to invalidate auth code: ${err}");
+        }
+    }
+
+    //사용자가 입력한 비밀번호로 update를 하는 요청을 보내는 함수
+    async function updatePassword(password) {
+        const formData = new FormData();
+        formData.append("password", password);
+        const response = await fetch("/find-password/result", {
+            method: "POST",
+            body: formData
+        });
+        if(response.ok) {
+            alert("비밀번호를 변경했습니다. 새로운 비밀번호로 로그인해주세요.");
+            location.href = "/login";
+        }
+        else {
+            alert("서버에 문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
+            location.href = "/";
+        }
+    }
 });
 
-//인증 코드를 세션에서 지우는 요청을 보내는 함수
-function invalidAuthCode() {
-    $.ajax(
-        {
-            url: "/invalidAuthCode",
-            type: "POST",
-            async: false
-        }
-    ).done(function (res) {
-        console.log("success");
-    }).fail(function (res) {
-        console.log("fail");
-    });
-}
-
-//사용자가 입력한 비밀번호로 update를 하는 요청을 보내는 함수
-function updatePassword(password, messageBox) {
-    $.ajax({
-        url: "/find-password/result",
-        type: "POST",
-        async: false,
-        data: {
-            "password": password
-        }
-    }).done(function (res) {
-        alert("비밀번호를 변경했습니다. 새로운 비밀번호로 로그인해주세요.");
-        location.href = "/login";
-    }).fail(function (res) {
-        const status = res.status;
-        if(status == 500) {
-            alert("서버에 문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
-        }
-        location.href = "/";
-    });
-}
 
 
 
