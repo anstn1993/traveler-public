@@ -38,7 +38,7 @@ public class QAccount extends EntityPathBase<Account> {
 
     public final StringPath profileImageUri = createString("profileImageUri");
 
-    public final DateTimePath<java.time.LocalDateTime> regDate = createDateTime("regDate", java.time.LocalDateTime.class);
+    public final DateTimePath<java.time.ZonedDateTime> regDate = createDateTime("regDate", java.time.ZonedDateTime.class);
 
     public final SetPath<AccountRole, EnumPath<AccountRole>> roles = this.<AccountRole, EnumPath<AccountRole>>createSet("roles", AccountRole.class, EnumPath.class, PathInits.DIRECT2);
 

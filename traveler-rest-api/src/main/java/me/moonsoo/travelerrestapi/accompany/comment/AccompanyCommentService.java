@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Service
 public class AccompanyCommentService {
@@ -23,7 +23,7 @@ public class AccompanyCommentService {
     public AccompanyComment save(Accompany accompany, Account account, AccompanyComment accompanyComment) {
         accompanyComment.setAccompany(accompany);
         accompanyComment.setAccount(account);
-        accompanyComment.setRegDate(LocalDateTime.now());
+        accompanyComment.setRegDate(ZonedDateTime.now());
         return accompanyCommentRepository.save(accompanyComment);
     }
 

@@ -1,7 +1,8 @@
 window.addEventListener("load", function() {
     const uploadBtn = document.querySelector("[value='업로드']");//업로드 버튼
+    //업로드 처리 로딩 다이얼로그
+    const loadingBox = document.querySelector(".loading-box");
     uploadBtn.addEventListener("click", function() {
-        const formData = null;
         const title = document.querySelector("#title-input").value;
         const article = document.querySelector("#article-textarea").value;
         const startDate = document.querySelector("#start-date-input").value;
@@ -9,6 +10,13 @@ window.addEventListener("load", function() {
         const location = address;
         const latitude = marker.getPosition().lat();
         const longitude = marker.getPosition().lng();
+        console.log("title: " + title);
+        console.log("article: " + article);
+        console.log("startDate: " + startDate);
+        console.log("endDate: " + endDate);
+        console.log("location: " + location);
+        console.log("latitude: " + latitude);
+        console.log("longitude: " + longitude);
 
         // empty data check
         if(location === undefined) {
@@ -40,17 +48,51 @@ window.addEventListener("load", function() {
             return;
         }
 
-        formData.append("title", title);
-        formData.append("article", article);
-        formData.append("startDate", startDate);
-        formData.append("endDate", endDate);
-        formData.append("location", location);
-        formData.append("latitude", latitude);
-        formData.append("longitude", longitude);
-        sendCreateAccompanyRequest(formData);
+        const requestBody = {
+            "title": title,
+            "article": article,
+            "startDate": startDate,
+            "endDate": endDate,
+            "location": location,
+            "latitude": latitude,
+            "longitude": longitude
+        };
+        sendCreateAccompanyRequest(requestBody);
     });
 
-    function sendCreateAccompanyRequest(formDate) {
-        $.ajax().done().fail();
+    async function sendCreateAccompanyRequest(requestBody) {
+        toggleLoadingBox(loadingBox);
+        const response = await fetch("/accompanies", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json;charset=utf-8"
+            },
+            body: JSON.stringify(requestBody)
+        });
+        toggleLoadingBox(loadingBox);
+        if(response.ok) {
+            alert("업로드 성공!");
+            location.href = "/accompanies"
+        }
+        else if(response.status == 401) {
+            alert("인증 토큰이 만료되었습니다. 다시 로그인해주세요.");
+            location.href = "/login";
+        }
+        else {
+            const responseBody = await response.json();
+            let message;
+            try {
+                message = responseBody.responseJSON[0].defaultMessage;
+            } catch (error) {
+                alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
+                return;
+            }
+            alert(message);
+        }
+    }
+
+    //로딩 박스를 on/off하는 함수
+    function toggleLoadingBox(loadingBox) {
+        loadingBox.classList.toggle("on");
     }
 });

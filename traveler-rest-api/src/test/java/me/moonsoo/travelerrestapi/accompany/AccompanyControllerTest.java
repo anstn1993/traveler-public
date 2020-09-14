@@ -1,8 +1,6 @@
 package me.moonsoo.travelerrestapi.accompany;
 
 import me.moonsoo.commonmodule.account.Account;
-import me.moonsoo.commonmodule.account.AccountRole;
-import me.moonsoo.commonmodule.account.Sex;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyComment;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +14,7 @@ import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.time.ZonedDateTime;
 import java.util.stream.IntStream;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -165,7 +163,7 @@ class AccompanyControllerTest extends AccompanyBaseControllerTest {
                 .longitude(120.1111)
                 .startDate(LocalDateTime.of(2020, 4, 24, 13, 00, 00))
                 .endDate(LocalDateTime.of(2020, 4, 25, 13, 00, 00))
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .viewCount(100)
                 .build();
 

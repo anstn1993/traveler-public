@@ -1,6 +1,5 @@
 package me.moonsoo.travelerrestapi.schedule;
 
-import com.querydsl.core.types.Predicate;
 import me.moonsoo.commonmodule.account.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -8,8 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +30,7 @@ public class ScheduleService {
     public Schedule save(Account account, Schedule schedule) {
         schedule.setAccount(account);
         schedule.setViewCount(0);
-        schedule.setRegDate(LocalDateTime.now());
+        schedule.setRegDate(ZonedDateTime.now());
         Schedule savedSchedule = scheduleRepository.save(schedule);
         for (ScheduleLocation scheduleLocation : savedSchedule.getScheduleLocations()) {
             scheduleLocation.setSchedule(schedule);

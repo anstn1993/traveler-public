@@ -30,7 +30,7 @@
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
     <script src="/js/toggle-control.js"></script>
-    <script src="/js/userpage.js"></script>
+    <script src="/js/accompany-board.js"></script>
 </head>
 <body>
 <div class="body__container">
@@ -50,7 +50,7 @@
                     <ul class="main-menu">
                         <li><a href="#">커뮤니티</a></li>
                         <li><a href="#">일정 만들기</a></li>
-                        <li><a href="#">동행 구하기</a></li>
+                        <li th:if="${session.account != null}"><a href="#" th:href="'/users/' + ${session.account.getId()}" th:text="마이페이지">마이페이지</a></li>
                         <li>
                             <a th:if="${session.account == null}" th:href="@{/login}">로그인</a>
                             <a th:if="${session.account != null}" th:href="@{/logout}">로그아웃</a>
@@ -67,12 +67,17 @@
 
         </section>
         <section class="section search-section">
-            <form id="search-form" action="#" method="get">
-                <input class="input--text" type="text" placeholder="검색" name="search">
+            <form id="search-form" action="/accompanies" method="get">
+                <input class="input--text" type="text" placeholder="검색" name="search" th:value="${search}">
                 <select name="filter" id="filter">
-                    <option value="writer">작성자</option>
-                    <option value="place">위치</option>
-                    <option value="title">게시글</option>
+                    <option th:if="${filter == null || !filter.equals('writer')}" value="writer">작성자</option>
+                    <option th:if="${filter != null && filter.equals('writer')}" value="writer" selected>작성자</option>
+                    <option th:if="${filter == null || !filter.equals('place')}" value="place">동행 위치</option>
+                    <option th:if="${filter != null && filter.equals('place')}" value="place" selected>동행 위치</option>
+                    <option th:if="${filter == null || !filter.equals('title')}" value="title">제목</option>
+                    <option th:if="${filter != null && filter.equals('title')}" value="title" selected>제목</option>
+                    <option th:if="${filter == null || !filter.equals('article')}" value="article">게시글</option>
+                    <option th:if="${filter != null && filter.equals('article')}" value="article" selected>게시글</option>
                 </select>
                 <input type="submit" value="검색">
             </form>
@@ -91,47 +96,30 @@
                     <td>제목</td>
                     <td>작성자</td>
                     <td>게시일</td>
+                    <td>조회수</td>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
-                    <td>만수</td>
-                    <td>2019.01.01</td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
-                    <td>만수</td>
-                    <td>2019.01.01</td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
-                    <td>만수</td>
-                    <td>2019.01.01</td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
-                    <td>만수</td>
-                    <td>2019.01.01</td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
-                    <td>만수만수만수만수만수만수만수만수</td>
-                    <td>2019.01.01</td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!로마 여행하실 분 구해요~~!!</td>
-                    <td>만수</td>
-                    <td>2019.01.01</td>
-                </tr>
+                    <tr th:each="accompany : ${accompanyList.content}">
+                            <td th:text="${accompany.id}"></td>
+                            <td th:text="${accompany.title}"></td>
+                            <td th:text="${accompany.account.nickname}"></td>
+                            <td th:text="${#temporals.format(accompany.regDate, 'yyyy-MM-dd a hh:mm')}"></td>
+                            <td th:text="${accompany.viewCount}"></td>
+                    </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="page-control-box">
+            <div class="inner">
+                <a th:if="${accompanyList.page.number / 5 * 5 >= 5}" th:href="${search != null}?'/accompanies?page=' + ${accompanyList.page.number / 5 * 5 - 1} + '&search=' + ${search} + '&filter=' + ${filter}: '/accompanies?page=' + ${accompanyList.page.number / 5 * 5 - 1}">이전</a>
+                <a class="page-number" th:if="${accompanyList.page.number / 5 * 5 < accompanyList.page.totalPages}" th:href="${search != null}?'/accompanies?page=' + ${accompanyList.page.number / 5 * 5} + '&search=' + ${search} + '&filter=' + ${filter} : '/accompanies?page=' + ${accompanyList.page.number / 5 * 5}" th:text="${accompanyList.page.number / 5 * 5 + 1}"></a>
+                <a class="page-number" th:if="${accompanyList.page.number / 5 * 5 + 1 < accompanyList.page.totalPages}" th:href="${search != null}?'/accompanies?page=' + ${accompanyList.page.number / 5 * 5 + 1} + '&search=' + ${search} + '&filter=' + ${filter} : '/accompanies?page=' + ${accompanyList.page.number / 5 * 5 + 1}" th:text="${accompanyList.page.number / 5 * 5 + 2}"></a>
+                <a class="page-number" th:if="${accompanyList.page.number / 5 * 5 + 2 < accompanyList.page.totalPages}" th:href="${search != null}?'/accompanies?page=' + ${accompanyList.page.number / 5 * 5 + 2} + '&search=' + ${search} + '&filter=' + ${filter} : '/accompanies?page=' + ${accompanyList.page.number / 5 * 5 + 2}" th:text="${accompanyList.page.number / 5 * 5 + 3}"></a>
+                <a class="page-number" th:if="${accompanyList.page.number / 5 * 5 + 3 < accompanyList.page.totalPages}" th:href="${search != null}?'/accompanies?page=' + ${accompanyList.page.number / 5 * 5 + 3} + '&search=' + ${search} + '&filter=' + ${filter} : '/accompanies?page=' + ${accompanyList.page.number / 5 * 5 + 3}" th:text="${accompanyList.page.number / 5 * 5 + 4}"></a>
+                <a class="page-number" th:if="${accompanyList.page.number / 5 * 5 + 4 < accompanyList.page.totalPages}"  th:href="${search != null}?'/accompanies?page=' + ${accompanyList.page.number / 5 * 5 + 4} + '&search=' + ${search} + '&filter=' + ${filter} : '/accompanies?page=' + ${accompanyList.page.number / 5 * 5 + 4}" th:text="${accompanyList.page.number / 5 * 5 + 5}"></a>
+                <a th:if="${accompanyList.page.number / 5 * 5 + 5 < accompanyList.page.totalPages}" th:href="${search != null}?'/accompanies?page=' + ${accompanyList.page.number / 5 * 5 + 5} + '&search=' + ${search} + '&filter=' + ${filter} : '/accompanies?page=' + ${accompanyList.page.number / 5 * 5 + 5}">다음</a>
+            </div>
         </div>
     </main>
 </div>

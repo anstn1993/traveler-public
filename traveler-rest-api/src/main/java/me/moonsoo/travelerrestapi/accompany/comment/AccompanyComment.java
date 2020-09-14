@@ -8,7 +8,7 @@ import me.moonsoo.travelerrestapi.accompany.Accompany;
 import me.moonsoo.travelerrestapi.accompany.AccompanySerializer;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Getter @Setter @Builder
 @EqualsAndHashCode(of = "id")
@@ -31,5 +31,5 @@ public class AccompanyComment {
     private String comment;
 
     @Column(nullable = false)
-    private LocalDateTime regDate;
+    private ZonedDateTime regDate;
 }

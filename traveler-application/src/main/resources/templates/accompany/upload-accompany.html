@@ -25,13 +25,10 @@
     <link rel="stylesheet" href="/css/large/upload-accompany.css" type="text/css"/>
     <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/header_medium.css" type="text/css"/>
     <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/upload-accompany_medium.css" type="text/css"/>
-    <script
-            src="https://code.jquery.com/jquery-3.4.1.min.js"
-            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYh4bvHSiM73-OsppOKfs7JAhxVPQXwWM&callback=initMap&libraries=&v=weekly" defer></script>
-    <script src="/js/google-map.js"></script>
+    <script src="/js/google-map-for-upload-accompany.js"></script>
+    <script src="/js/toggle-control.js"></script>
     <script src="/js/upload-accompany.js"></script>
 </head>
 <body>
@@ -52,7 +49,7 @@
                     <ul class="main-menu">
                         <li><a href="#">커뮤니티</a></li>
                         <li><a href="#">일정 만들기</a></li>
-                        <li><a href="#">동행 구하기</a></li>
+                        <li><a href="/accompanies">동행 구하기</a></li>
                         <li>
                             <a th:if="${session.account == null}" th:href="@{/login}">로그인</a>
                             <a th:if="${session.account != null}" th:href="@{/logout}">로그아웃</a>
@@ -76,7 +73,7 @@
                             </div>
                             <div class="content-area article-area">
                                 <label for="article-textarea">게시글</label>
-                                <textarea id="article-textarea" class="input--text" type="text" name="article" placeholder="게시물 제목" required></textarea>
+                                <textarea id="article-textarea" class="input--text" type="text" name="article" placeholder="게시글" required></textarea>
                             </div>
                             <div class="content-area start-date-area">
                                 <label for="start-date-input">시작 날짜</label>
@@ -100,6 +97,13 @@
                 <a href="/accompanies" class="btn cancel-btn">취소</a>
             </div>
         </main>
+    </div>
+</div>
+<!--업로드 버튼 클릭 시 서버로부터 응답이 올 때까지 화면에 표시해줄 로딩 창-->
+<div class="loading-container">
+    <div class="loading-box">
+        <p>동행 게시물 업로드 중...</p>
+        <div class="loading-bar"></div>
     </div>
 </div>
 </body>

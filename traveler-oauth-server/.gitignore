@@ -4,6 +4,8 @@ target/
 !**/src/main/**
 !**/src/test/**
 
+datasource.properties
+Dockerfile
 ### STS ###
 .apt_generated
 .classpath

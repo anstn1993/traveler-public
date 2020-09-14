@@ -14,6 +14,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -1119,7 +1120,7 @@ class PostControllerTest extends PostBaseControllerTest {
                 .location("somewhere")
                 .latitude(33.0000)
                 .longitude(127.0000)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .viewCount(100)
                 .build();
     }

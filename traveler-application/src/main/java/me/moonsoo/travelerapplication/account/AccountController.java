@@ -7,8 +7,6 @@ import me.moonsoo.commonmodule.account.Sex;
 import me.moonsoo.travelerapplication.email.EmailService;
 import me.moonsoo.travelerapplication.error.ForbiddenException;
 import me.moonsoo.travelerapplication.error.PageNotFoundException;
-import me.moonsoo.travelerapplication.deserialize.CustomDeserializer;
-import me.moonsoo.travelerapplication.deserialize.CustomPagedModel;
 import me.moonsoo.travelerapplication.properties.AppProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +27,13 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class AccountController {
@@ -84,9 +83,8 @@ public class AccountController {
         if (username != null) {
             model.addAttribute("username", username);
         }
-        return "account/login";
+        return "/account/login";
     }
-
 
     @GetMapping("/logout")
     public String getLogoutPage() {
@@ -104,7 +102,7 @@ public class AccountController {
         if (!message.equals("")) {
             model.addAttribute("message", message);
         }
-        return "account/find-username";
+        return "/account/find-username";
     }
 
 
@@ -153,7 +151,7 @@ public class AccountController {
         if (!message.equals("")) {
             model.addAttribute("message", message);
         }
-        return "account/find-password";
+        return "/account/find-password";
     }
 
     //사용자 아이디와 이메일 주소를 받아서 존재하는 사용자인지 검사하고
@@ -201,7 +199,7 @@ public class AccountController {
         if (authCode == null) {//세션에 인증 코드가 없는 상태에서 요청한 경우
             return "redirect:/";
         }
-        return "account/authenticate";
+        return "/account/authenticate";
     }
 
     //param: code-사용자가 입력한 코드, authCode-세션에 저장되어 있는 인증 코드
@@ -237,7 +235,7 @@ public class AccountController {
         }
         model.addAttribute("username", username);
         session.invalidate();
-        return "account/find-username-result";
+        return "/account/find-username-result";
     }
 
     //비밀번호 변경 페이지 get
@@ -256,7 +254,7 @@ public class AccountController {
         }
         session.removeAttribute("authType");
         session.removeAttribute("authCode");
-        return "account/find-password-result";
+        return "/account/find-password-result";
     }
 
     //비밀번호 변경 처리
@@ -285,7 +283,7 @@ public class AccountController {
         if (account != null) {
             return "redirect:/";
         }
-        return "account/sign-up";
+        return "/account/sign-up";
     }
 
     //회원가입 처리
@@ -346,7 +344,7 @@ public class AccountController {
         model.addAttribute("followingCount", followResourceCount.get("followingCount"));
         model.addAttribute("followerCount", followResourceCount.get("followerCount"));
         model.addAttribute("user", targetUser);//사용자 정보
-        return "account/userpage";
+        return "/account/userpage";
     }
 
     //프로필 수정 페이지 get
@@ -361,7 +359,7 @@ public class AccountController {
             throw new ForbiddenException();
         }
         model.addAttribute("account", account);
-        return "account/edit-profile";
+        return "/account/edit-profile";
     }
 
     //프로필 수정 처리 핸들러

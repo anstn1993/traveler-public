@@ -5,7 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 
@@ -56,5 +56,5 @@ public class Account implements Serializable {
 
     @Column(nullable = false)
     @JsonIgnore
-    private LocalDateTime regDate;//가입 일자
+    private ZonedDateTime regDate;//가입 일자
 }

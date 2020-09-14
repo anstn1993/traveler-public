@@ -13,7 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.stream.IntStream;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -22,7 +22,6 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -1194,7 +1193,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
         return PostChildComment.builder()
                 .id(100)
                 .comment("댓글")
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
     }
 
@@ -1204,7 +1203,7 @@ class PostChildCommentControllerTest extends PostBaseControllerTest {
                 .post(post)
                 .postComment(postComment)
                 .comment("comment" + index)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
         return postChildCommentRepository.save(postChildComment);
     }

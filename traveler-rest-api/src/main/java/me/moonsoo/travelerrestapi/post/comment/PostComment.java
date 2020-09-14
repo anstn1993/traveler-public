@@ -6,8 +6,9 @@ import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountSerializer;
 import me.moonsoo.travelerrestapi.post.Post;
 import me.moonsoo.travelerrestapi.post.PostSerializer;
+
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Builder
 @Getter
@@ -33,6 +34,6 @@ public class PostComment {
     private String comment;
 
     @Column(nullable = false)
-    private LocalDateTime regDate;
+    private ZonedDateTime regDate;
 
 }

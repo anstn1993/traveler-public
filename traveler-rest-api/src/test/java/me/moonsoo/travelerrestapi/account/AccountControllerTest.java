@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -1263,7 +1264,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .nickname("user")
                 .sex(Sex.MALE)
                 //허용되지 않은 값들
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .authCode("adfaef")
                 .emailAuth(true)
                 .id(3000)
@@ -1307,7 +1308,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .nickname("user" + index)
                 .emailAuth(false)
                 .profileImageUri(null)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .authCode("authcode")
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))
@@ -1342,7 +1343,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .nickname("user" + index)
                 .emailAuth(true)
                 .profileImageUri(null)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .authCode(passwordEncoder.encode("authcode"))
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))
@@ -1386,7 +1387,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .startDate(LocalDateTime.of(2020, 4, 24, 13, 00, 00))
                 .endDate(LocalDateTime.of(2020, 4, 25, 13, 00, 00))
                 .account(account)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .viewCount(0)
                 .build();
         return accompanyRepository.save(accompany);
@@ -1397,7 +1398,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .comment("This is comment" + index)
                 .account(account)
                 .accompany(accompany)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
         return accompanyCommentRepository.save(accompanyComment);
     }
@@ -1408,7 +1409,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .accompany(accompany)
                 .accompanyComment(accompanyComment)
                 .comment("This is child comment" + index)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
         return accompanyChildCommentRepository.save(accompanyChildComment);
     }
@@ -1419,7 +1420,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .account(account)
                 .title("schedule" + index)
                 .scope(scope)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .viewCount(0)
                 .build();
         Schedule savedSchedule = scheduleRepository.save(schedule);
@@ -1478,7 +1479,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .location("somewhere" + index)
                 .latitude(33.0000)
                 .longitude(127.0000)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .viewCount(0)
                 .build();
         Post savedPost = postRepository.save(post);

@@ -14,7 +14,7 @@ function initMap() {
     infoWindow = new google.maps.InfoWindow;
     searchAddressInput = document.querySelector(".section-box .content-section .inner .map-box [type='text']");
     marker = new google.maps.Marker({
-        map: map,
+        map: map
     });
 
     //permit location permission

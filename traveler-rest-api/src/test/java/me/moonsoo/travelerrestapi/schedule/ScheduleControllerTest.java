@@ -18,6 +18,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1240,7 +1241,7 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .account(account)
                 .title("schedule" + index)
                 .scope(scope)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .viewCount(0)
                 .build();
         Schedule savedSchedule = scheduleRepository.save(schedule);
@@ -1364,7 +1365,7 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .scope(scope)
                 .scheduleLocations(scheduleLocations)
                 .viewCount(100)//허용되지 않은 값
-                .regDate(LocalDateTime.now())//허용되지 않은 값
+                .regDate(ZonedDateTime.now())//허용되지 않은 값
                 .build();
 
         return schedule;

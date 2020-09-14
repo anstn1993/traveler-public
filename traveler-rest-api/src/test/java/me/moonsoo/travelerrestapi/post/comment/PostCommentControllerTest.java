@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.stream.IntStream;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -902,7 +903,7 @@ class PostCommentControllerTest extends PostBaseControllerTest {
         return PostComment.builder()
                 .comment("comment")
                 .id(100)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
     }
 

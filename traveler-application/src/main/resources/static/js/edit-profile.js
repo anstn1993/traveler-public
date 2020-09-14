@@ -62,7 +62,7 @@ window.addEventListener("load", function () {
         const xhr = new XMLHttpRequest();
         xhr.responseType = "blob";
         xhr.onload = function () {
-            if(xhr.status == 200) {
+            if (xhr.status == 200) {
                 const imageBlob = xhr.response;
                 //blob to base 64
                 const reader = new FileReader();
@@ -75,26 +75,6 @@ window.addEventListener("load", function () {
         }
         xhr.open("GET", profileImg.src);
         xhr.send();
-        // $.ajax({
-        //     type: "GET",
-        //     url: profileImg.src,
-        //     headers: {'Access-Control-Allow-Origin': '*'},
-        //     xhrFields: {
-        //         responseType: 'blob'
-        //     }
-        // }).done(function (res) {
-        //     //res type: blob
-        //     console.log(res.type);
-        //     //blob to base 64
-        //     const reader = new FileReader();
-        //     reader.readAsDataURL(res);
-        //     reader.onload = function () {
-        //         console.log(reader);
-        //         dataUri = reader.result;
-        //     }
-        // }).fail(function (res) {
-        //     console.log(res);
-        // });
     }
 
     // 메뉴 선택에 따른 폼 전환
@@ -323,16 +303,16 @@ window.addEventListener("load", function () {
                 alert("인증 토큰이 만료되었습니다. 다시 로그인해주세요.");
                 location.href = "/login";
             } else {
-                if (res.status != 401) {
-                    let message;
-                    try {
-                        message = res.responseJSON[0].defaultMessage;
-                    } catch (error) {
-                        alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
-                        return;
-                    }
-                    alert(message);
+                let message;
+                const responseBody = await response.json();
+                try {
+                    message = responseBody.responseJSON[0].defaultMessage;
+                } catch (error) {
+                    alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
+                    return;
                 }
+                alert(message);
+
             }
         } catch (err) {
             alert(err);
@@ -348,17 +328,15 @@ window.addEventListener("load", function () {
                 method: "PUT",
                 body: formData
             });
-            if(response.ok) {
+            if (response.ok) {
                 toggleLoadingBox(loadingBox, loadingMessage, changePasswordLoadingMessage);
                 alert("비밀번호 변경을 완료했습니다!");
-            }
-            else if(response.status == 401) {
+            } else if (response.status == 401) {
                 alert("인증 토큰이 만료되었습니다. 다시 로그인해주세요.");
                 location.href = "/login";
-            }
-            else {
-                const responseBody = await response.json();
+            } else {
                 let message;
+                const responseBody = await response.json();
                 try {
                     message = responseBody.responseJSON[0].defaultMessage;
                 } catch (err) {
@@ -381,18 +359,17 @@ window.addEventListener("load", function () {
                 method: "DELETE"
             });
             toggleLoadingBox(loadingBox, loadingMessage, withdrawlLoadingMessage);
-            if(response.ok) {
+            if (response.ok) {
                 alert("회원탈퇴가 완료되었습니다!");
                 location.href = "/";//메인 페이지로 이동
-            }
-            else if (response.status == 401) {
+            } else if (response.status == 401) {
                 alert("인증 토큰이 만료되었습니다. 다시 로그인해주세요.");
                 location.href = "/login";
-            }
-            else {
+            } else {
                 let message;
+                const responseBody = await response.json();
                 try {
-                    message = res.responseJSON[0].defaultMessage;
+                    message = responseBody.responseJSON[0].defaultMessage;
                 } catch (err) {
                     alert(err);
                     return;

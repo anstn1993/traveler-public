@@ -13,7 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Builder
 @Getter
@@ -41,6 +41,6 @@ public class PostChildComment {
 
     private String comment;
 
-    private LocalDateTime regDate;
+    private ZonedDateTime regDate;
 
 }

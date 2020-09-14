@@ -84,30 +84,4 @@ public class FollowController {
         ResponseEntity<Object> followerListResponse = oAuth2RestTemplate.getForEntity(getFollowListUrl, Object.class);
         return followerListResponse;
     }
-
-
-    private CustomPagedModel<AccountModel> getFollowingList(Account targetUser, String getFollowingListUri) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoSuchFieldException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(MediaTypes.HAL_JSON));
-        HttpEntity request = new HttpEntity(headers);
-        ResponseEntity<Object> followingListResponse = oAuth2RestTemplate.getForEntity(getFollowingListUri, Object.class);
-        CustomDeserializer<AccountModel> customDeserializer = new CustomDeserializer<>();
-        CustomPagedModel<AccountModel> followingList = customDeserializer.deseriazizePagedModel(followingListResponse.getBody(), "accountList", AccountModel.class);
-        return followingList;
-    }
-
-    private CustomPagedModel<AccountModel> getFollowerList(Account targetUser, String getFollowerListUri) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoSuchFieldException {
-        UriComponentsBuilder builder =
-                UriComponentsBuilder.fromHttpUrl(appProperties.getRestApiUrl() + "/accounts/" + targetUser.getId() + "/followers")
-                        .queryParam("size", "10")
-                        .queryParam("page", "0")
-                        .queryParam("sort", "id,DESC");
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(MediaTypes.HAL_JSON));
-        HttpEntity request = new HttpEntity(headers);
-        ResponseEntity<Object> followerListResponse = oAuth2RestTemplate.getForEntity(getFollowerListUri, Object.class);
-        CustomDeserializer<AccountModel> customDeserializer = new CustomDeserializer<>();
-        CustomPagedModel<AccountModel> followerList = customDeserializer.deseriazizePagedModel(followerListResponse.getBody(), "accountList", AccountModel.class);
-        return followerList;
-    }
 }

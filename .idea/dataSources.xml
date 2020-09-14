@@ -13,5 +13,11 @@
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://localhost:3307/traveler</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="ec2" uuid="b4f47c37-e32f-4a00-b339-dd025c9db731">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://13.209.207.163:3306/traveler</jdbc-url>
+    </data-source>
   </component>
 </project>

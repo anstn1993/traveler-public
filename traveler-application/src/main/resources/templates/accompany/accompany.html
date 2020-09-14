@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>동행 구하기 게시물</title>
+    <meta name="author" content="MoonSooKim">
+    <meta name="description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Traveler">
+    <meta property="og:title" content="당신의 여행을 위한 공간입니다.">
+    <meta property="og:description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+    <meta property="og:url" content="http://localhost">
+
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:site" content="GitHub">
+    <meta property="twitter:title" content="당신의 여행을 위한 공간입니다.">
+    <meta property="twitter:description" content="Traveler는 여행자들이 자신만의 일정을 만들거나 동행을 구하기도 하고 소통할 수 있는 공간을 제공하는 커뮤니티 입니다.">
+    <meta property="twitter:url" content="https://loclahost">
+
+    <!-- 브라우저 스타일 초기화 reset.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css" integrity="sha512-IJEbgDEF7OeKJRa0MY2PApnyJHRIsgzCveek4ec8VWQ+7KG3ZSKVNYa5xP/Gh0hVP0Mwb+gBsk+GwR3JQGhQNg==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/common.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/header.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/large/accompany.css" type="text/css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/header_medium.css" type="text/css"/>
+    <link rel="stylesheet" media="all and (max-width:1024px)" href="/css/medium/accompany_medium.css" type="text/css"/>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYh4bvHSiM73-OsppOKfs7JAhxVPQXwWM&callback=initMap&libraries=&v=weekly" defer></script>
+    <script src="/js/google-map-for-accompany.js"></script>
+    <script src="/js/toggle-control.js"></script>
+</head>
+<body>
+<div class="body__container">
+    <!--HEADER-->
+    <header>
+        <nav>
+            <a class="nav-brand" href="/">Traveler</a>
+            <div class="clearfix toggle">
+                <a class="nav-brand" href="/">Traveler</a>
+                <ul class="notification-group float--right">
+                    <li><a href="#">채팅</a></li>
+                    <li><a href="#">알림</a></li>
+                </ul>
+            </div>
+            <div class="inner">
+                <div class="menu-group toggle">
+                    <ul class="main-menu">
+                        <li><a href="#">커뮤니티</a></li>
+                        <li><a href="#">일정 만들기</a></li>
+                        <li><a href="/accompanies">동행 구하기</a></li>
+                        <li>
+                            <a th:if="${session.account == null}" th:href="@{/login}">로그인</a>
+                            <a th:if="${session.account != null}" th:href="@{/logout}">로그아웃</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="toggle-btn">header menu toggle button</div>
+        </nav>
+        <h2 th:text="${accompany.account.nickname} + '님과 함께 동행해보세요!'">당신과 함께 할 여행자를 구하세요!</h2>
+    </header>
+    <div class="section-box">
+        <main class="section content-section">
+            <div class="inner">
+                <div class="content-info-box">
+                    <div class="title" th:text="${accompany.title}">제목</div>
+                        <a th:href="'/users/' + ${accompany.account.id}">
+                            <div class="user-info">
+                                <div class="profile--img">
+                                    <img th:src="${accompany.account.profileImageUri}?:'/image/profile.png'" alt="프로필 이미지" width="50px" height="50px">
+                                </div>
+                                <div class="profile--nickname" th:text="${accompany.account.nickname}">만수</div>
+                            </div>
+                        </a>
+                    <div class="reg-date-view-count-group">
+                        <div class="reg-date" th:text="${#temporals.format(accompany.regDate, 'yyyy-MM-dd a hh:mm')}">2020-01-01 오전 09:15</div>
+                        <div class="view-count" th:text="'조회 ' + ${accompany.viewCount}">조회 0</div>
+                    </div>
+                </div>
+                <div class="line-divider"></div>
+                <div class="content-box">
+                    <div class="article" th:text="${accompany.article}">
+                        게시글 영역
+                    </div>
+                    <div class="line-divider"></div>
+                    <div class="date-box">
+                        <div>동행 일자</div>
+                        <div th:text="${#temporals.format(accompany.startDate, 'yyyy-MM-dd a hh:mm')} + ' ~ ' + ${#temporals.format(accompany.endDate, 'yyyy-MM-dd a hh:mm')}"></div>
+                    </div>
+                    <div class="line-divider"></div>
+                    <div class="map-box">
+                        <span class="position" th:text="${accompany.location}">위치</span>
+                        <span class="latitude" th:text="${accompany.latitude}">22.0000</span>
+                        <span class="longitude" th:text="${accompany.longitude}">100.0000</span>
+                        <div id="map"></div>
+                    </div>
+                </div>
+                <div class="line-divider"></div>
+                <div class="comment-box">
+                    <span th:text="'댓글(' + ${commentList.content.size()} + '개)'">댓글</span>
+                    <div class="comment-group">
+                        <!-- loop -->
+                        <div th:each="comment : ${commentList.content}" class="comment-item">
+                            <div class="clearfix">
+                                <div class="float--left">
+                                    <div class="comment-id" th:text="${comment.id}">10</div>
+                                    <div class="profile--img">
+                                        <img th:src="${comment.account.profileImageUri}?:'/image/profile.png'" alt="프로필 이미지" width="40px" height="40px">
+                                    </div>
+                                    <div class="flex-area">
+                                        <div class="nickname" th:text="${comment.account.nickname}">만수</div>
+                                        <div class="comment" th:text="${comment.comment}">댓글 영역입니다.</div>
+                                        <div class="reg-date-and-reply">
+                                            <div class="reg-date" th:text="${#temporals.format(comment.regDate, 'yyyy-MM-dd a hh:mm')}">2020-01-01 오전 8:07</div>
+                                            <div class="reply">답글 달기</div>
+                                            <div class="show-reply exist">답글 보기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="float--right">
+                                    <div th:class="${session.account.id.equals(comment.account.id)}?'update-delete-box my-comment' : 'update-delete-box'">
+                                        <div class="update">수정</div>
+                                        <div class="delete">삭제</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="child-comment-group">
+                                <!-- loop -->
+                                <div class="child-comment-item">
+                                    <div class="clearfix">
+                                        <div class="float--left">
+                                            <div class="comment-id">10</div>
+                                            <div class="profile--img">
+                                                <img src="/image/profile.png" alt="프로필 이미지" width="40px" height="40px">
+                                            </div>
+                                            <div class="flex-area">
+                                                <div class="nickname">만수</div>
+                                                <div class="comment">댓글 영역입니다.</div>
+                                                <div class="reg-date">2020-01-01 오전 8:07</div>
+                                            </div>
+                                        </div>
+                                        <div class="float--right">
+                                            <div class="update-delete-box my-comment">
+                                                <div class="update">수정</div>
+                                                <div class="delete">삭제</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="child-comment-item">
+                                    <div class="clearfix">
+                                        <div class="float--left">
+                                            <div class="comment-id">10</div>
+                                            <div class="profile--img">
+                                                <img src="/image/profile.png" alt="프로필 이미지" width="40px" height="40px">
+                                            </div>
+                                            <div class="flex-area">
+                                                <div class="nickname">만수</div>
+                                                <div class="comment">댓글 영역입니다.</div>
+                                                <div class="reg-date">2020-01-01 오전 8:07</div>
+                                            </div>
+                                        </div>
+                                        <div class="float--right">
+                                            <div class="update-delete-box my-comment">
+                                                <div class="update">수정</div>
+                                                <div class="delete">삭제</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="child-comment-item">
+                                    <div class="clearfix">
+                                        <div class="float--left">
+                                            <div class="comment-id">10</div>
+                                            <div class="profile--img">
+                                                <img src="/image/profile.png" alt="프로필 이미지" width="40px" height="40px">
+                                            </div>
+                                            <div class="flex-area">
+                                                <div class="nickname">만수</div>
+                                                <div class="comment">댓글 영역입니다.</div>
+                                                <div class="reg-date">2020-01-01 오전 8:07</div>
+                                            </div>
+                                        </div>
+                                        <div class="float--right">
+                                            <div class="update-delete-box my-comment">
+                                                <div class="update">수정</div>
+                                                <div class="delete">삭제</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="child-comment-item">
+                                    <div class="clearfix">
+                                        <div class="float--left">
+                                            <div class="comment-id">10</div>
+                                            <div class="profile--img">
+                                                <img src="/image/profile.png" alt="프로필 이미지" width="40px" height="40px">
+                                            </div>
+                                            <div class="flex-area">
+                                                <div class="nickname">만수</div>
+                                                <div class="comment">댓글 영역입니다.</div>
+                                                <div class="reg-date">2020-01-01 오전 8:07</div>
+                                            </div>
+                                        </div>
+                                        <div class="float--right">
+                                            <div class="update-delete-box my-comment">
+                                                <div class="update">수정</div>
+                                                <div class="delete">삭제</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="more-box">
+                                    <div class="more exist">답글 더 보기</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comment-input">
+                        <textarea name="comment" cols="30" rows="10" placeholder="댓글을 남겨주세요!"></textarea>
+                        <button class="btn btn--primary">등록</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

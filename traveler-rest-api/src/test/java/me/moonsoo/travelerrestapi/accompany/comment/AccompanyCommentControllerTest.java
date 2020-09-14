@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -138,7 +139,7 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .id(100)//허용되지 않은 값
                 .account(account)//허용되지 않은 값
                 .accompany(accompany)//허용되지 않은 값
-                .regDate(LocalDateTime.now())//허용되지 않은 값
+                .regDate(ZonedDateTime.now())//허용되지 않은 값
                 .comment("This is comment.")
                 .build();
 

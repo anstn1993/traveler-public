@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Service
 public class PostChildCommentService {
@@ -21,7 +21,7 @@ public class PostChildCommentService {
                 .account(account)
                 .post(post)
                 .postComment(postComment)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .comment(postChildCommentDto.getComment())
                 .build();
         return postChildCommentRepository.save(postChildComment);

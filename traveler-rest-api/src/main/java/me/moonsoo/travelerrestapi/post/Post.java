@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountSerializer;
-import me.moonsoo.travelerrestapi.schedule.Schedule;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -44,7 +43,7 @@ public class Post {
     private Double longitude;//장소 경도
 
     @Column(nullable = false)
-    private LocalDateTime regDate;//게시물 등록 시간
+    private ZonedDateTime regDate;//게시물 등록 시간
 
     @Column(columnDefinition = "integer default 0")
     private Integer viewCount;//조회수

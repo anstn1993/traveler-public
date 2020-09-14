@@ -1,9 +1,7 @@
 package me.moonsoo.travelerrestapi.accompany;
 
 import me.moonsoo.commonmodule.account.Account;
-import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildComment;
 import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildCommentRepository;
-import me.moonsoo.travelerrestapi.accompany.comment.AccompanyComment;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyCommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.ZonedDateTime;
 
 @Service
 public class AccompanyService {
@@ -30,7 +28,9 @@ public class AccompanyService {
     public Accompany save(Accompany accompany, Account account) {
         accompany.setAccount(account);//작성자 set
         accompany.setViewCount(0);//조회수 set
-        accompany.setRegDate(LocalDateTime.now());//게시물 생성 시간 set
+        ZonedDateTime now = ZonedDateTime.now();
+        LocalDateTime now1 = LocalDateTime.now();
+        accompany.setRegDate(now);//게시물 생성 시간 set
         return accompanyRepository.save(accompany);
     }
 

@@ -1,21 +1,15 @@
 package me.moonsoo.travelerrestapi.accompany;
 
 import me.moonsoo.commonmodule.account.Account;
-import me.moonsoo.commonmodule.account.AccountRole;
-import me.moonsoo.commonmodule.account.Sex;
 import me.moonsoo.travelerrestapi.BaseControllerTest;
 import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildComment;
 import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildCommentRepository;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyComment;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyCommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 
 import java.time.LocalDateTime;
-import java.util.Set;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import java.time.ZonedDateTime;
 
 public class AccompanyBaseControllerTest extends BaseControllerTest {
 
@@ -52,7 +46,7 @@ public class AccompanyBaseControllerTest extends BaseControllerTest {
                 .startDate(LocalDateTime.of(2020, 4, 24, 13, 00, 00))
                 .endDate(LocalDateTime.of(2020, 4, 25, 13, 00, 00))
                 .account(account)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .viewCount(0)
                 .build();
         return accompanyRepository.save(accompany);
@@ -65,7 +59,7 @@ public class AccompanyBaseControllerTest extends BaseControllerTest {
                 .comment("This is comment" + index)
                 .account(account)
                 .accompany(accompany)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
         return accompanyCommentRepository.save(accompanyComment);
     }
@@ -76,7 +70,7 @@ public class AccompanyBaseControllerTest extends BaseControllerTest {
                 .accompany(accompany)
                 .accompanyComment(accompanyComment)
                 .comment("This is child comment" + index)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
         return accompanyChildCommentRepository.save(accompanyChildComment);
     }

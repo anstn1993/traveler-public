@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -60,7 +60,7 @@ public class BaseControllerTest {
                 .nickname("user" + index)
                 .emailAuth(true)
                 .profileImageUri(null)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .authCode("authcode")
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))

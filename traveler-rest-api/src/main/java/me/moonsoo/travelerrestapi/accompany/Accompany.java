@@ -7,7 +7,7 @@ import me.moonsoo.commonmodule.account.AccountSerializer;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
+import java.time.ZonedDateTime;
 
 
 //동행 구하기 게시판의 게시물을 저장하는 엔티티
@@ -45,7 +45,7 @@ public class Accompany {
     private Double longitude;//여행 장소 경도
 
     @Column(nullable = false)
-    private LocalDateTime regDate;//게시물 등록 시간
+    private ZonedDateTime regDate;//게시물 등록 시간
 
     @Column(columnDefinition = "integer default 0")
     private Integer viewCount;//조회수

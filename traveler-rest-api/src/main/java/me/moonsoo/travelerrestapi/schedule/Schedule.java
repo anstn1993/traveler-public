@@ -6,10 +6,8 @@ import me.moonsoo.commonmodule.account.Account;
 import me.moonsoo.commonmodule.account.AccountSerializer;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter @Setter
@@ -33,7 +31,7 @@ public class Schedule {
     private Scope scope;//공개 범위
 
     @Column(nullable = false)
-    private LocalDateTime regDate;//게시물 등록 시간
+    private ZonedDateTime regDate;//게시물 등록 시간
 
     @Column(columnDefinition = "integer default 0")
     private Integer viewCount;//조회수

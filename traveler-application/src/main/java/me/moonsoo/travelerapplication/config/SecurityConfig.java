@@ -126,7 +126,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/users/*/profile",
                 "/users/*/password",
                 "/users/*/withdrawl",
-                "/users/followings/**")
+                "/users/followings/**",
+                "/accompanies")
         ;
         http.formLogin().loginPage("/login").successForwardUrl("/").permitAll();
         http.logout().logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true);

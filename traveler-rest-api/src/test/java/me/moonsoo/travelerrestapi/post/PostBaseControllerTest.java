@@ -8,7 +8,6 @@ import me.moonsoo.travelerrestapi.BaseControllerTest;
 import me.moonsoo.travelerrestapi.post.comment.PostComment;
 import me.moonsoo.travelerrestapi.post.comment.PostCommentRepository;
 import me.moonsoo.travelerrestapi.properties.S3Properties;
-import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.FileCopyUtils;
@@ -16,7 +15,7 @@ import org.springframework.util.FileCopyUtils;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -54,7 +53,7 @@ public class PostBaseControllerTest extends BaseControllerTest {
                 .location("somewhere" + index)
                 .latitude(33.0000)
                 .longitude(127.0000)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .viewCount(0)
                 .build();
         Post savedPost = postRepository.save(post);
@@ -119,7 +118,7 @@ public class PostBaseControllerTest extends BaseControllerTest {
                 .post(post)
                 .account(account)
                 .comment("comment" + index)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
 
         return postCommentRepository.save(postComment);

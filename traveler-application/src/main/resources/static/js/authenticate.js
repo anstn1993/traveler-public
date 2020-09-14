@@ -83,28 +83,6 @@ window.addEventListener('load', function () {
         } catch (err) {
             alert("문제가 생겼습니다. 잠시 후 다시 시도해주세요.");
         }
-        // $.ajax({
-        //     url: "/authenticate",
-        //     type: "POST",
-        //     async: false,
-        //     data: {
-        //         "authCode": authCode
-        //     }
-        // }).done(function (res) {
-        //     console.log(res);
-        //     console.log(res.authType);
-        //     const authType = res.authType;
-        //     if(authType == "username") {
-        //         authInvalid = false;
-        //         location.href="/find-username/result";
-        //     }
-        //     else {//authType == "password"
-        //         authInvalid = false;
-        //         location.href="/find-password/result";
-        //     }
-        // }).fail(function (res) {
-        //
-        // });
     }
 });
 

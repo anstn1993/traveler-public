@@ -2,3 +2,33 @@ header {
     height: 300px;
     background-position: left bottom;
 }
+.section-box .content-section .inner .flex-area {
+    display: flex;
+    flex-direction: column;
+}
+/* LEFT CONTENT AREA */
+.section-box .content-section .inner .flex-area .left-side {
+    width: 100%;
+    text-align: center;
+}
+.section-box .content-section .inner .flex-area .content-area textarea {
+    width: 80%;
+}
+.section-box .content-section .inner .flex-area .start-date-area {
+    display: inline-block;
+}
+.section-box .content-section .inner .flex-area .end-date-area {
+    display: inline-block;
+}
+/* CONTENT AREA(MAP) */
+.section-box .content-section .inner .right-side {
+    margin-left: 0;
+    width: 100%;
+}
+.section-box .content-section .inner .map-box {
+    height: 500px;
+    width: 100%;
+    box-shadow: 1px 1px 9px #000;
+    position: relative;
+    border-radius: 5px;
+}
