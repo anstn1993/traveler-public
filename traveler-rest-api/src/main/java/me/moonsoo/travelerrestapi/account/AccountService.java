@@ -6,7 +6,6 @@ import me.moonsoo.commonmodule.account.AccountRole;
 import me.moonsoo.travelerrestapi.accompany.AccompanyRepository;
 import me.moonsoo.travelerrestapi.accompany.childcomment.AccompanyChildCommentRepository;
 import me.moonsoo.travelerrestapi.accompany.comment.AccompanyCommentRepository;
-import me.moonsoo.travelerrestapi.email.EmailService;
 import me.moonsoo.travelerrestapi.follow.FollowRepository;
 import me.moonsoo.travelerrestapi.post.FileUploader;
 import me.moonsoo.travelerrestapi.post.PostRepository;
@@ -24,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -76,7 +75,7 @@ public class AccountService {
         account.setPassword(passwordEncoder.encode(account.getPassword()));//비밀번호 암호화
         account.setEmailAuth(false);//이메일 인증 여부
         account.setAuthCode(passwordEncoder.encode(account.getEmail()));//이메일 인증 코드
-        account.setRegDate(LocalDateTime.now());
+        account.setRegDate(ZonedDateTime.now());
         account.setProfileImageUri(null);
         account.setRoles(Set.of(AccountRole.USER));
         if (!imageFile.isEmpty()) {//프로필 이미지가 존재하는 경우 s3서버에 저장

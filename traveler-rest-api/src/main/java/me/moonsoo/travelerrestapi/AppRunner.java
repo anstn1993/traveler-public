@@ -11,9 +11,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -58,7 +57,7 @@ public class AppRunner implements ApplicationRunner {
                 .nickname("user" + index)
                 .profileImageUri(null)
                 .introduce(null)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .sex(Sex.MALE)
                 .build();
         return accountRepository.save(account);
