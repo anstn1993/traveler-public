@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -65,7 +66,7 @@ public class AccompanyBaseControllerTest extends BaseControllerTest {
                 .comment("This is comment" + index)
                 .account(account)
                 .accompany(accompany)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
         return accompanyCommentRepository.save(accompanyComment);
     }
@@ -76,7 +77,7 @@ public class AccompanyBaseControllerTest extends BaseControllerTest {
                 .accompany(accompany)
                 .accompanyComment(accompanyComment)
                 .comment("This is child comment" + index)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
         return accompanyChildCommentRepository.save(accompanyChildComment);
     }

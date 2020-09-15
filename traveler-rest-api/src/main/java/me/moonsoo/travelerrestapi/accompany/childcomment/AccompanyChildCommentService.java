@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Service
 public class AccompanyChildCommentService {
@@ -21,7 +22,7 @@ public class AccompanyChildCommentService {
         childComment.setAccompany(accompany);
         childComment.setAccompanyComment(comment);
         childComment.setAccount(account);
-        childComment.setRegDate(LocalDateTime.now());
+        childComment.setRegDate(ZonedDateTime.now());
         return accompanyChildCommentRepository.save(childComment);
     }
 

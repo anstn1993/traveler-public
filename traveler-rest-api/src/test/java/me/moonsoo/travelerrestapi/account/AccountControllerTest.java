@@ -157,9 +157,6 @@ class AccountControllerTest extends BaseControllerTest {
         greenMail.reset();
     }
 
-//    @RegisterExtension
-//    public static SmtpServerExtension smtpServerExtension = new SmtpServerExtension(new GreenMail(ServerSetup.SMTP));
-
 
     @Test
     @DisplayName("사용자 추가 테스트(프로필 이미지 o)")
@@ -181,7 +178,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .file(mockFile)
                 .part(accountPart)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
@@ -221,7 +221,10 @@ class AccountControllerTest extends BaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("요청 본문의 컨텐츠 타입")
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("요청 본문의 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         responseHeaders.and(
                                 headerWithName(HttpHeaders.LOCATION).description("생성된 account 리소스 링크")
@@ -260,7 +263,10 @@ class AccountControllerTest extends BaseControllerTest {
         mockMvc.perform(multipart("/api/accounts")
                 .part(accountPart)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
@@ -295,7 +301,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .file(mockFile)
                 .part(accountPart)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -316,7 +325,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .file(mockFile)
                 .part(accountPart)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isUnsupportedMediaType())
         ;
@@ -331,7 +343,10 @@ class AccountControllerTest extends BaseControllerTest {
         mockMvc.perform(multipart("/api/accounts")
                 .file(mockFile)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -351,7 +366,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .file(mockFile)
                 .part(accountPart)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -372,7 +390,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .file(mockFile)
                 .part(accountPart)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -413,6 +434,9 @@ class AccountControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,ASC"))
@@ -445,6 +469,9 @@ class AccountControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,ASC")
@@ -476,6 +503,9 @@ class AccountControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "0")
                 .param("size", "10")
                 .param("sort", "id,ASC"))
@@ -501,6 +531,9 @@ class AccountControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts")
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,ASC")
@@ -562,7 +595,10 @@ class AccountControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", account.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -589,7 +625,10 @@ class AccountControllerTest extends BaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("accountId").description("사용자 id")
@@ -627,7 +666,10 @@ class AccountControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", otherAccount.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -653,7 +695,10 @@ class AccountControllerTest extends BaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("accountId").description("사용자 id")
@@ -688,7 +733,10 @@ class AccountControllerTest extends BaseControllerTest {
         Account account = createAccount(username, email, password, 1);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", account.getId())
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -716,7 +764,10 @@ class AccountControllerTest extends BaseControllerTest {
         Account account = createAccountWithoutEmailAuth(username, email, password, 1);//이메일 인증을 하지 않은 사용자
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", account.getId())
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -726,7 +777,10 @@ class AccountControllerTest extends BaseControllerTest {
     @DisplayName("사용자 조회 실패-존재하지 않는 사용자(404 Not found)")
     public void getAccountFail_Not_Found() throws Exception {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}", 404)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -753,7 +807,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .part(accountPart)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -789,7 +846,10 @@ class AccountControllerTest extends BaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("요청 본문의 컨텐츠 타입")
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("요청 본문의 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         responseHeaders,
                         responseFields(
@@ -832,7 +892,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .part(accountPart)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -870,7 +933,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .part(accountPart)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -904,7 +970,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .part(accountPart)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -944,7 +1013,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .part(accountPart)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -971,7 +1043,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .part(accountPart)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isUnsupportedMediaType())
         ;
@@ -992,7 +1067,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .file(mockFile)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -1018,7 +1096,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .part(accountPart)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -1045,7 +1126,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .part(accountPart)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -1070,7 +1154,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .file(mockFile)
                 .part(accountPart)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
         ;
@@ -1097,7 +1184,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .part(accountPart)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isForbidden())
         ;
@@ -1124,7 +1214,10 @@ class AccountControllerTest extends BaseControllerTest {
                 .part(accountPart)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -1398,7 +1491,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .comment("This is comment" + index)
                 .account(account)
                 .accompany(accompany)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
         return accompanyCommentRepository.save(accompanyComment);
     }
@@ -1409,7 +1502,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .accompany(accompany)
                 .accompanyComment(accompanyComment)
                 .comment("This is child comment" + index)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
         return accompanyChildCommentRepository.save(accompanyChildComment);
     }

@@ -55,6 +55,9 @@ class FollowControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(followDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
@@ -132,7 +135,10 @@ class FollowControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/accounts/{accountId}/followings", account.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -156,6 +162,9 @@ class FollowControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(follow)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -176,6 +185,9 @@ class FollowControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/accounts/{accountId}/followings", account.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(followDto)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
@@ -199,6 +211,9 @@ class FollowControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(followDto)))
                 .andDo(print())
                 .andExpect(status().isForbidden())
@@ -219,6 +234,9 @@ class FollowControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(followDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -242,6 +260,9 @@ class FollowControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(followDto)))
                 .andDo(print())
                 .andExpect(status().isConflict())
@@ -265,6 +286,9 @@ class FollowControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings", account.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("size", "10")
                 .param("page", "1")
                 .param("sort", "id,ASC"))
@@ -289,7 +313,10 @@ class FollowControllerTest extends BaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("accountId").description("팔로잉 목록 소유자 id")
@@ -332,6 +359,9 @@ class FollowControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings", account.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("size", "10")
                 .param("page", "1")
                 .param("sort", "id,ASC"))
@@ -367,7 +397,10 @@ class FollowControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings/{followedId}", followingAccount.getId(), followedAccount.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -389,7 +422,10 @@ class FollowControllerTest extends BaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("accountId").description("사용자 id"),
@@ -425,7 +461,10 @@ class FollowControllerTest extends BaseControllerTest {
         createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings/{followedId}", followingAccount.getId(), followedAccount.getId())
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -453,7 +492,10 @@ class FollowControllerTest extends BaseControllerTest {
         createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings/{followedId}", 404, followedAccount.getId())
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -471,7 +513,10 @@ class FollowControllerTest extends BaseControllerTest {
         createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followings/{followedId}", followingAccount.getId(), 404)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -494,6 +539,9 @@ class FollowControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers", account.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("size", "10")
                 .param("page", "1")
                 .param("sort", "id,ASC"))
@@ -518,7 +566,10 @@ class FollowControllerTest extends BaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("accountId").description("팔로워 목록 소유자 id")
@@ -561,6 +612,9 @@ class FollowControllerTest extends BaseControllerTest {
         });
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers", account.getId())
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("size", "10")
                 .param("page", "1")
                 .param("sort", "id,ASC"))
@@ -596,7 +650,10 @@ class FollowControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers/{followingId}", followedAccount.getId(), followingAccount.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -618,7 +675,10 @@ class FollowControllerTest extends BaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("accountId").description("사용자 id"),
@@ -654,7 +714,10 @@ class FollowControllerTest extends BaseControllerTest {
         createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers/{followingId}", followedAccount.getId(), followingAccount.getId())
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -682,7 +745,10 @@ class FollowControllerTest extends BaseControllerTest {
         createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers/{followingId}", 404, followingAccount.getId())
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -700,7 +766,10 @@ class FollowControllerTest extends BaseControllerTest {
         createFollow(followingAccount, followedAccount);//followingAccount가 followedAccount를 follow
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accounts/{accountId}/followers/{followingId}", followedAccount.getId(), 404)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;

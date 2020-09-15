@@ -77,6 +77,9 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(scheduleDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
@@ -170,7 +173,10 @@ class ScheduleControllerTest extends BaseControllerTest {
         mockMvc.perform(post("/api/schedules")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
@@ -190,6 +196,9 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(schedule)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -210,6 +219,9 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(scheduleDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -228,6 +240,9 @@ class ScheduleControllerTest extends BaseControllerTest {
         mockMvc.perform(post("/api/schedules")
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(scheduleDto)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
@@ -255,6 +270,9 @@ class ScheduleControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer" + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,DESC"))
@@ -277,7 +295,10 @@ class ScheduleControllerTest extends BaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         requestParameters(
                                 parameterWithName("page").optional().description("페이지 번호"),
@@ -324,6 +345,9 @@ class ScheduleControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer" + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,DESC")
@@ -362,6 +386,9 @@ class ScheduleControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer" + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "0")
                 .param("size", "10")
                 .param("sort", "id,DESC")
@@ -397,6 +424,9 @@ class ScheduleControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer" + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "0")
                 .param("size", "10")
                 .param("sort", "id,DESC")
@@ -432,6 +462,9 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,DESC"))
@@ -467,6 +500,9 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,DESC")
@@ -504,6 +540,9 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "0")
                 .param("size", "10")
                 .param("sort", "id,DESC")
@@ -537,6 +576,9 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "0")
                 .param("size", "10")
                 .param("sort", "id,DESC")
@@ -574,6 +616,9 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,DESC"))
@@ -608,6 +653,9 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,DESC")
@@ -644,6 +692,9 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,DESC")
@@ -680,6 +731,9 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules")
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,DESC")
@@ -713,7 +767,10 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules/{scheduleId}", schedule.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -740,7 +797,10 @@ class ScheduleControllerTest extends BaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("scheduleId").description("일정 게시물의 id")
@@ -797,7 +857,10 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         ResultActions resultActions = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules/{scheduleId}", schedule.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print());
 
         if (scope.equals(Scope.FOLLOWER) && !following) {//scope가 FOLLOWER인데 팔로잉하고 있지 않은 경우 forbidden
@@ -840,7 +903,10 @@ class ScheduleControllerTest extends BaseControllerTest {
         Schedule schedule = createSchedule(account, 0, 3, 3, scope);
 
         ResultActions resultActions = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/schedules/{scheduleId}", schedule.getId())
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print());
         if (scope.equals(Scope.ALL)) {
             resultActions
@@ -896,7 +962,10 @@ class ScheduleControllerTest extends BaseControllerTest {
 
         mockMvc.perform(get("/api/schedules/{scheduleId}", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andExpect(status().isNotFound());
     }
 
@@ -948,6 +1017,9 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(scheduleDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -1037,6 +1109,9 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(scheduleDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -1058,6 +1133,9 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(schedule)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -1080,6 +1158,9 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(scheduleDtoWithWrongValue)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -1104,6 +1185,9 @@ class ScheduleControllerTest extends BaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.put("/api/schedules/{scheduleId}", schedule.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(scheduleDto)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
@@ -1129,6 +1213,9 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(scheduleDto)))
                 .andDo(print())
                 .andExpect(status().isForbidden())
@@ -1154,6 +1241,9 @@ class ScheduleControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(scheduleDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())

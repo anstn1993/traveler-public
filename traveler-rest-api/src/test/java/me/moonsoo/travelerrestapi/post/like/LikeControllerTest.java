@@ -51,7 +51,10 @@ class LikeControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/likes", post.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
@@ -71,7 +74,10 @@ class LikeControllerTest extends PostBaseControllerTest {
                                 linkWithRel("delete-like").description("추가된 좋아요 리소스를 삭제할 수 있는 링크")
                         ),
                         requestHeaders(
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("postId").description("좋아요 추가할 post 게시물 id")
@@ -106,7 +112,10 @@ class LikeControllerTest extends PostBaseControllerTest {
         Post post = createPost(account, 0, 1, 1);
 
         mockMvc.perform(post("/api/posts/{postId}/likes", post.getId())
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
         ;
@@ -122,7 +131,10 @@ class LikeControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(post("/api/posts/{postId}/likes", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -141,7 +153,10 @@ class LikeControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/likes", post.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isConflict());
     }
@@ -166,7 +181,10 @@ class LikeControllerTest extends PostBaseControllerTest {
                 .param("size", "10")
                 .param("sort", "id,ASC")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.likeList").exists())
@@ -185,7 +203,10 @@ class LikeControllerTest extends PostBaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("postId").description("좋아요가 달린 게시물 id")
@@ -230,7 +251,10 @@ class LikeControllerTest extends PostBaseControllerTest {
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,ASC")
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.likeList").exists())
@@ -258,7 +282,10 @@ class LikeControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/likes/{likeId}", post.getId(), like.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -278,7 +305,10 @@ class LikeControllerTest extends PostBaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("postId").description("post게시물 리소스 id"),
@@ -315,7 +345,10 @@ class LikeControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/likes/{likeId}", post.getId(), like.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -337,7 +370,10 @@ class LikeControllerTest extends PostBaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token")
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("postId").description("post게시물 리소스 id"),
@@ -372,7 +408,10 @@ class LikeControllerTest extends PostBaseControllerTest {
         Like like = createLike(post, account);//post 게시물에 다른 사용자의 좋아요 리소스 추가
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/likes/{likeId}", post.getId(), like.getId())
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -400,7 +439,10 @@ class LikeControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/likes/{likeId}", 404, like.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -420,7 +462,10 @@ class LikeControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/likes/{likeId}", post2.getId(), like.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isConflict())
         ;
@@ -437,7 +482,10 @@ class LikeControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/likes/{likeId}", post.getId(), 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;

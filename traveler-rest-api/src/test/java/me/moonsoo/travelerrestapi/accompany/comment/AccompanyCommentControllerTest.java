@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -54,6 +55,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
@@ -120,7 +124,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(post("/api/accompanies/{accompanyId}/comments", accompany.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
@@ -138,7 +145,7 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .id(100)//허용되지 않은 값
                 .account(account)//허용되지 않은 값
                 .accompany(accompany)//허용되지 않은 값
-                .regDate(LocalDateTime.now())//허용되지 않은 값
+                .regDate(ZonedDateTime.now())//허용되지 않은 값
                 .comment("This is comment.")
                 .build();
 
@@ -147,6 +154,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(accompanyComment)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -165,6 +175,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -186,6 +199,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(post("/api/accompanies/{accompanyId}/comments", accompany.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
@@ -209,6 +225,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments", accompany.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,ASC"))//sort cirteria: id, regDate
@@ -250,6 +269,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments", accompany.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,ASC"))//sort cirteria: id, regDate
@@ -280,7 +302,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("accompanyId").description("댓글을 추가할 동행 게시물 id")
@@ -317,6 +342,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments", 404)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,ASC"))//sort cirteria: id, regDate
@@ -338,7 +366,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -365,7 +396,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("accompanyId").description("동행 게시물 id"),
@@ -406,7 +440,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -438,7 +475,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -470,7 +510,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(get("/api/accompanies/404/comments/{commentId}", accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -489,7 +532,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(get("/api/accompanies/{accompanyId}/comments/404", accompany.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -511,7 +557,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(get("/api/accompanies/{accompanyId}/comments/{commentId}", accompany2.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isConflict())
         ;
@@ -534,6 +583,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -596,7 +648,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -617,6 +672,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(accompanyComment)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -636,7 +694,10 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.put("/api/accompanies/{accompanyId}/comments/{commentId}", accompany.getId(), accompanyComment.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
         ;
@@ -660,6 +721,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isForbidden())
@@ -683,6 +747,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -707,6 +774,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -732,6 +802,9 @@ class AccompanyCommentControllerTest extends AccompanyBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(accompanyCommentDto)))
                 .andDo(print())
                 .andExpect(status().isConflict())

@@ -13,6 +13,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
@@ -41,7 +42,7 @@ public class AccompanyChildComment {
     private String comment;
 
     @Column(nullable = false)
-    private LocalDateTime regDate;
+    private ZonedDateTime regDate;
 
 
 

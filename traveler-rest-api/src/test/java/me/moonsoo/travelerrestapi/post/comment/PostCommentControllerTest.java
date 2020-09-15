@@ -52,6 +52,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
@@ -115,7 +118,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/comments", post.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -137,6 +143,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -159,6 +168,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -180,6 +192,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.post("/api/posts/{postId}/comments", post.getId())
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
@@ -201,6 +216,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -225,6 +243,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments", post.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,ASC"))
@@ -249,7 +270,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("postId").description("댓글을 추가할 post 게시물 id")
@@ -296,6 +320,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments", post.getId())
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .param("page", "1")
                 .param("size", "10")
                 .param("sort", "id,ASC"))
@@ -326,7 +353,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments", 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -346,7 +376,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -373,7 +406,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
-                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입")
+                                headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
+                                headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+                                headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+                                headerWithName("X-Forwarded-Port").description("서버의 포트 번호")
                         ),
                         pathParameters(
                                 parameterWithName("postId").description("post 게시물 id"),
@@ -413,7 +449,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -444,7 +483,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
         PostComment postComment = createPostComment(0, account, post);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId())
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -477,7 +519,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", 404, postComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -496,7 +541,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", post.getId(), 404)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -517,7 +565,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/posts/{postId}/comments/{commentId}", post2.getId(), postComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isConflict())
         ;
@@ -540,6 +591,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -600,7 +654,10 @@ class PostCommentControllerTest extends PostBaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON))
+                .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -623,6 +680,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -646,6 +706,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -668,6 +731,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.put("/api/posts/{postId}/comments/{commentId}", post.getId(), postComment.getId())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
@@ -692,6 +758,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isForbidden())
@@ -715,6 +784,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -737,6 +809,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -761,6 +836,9 @@ class PostCommentControllerTest extends PostBaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaTypes.HAL_JSON)
+                .header("X-Forwarded-Proto", proto)
+                .header("X-Forwarded-Host", host)
+                .header("X-Forwarded-Port", port)
                 .content(objectMapper.writeValueAsString(postCommentDto)))
                 .andDo(print())
                 .andExpect(status().isConflict())

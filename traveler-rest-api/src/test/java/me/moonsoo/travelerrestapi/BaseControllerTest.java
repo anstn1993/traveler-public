@@ -59,6 +59,10 @@ public class BaseControllerTest {
 
     protected Account account;
 
+    protected static final String proto = "http";
+    protected static final String host = "13.209.207.163";
+    protected static final String port = "8080";
+
     //페이징 링크 조각
     protected final LinksSnippet pagingLinks = links(
             linkWithRel("first").description("첫 번째 페이지 리소스 요청 url"),
@@ -71,7 +75,10 @@ public class BaseControllerTest {
     protected final RequestHeadersSnippet requestHeaders = requestHeaders(
             headerWithName(HttpHeaders.ACCEPT).description("응답 본문으로 받기를 원하는 컨텐츠 타입"),
             headerWithName(HttpHeaders.CONTENT_TYPE).description("요청 본문의 컨텐츠 타입"),
-            headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"));
+            headerWithName(HttpHeaders.AUTHORIZATION).description("oauth2 access token"),
+            headerWithName("X-Forwarded-Proto").description("서버의 프로토콜"),
+            headerWithName("X-Forwarded-Host").description("서버의 호스트 주소"),
+            headerWithName("X-Forwarded-Port").description("서버의 포트 번호"));
 
     protected final ResponseHeadersSnippet responseHeaders = responseHeaders(
             headerWithName(HttpHeaders.CONTENT_TYPE).description("응답 본문의 컨텐츠 타입"));
