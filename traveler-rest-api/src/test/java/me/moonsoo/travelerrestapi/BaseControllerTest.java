@@ -21,7 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
@@ -30,7 +30,6 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest
@@ -102,7 +101,7 @@ public class BaseControllerTest {
                 .introduce("It's me!")
                 .emailAuth(true)
                 .profileImageUri(null)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .authCode("authcode")
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))

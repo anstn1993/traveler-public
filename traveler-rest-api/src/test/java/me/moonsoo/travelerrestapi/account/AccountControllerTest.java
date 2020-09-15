@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -1263,7 +1264,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .nickname("user")
                 .sex(Sex.MALE)
                 //허용되지 않은 값들
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .authCode("adfaef")
                 .emailAuth(true)
                 .id(3000)
@@ -1307,7 +1308,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .nickname("user" + index)
                 .emailAuth(false)
                 .profileImageUri(null)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .authCode("authcode")
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))
@@ -1342,7 +1343,7 @@ class AccountControllerTest extends BaseControllerTest {
                 .nickname("user" + index)
                 .emailAuth(true)
                 .profileImageUri(null)
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .authCode(passwordEncoder.encode("authcode"))
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))

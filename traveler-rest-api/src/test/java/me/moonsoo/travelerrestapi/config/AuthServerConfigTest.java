@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -60,7 +61,7 @@ class AuthServerConfigTest extends BaseControllerTest {
                 .nickname("만수")
                 .emailAuth(true)
                 .authCode("authcode")
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))
                 .build();
