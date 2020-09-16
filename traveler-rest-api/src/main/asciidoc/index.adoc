@@ -92,7 +92,7 @@
 
 `GET` 요청을 사용하여 인덱스에 접근할 수 있다.
 
-operation::index[snippets='response-body,http-response,links']
+operation::index[snippets='curl-request,http-request,response-body,http-response,links']
 
 [[resources-account]]
 == 사용자 리소스
