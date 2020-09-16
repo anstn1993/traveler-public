@@ -91,8 +91,8 @@ public class FollowController {
         headers.setAccept(List.of(MediaTypes.HAL_JSON));
         HttpEntity request = new HttpEntity(headers);
         ResponseEntity<Object> followingListResponse = oAuth2RestTemplate.getForEntity(getFollowingListUri, Object.class);
-        CustomDeserializer<AccountModel> customDeserializer = new CustomDeserializer<>();
-        CustomPagedModel<AccountModel> followingList = customDeserializer.deseriazizePagedModel(followingListResponse.getBody(), "accountList", AccountModel.class);
+        CustomDeserializer<AccountModel> customDeserializer = new CustomDeserializer<>(AccountModel.class, "accountList", followingListResponse.getBody());
+        CustomPagedModel<AccountModel> followingList = customDeserializer.deseriazizePagedModel();
         return followingList;
     }
 
@@ -106,8 +106,8 @@ public class FollowController {
         headers.setAccept(List.of(MediaTypes.HAL_JSON));
         HttpEntity request = new HttpEntity(headers);
         ResponseEntity<Object> followerListResponse = oAuth2RestTemplate.getForEntity(getFollowerListUri, Object.class);
-        CustomDeserializer<AccountModel> customDeserializer = new CustomDeserializer<>();
-        CustomPagedModel<AccountModel> followerList = customDeserializer.deseriazizePagedModel(followerListResponse.getBody(), "accountList", AccountModel.class);
+        CustomDeserializer<AccountModel> customDeserializer = new CustomDeserializer<>(AccountModel.class, "accountList", followerListResponse.getBody());
+        CustomPagedModel<AccountModel> followerList = customDeserializer.deseriazizePagedModel();
         return followerList;
     }
 }

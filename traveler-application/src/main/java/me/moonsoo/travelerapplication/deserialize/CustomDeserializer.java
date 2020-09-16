@@ -11,8 +11,13 @@ import java.util.List;
 //rest api서버로부터 받은 리소스들을 deserialize하는 역할을 담당한다.
 @AllArgsConstructor
 public class CustomDeserializer<T> {
+
+    private Class type;
+    private String contentFieldName;
+    private Object responseBody;
+
     //리소스 목록들의 정보에 대한 deserialize수행
-    public CustomPagedModel<T> deseriazizePagedModel(Object responseBody, String contentFieldName, Class type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
+    public CustomPagedModel<T> deseriazizePagedModel() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
         CustomPagedModel<T> customPagedModel = new CustomPagedModel<>();
         customPagedModel.setContent(new ArrayList<>());
         customPagedModel.setLinks(new ArrayList<>());
@@ -20,7 +25,7 @@ public class CustomDeserializer<T> {
         LinkedHashMap<String, LinkedHashMap> body = (LinkedHashMap<String, LinkedHashMap>) responseBody;
         ArrayList<LinkedHashMap<Integer, T>> contentList = body.get("_embedded") == null ? null : (ArrayList<LinkedHashMap<Integer, T>>) body.get("_embedded").get(contentFieldName);
         if (contentList != null) {
-            deserializeResourceList(type, customPagedModel, contentList);//리소스 리스트 deserialize
+            deserializeResourceList(customPagedModel, contentList);//리소스 리스트 deserialize
         }
 
         LinkedHashMap<String, LinkedHashMap> links = (LinkedHashMap<String, LinkedHashMap>) body.get("_links");
@@ -45,7 +50,7 @@ public class CustomDeserializer<T> {
         }
     }
 
-    private void deserializeResourceList(Class type, CustomPagedModel<T> customPagedModel, ArrayList<LinkedHashMap<Integer, T>> contentList) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
+    private void deserializeResourceList(CustomPagedModel<T> customPagedModel, ArrayList<LinkedHashMap<Integer, T>> contentList) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
         //리소스 리스트 반복
         for (LinkedHashMap content : contentList) {
             Object resource = type.getDeclaredConstructor().newInstance();//리소스 모델 객체 생성
