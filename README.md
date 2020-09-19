@@ -11,4 +11,4 @@ Traveler project
 # 프로젝트 구조
 
 # 데이터베이스 스키마
-![database schema] ()
+![database schema] (https://github.com/anstn1993/traveler-public/blob/master/traveler.png)
