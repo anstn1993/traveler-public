@@ -35,4 +35,23 @@ post_comment | 여행 게시물의 댓글 테이블
 post_child_comment | 여행 게시물 댓글의 대댓글 테이블
 follow | 사용자 팔로우/팔로잉 테이블
 
+# 기술 스택
+언어: java, javascript, html(thymeleaf), css
+IDE: IntelliJ
+서버 호스팅: aws ec2(ubuntu)
+웹 서버: tomcat
+프록시 서버: nginx
+스토리지: aws s3
+데이터베이스: MySQL
+프레임워크: spring boot, spring jpa, spring security, spring hateoas, spring rest docs
+라이브러리: [query dsl](http://www.querydsl.com/), lombok, spring mail, [green mail](https://greenmail-mail-test.github.io/greenmail/), [s3 mock](https://github.com/findify/s3mock) ...
 
+# 세부 모듈 소개
+
+## traveler oauth2 server
+
+rest api에 접근하기 위한 클라이언트 oauth2 인증 서버입니다. 
+
+'''
+/
+'''
