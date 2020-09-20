@@ -20,4 +20,19 @@ application서버는 rest api의 클라이언트로서 db에 직접 접근하지
 
 Table | Description
 ----- | -----------
-account | 사용자 정보 
+account | 사용자 정보 테이블
+accompany | 동행 게시물 테이블
+accompany_comment | 동행 게시물 댓글 테이블
+accompany_child_comment | 동행 게시물 댓글의 대댓글 테이블
+schedule | 일정 게시물 테이블
+schedule_location | 일정 게시물에 등록되는 위치 테이블
+schedule_detail | 일정 게시물에 등록되는 위치에서의 상세 일정 테이블
+post | 여행 게시물 테이블
+post_image | 여행 게시물에 업로드되는 이미지 테이블
+post_like | 여행 게시물의 좋아요 테이블
+post_tag | 여행 게시물의 태그 테이블
+post_comment | 여행 게시물의 댓글 테이블
+post_child_comment | 여행 게시물 댓글의 대댓글 테이블
+follow | 사용자 팔로우/팔로잉 테이블
+
+
