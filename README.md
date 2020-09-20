@@ -19,4 +19,5 @@ application서버는 rest api의 클라이언트로서 db에 직접 접근하지
 ![database schema](https://github.com/anstn1993/traveler-public/blob/master/traveler.png?raw=true)
 
 Table | Description
+----- | -----------
 account | 사용자 정보 
