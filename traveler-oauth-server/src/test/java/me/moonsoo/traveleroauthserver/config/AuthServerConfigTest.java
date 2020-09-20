@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -47,7 +48,7 @@ class AuthServerConfigTest extends BaseControllerTest {
                 .emailAuth(true)
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
 
         accountService.saveAccount(account);

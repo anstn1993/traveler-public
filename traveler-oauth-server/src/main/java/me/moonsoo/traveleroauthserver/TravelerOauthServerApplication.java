@@ -11,6 +11,7 @@ public class TravelerOauthServerApplication {
     //실제 서비스시의 프로퍼티
     public static final String properties =
             "spring.config.location=" +
+                    "classpath:datasource.properties" +
                     "classpath:application.properties";
 
     //테스트 프로파일 시의 프로퍼티

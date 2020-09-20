@@ -7,10 +7,11 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.Set;
 
-@Component
+
 public class AppRunner implements ApplicationRunner {
 
     @Autowired
@@ -31,7 +32,7 @@ public class AppRunner implements ApplicationRunner {
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.USER))
                 .authCode("salkdjflakf")
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
 
         Account admin = Account.builder()
@@ -44,7 +45,7 @@ public class AppRunner implements ApplicationRunner {
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.ADMIN))
                 .authCode("salkdjflakf")
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
 
         Optional<Account> userOpt = accountRepository.findByEmail(user.getEmail());

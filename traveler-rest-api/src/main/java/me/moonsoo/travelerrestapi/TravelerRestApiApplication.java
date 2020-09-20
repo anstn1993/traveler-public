@@ -24,7 +24,6 @@ import javax.persistence.PersistenceContext;
 @SpringBootApplication(scanBasePackages = {"me.moonsoo.commonmodule", "me.moonsoo.travelerrestapi"})
 public class TravelerRestApiApplication {
 
-
     //실제 서비스시의 프로퍼티
     public static final String properties =
             "spring.config.location=" +

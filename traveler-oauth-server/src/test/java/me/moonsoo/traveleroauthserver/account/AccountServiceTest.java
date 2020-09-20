@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +50,7 @@ class AccountServiceTest extends BaseControllerTest {
                 .emailAuth(true)
                 .sex(Sex.MALE)
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
-                .regDate(LocalDateTime.now())
+                .regDate(ZonedDateTime.now())
                 .build();
 
         accountService.saveAccount(account);
