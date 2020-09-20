@@ -9,6 +9,7 @@ Traveler project
 3. application: 실제 웹 서비스 모듈로 rest api와 연동되어 동작하는 클라이언트
 
 # 프로젝트 구조
+![project structure](https://github.com/anstn1993/traveler-public/blob/master/project-structure.PNG?raw=true)
 
 # 데이터베이스 스키마
 ![database schema](https://github.com/anstn1993/traveler-public/blob/master/traveler.png?raw=true)
