@@ -81,7 +81,7 @@ password
 ----WebKitFormBoundary7MA4YWxkTrZu0gW
 ```
 
-응답 본문은 다음과 같이 오게 됩니다.
+응답 본문은 아래와 같이 오게 됩니다.
 
 ```
 {
@@ -92,3 +92,16 @@ password
     "scope": "read write"
 }
 ```
+
+access_token 필드의 값을 rest api 요청시 Authorization 헤더에 담아서 보낼 수 있습니다. rest api 요청 메소드에 따라 access token의 필요 여부가 달라집니다.
+
+실제 요청을 테스트해보고 싶으시다면 username은 'testuser'로, password는 '11111111'로 설정하셔서 요청하시면 됩니다.
+
+
+## traveler rest api
+
+여행자 커뮤니티 rest api 입니다. 모든 응답 본문에 현재 리소스에서 전이할 수 있는 상태 링크를 제공하여 hateoas를 만족하도록 구성하였습니다. 더불어 profile 링크를 제공하여 api 문서에 접근할 수 있도록 하여 self-descriptive를 만족하도록 구성했습니다. 
+
+api에 대한 자세한 명세는 하단의 링크를 참조해주세요. 
+
+[rest api 문서](http://13.209.207.163/docs/index.html)
