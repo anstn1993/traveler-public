@@ -100,7 +100,7 @@ access_token 필드의 값을 rest api 요청시 Authorization 헤더에 담아�
 
 ## traveler rest api
 
-여행자 커뮤니티 rest api 입니다. 모든 응답 본문에 현재 리소스에서 전이할 수 있는 상태 링크를 제공하여 hateoas를 만족하도록 구성하였습니다. 더불어 profile 링크를 제공하여 api 문서에 접근할 수 있도록 하여 self-descriptive를 만족하도록 구성했습니다. 
+여행자 커뮤니티 rest api 입니다. 모든 응답 본문에 현재 리소스에서 전이할 수 있는 상태 링크를 제공하여 hateoas를 만족하도록 구성하였습니다. 더불어 profile 링크를 제공해 api 문서에 접근할 수 있도록 하여 self-descriptive를 만족하도록 구성했습니다. 
 
 api에 대한 자세한 명세는 하단의 링크를 참조해주세요. 
 
