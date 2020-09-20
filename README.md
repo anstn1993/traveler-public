@@ -59,8 +59,36 @@ IDE: IntelliJ
 
 ## traveler oauth2 server
 
-rest api에 접근하기 위한 클라이언트 oauth2 인증 서버입니다. 
+rest api에 접근하기 위한 클라이언트 oauth2 인증 서버입니다. oauth2 인증을 통해 토큰 발급을 발급받을 수 있습니다. 토큰은 아래와 같은 요청을 통해서 받을 수 있습니다. 
 
 ```
-/oauth/token
+POST /oauth/token? HTTP/1.1
+Host: 13.209.207.163
+Authorization: Basic dHJhdmVsZXI6cGFzcw==Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="username"
+
+testuser
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="password"
+
+11111111
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="grant_type"
+
+password
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+```
+
+응답 본문은 다음과 같이 오게 됩니다.
+
+```
+{
+    "access_token": "ef53b262-e9fb-442a-891e-646b3f6429a3",
+    "token_type": "bearer",
+    "refresh_token": "ad244fb6-3269-44d5-8147-3b12c38c9ac6",
+    "expires_in": 7199,
+    "scope": "read write"
+}
 ```
